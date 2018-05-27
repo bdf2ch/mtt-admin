@@ -1,0 +1,12 @@
+<el-dialog [visible]="true" [before-close]="handle">
+<ng-template #title>
+  <span>Новый сотрудник</span>
+</ng-template>
+<div class="container-fluid">
+  content
+</div>
+<ng-template #footer>
+  <el-button type="success" (click)="card.toggle2 = false">Добавить</el-button>
+  <el-button type="danger" (click)="card.toggle2 = false">Отмена</el-button>
+</ng-template>
+</el-dialog>

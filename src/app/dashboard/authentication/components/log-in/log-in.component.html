@@ -1,0 +1,50 @@
+<div class="log-in-wrapper container-fluid h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-4">
+
+      <!-- Start: User authentication form -->
+      <el-card class="log-in-container">
+        <ng-template #header>
+          <div class="clearfix">
+            <span class="h6">Авторизация</span>
+          </div>
+        </ng-template>
+        <el-form [formGroup]="loginForm"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+              <!-- Start: E-mail -->
+              <el-form-item class="mb-0"
+                            label="E-mail"
+                            el-class="auth-form-item"
+                            [required]="true"
+                            [status]="statusCtrl('email')"
+                            [error]="messageCtrl('email')">
+                <el-input native-type="text" formControlName="email" [(model)]="loginData.email"></el-input>
+              </el-form-item>
+              <!-- End: E-mail -->
+
+
+              <!-- Start: Password -->
+              <el-form-item label="Пароль"
+                            [required]="true"
+                            [status]="statusCtrl('password')"
+                            [error]="messageCtrl('password')">
+                <el-input native-type="password" formControlName="password" [(model)]="loginData.password"></el-input>
+              </el-form-item>
+          <!-- End: Password -->
+
+
+
+          <el-form-item class="d-flex justify-content-end">
+            <el-button type="primary" (click)="submit()" [loading]="false">&nbsp; Войти</el-button>
+          </el-form-item>
+
+
+        </el-form>
+      </el-card>
+      <!-- End: user authentication form -->
+
+    </div>
+  </div>
+</div>

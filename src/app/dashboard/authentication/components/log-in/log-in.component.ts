@@ -24,7 +24,10 @@ export class LogInComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    const user = this.authenticationService.check();
+    console.log('user', user);
+  }
 
 
   statusCtrl(item: string): string {

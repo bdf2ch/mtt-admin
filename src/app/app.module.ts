@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ResourceModule } from '@ngx-resource/handler-ngx-http';
 import { ElModule } from 'element-angular';
 import { AuthenticationModule } from './dashboard/authentication/authentication.module';
+import { UserSessionGuard } from './shared/guards/user-session.guard';
 import { UsersModule } from './dashboard/users/users.module';
 
 import { AppComponent } from './app.component';
@@ -16,18 +17,24 @@ import { LogInComponent } from './dashboard/authentication/components/log-in/log
 
 const routes: Routes = [
   {
-    path: 'auth',
-    component: LogInComponent
+    path: '',
+    component: DashboardComponent,
+    canActivate: [UserSessionGuard]
   },
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [UserSessionGuard],
     children: [
       {
         path: 'users',
         component: UserListComponent
       }
     ]
+  },
+  {
+    path: 'auth',
+    component: LogInComponent
   }
 ];
 
@@ -51,7 +58,9 @@ const routes: Routes = [
     ElModule,
     AuthenticationModule
   ],
-  providers: [],
+  providers: [
+    UserSessionGuard
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

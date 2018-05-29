@@ -23,10 +23,15 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles/styles.less",
-              "node_modules/element-angular/theme/index.css",
-              "node_modules/bootstrap/dist/css/bootstrap.css"
+              "src/styles/styles.scss",
+              "node_modules/element-angular/theme/index.css"
+              //"node_modules/bootstrap/scss/bootstrap.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules/bootstrap/scss"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
@@ -74,7 +79,8 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles/styles.less"
+              "src/styles/styles.scss",
+              "node_modules/bootstrap/scss/bootstrap.scss"
             ],
             "scripts": [],
             "assets": [
@@ -123,7 +129,7 @@
   "defaultProject": "mtt-admin",
   "schematics": {
     "@schematics/angular:component": {
-      "styleext": "less"
+      "styleext": "scss"
     }
   }
 }

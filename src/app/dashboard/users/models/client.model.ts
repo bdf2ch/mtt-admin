@@ -3,6 +3,7 @@ import { ICompany } from '../../companies/interfaces/company.interface';
 import { IRole } from '../interfaces/role.interface';
 import { User } from './user.model';
 import { Company } from '../../companies/models/company.model';
+import { IClientDTO } from '../dto/client.dto';
 
 /**
  * Класс, реализующий интерфейс клиента
@@ -22,7 +23,7 @@ export class Client extends User implements IClient {
    * Конструктор
    * @param {IClient} config - Параметры инициализации
    */
-  constructor(config?: IClient) {
+  constructor(config?: IClientDTO) {
     super(config ? config : null);
     this.company = config ? new Company(config.company) : new Company();
   }

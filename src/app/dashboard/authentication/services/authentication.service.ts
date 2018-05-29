@@ -4,6 +4,7 @@ import { IUser } from '../../users/interfaces/user.interface';
 import { ILogIn } from '../interfaces/log-in.interface';
 import { User } from '../../users/models/user.model';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
+import {IUserDTO} from '../../users/dto/user.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,19 @@ import { IServerResponse } from '../../../shared/interfaces/server-response.inte
 export class AuthenticationService {
   private currentUser: User | null;
   private token: string;
+  private isAuthenticationInProgress: boolean;
 
   constructor(private readonly resource: AuthenticationResource) {
     this.currentUser = null;
+    this.isAuthenticationInProgress = false;
+  }
+
+  /**
+   * Выполняется ли процесс авторизации
+   * @returns {boolean}
+   */
+  isAuthenticating(): boolean {
+    return this.isAuthenticationInProgress;
   }
 
   /**
@@ -31,8 +42,9 @@ export class AuthenticationService {
   async check(): Promise<User | null> {
     try {
       if (window.localStorage && window.localStorage['api_token']) {
-        const result: IServerResponse<IUser> = await this.resource.check();
+        const result: IServerResponse<IUserDTO> = await this.resource.check();
         this.currentUser = result.data ? new User(result.data) : null;
+        console.log('current user', this.currentUser);
         return this.currentUser;
       }
     } catch (error) {
@@ -47,9 +59,10 @@ export class AuthenticationService {
    * @returns {Promise<User | null>}
    */
   async logIn(loginData: ILogIn): Promise<User | null> {
+    this.isAuthenticationInProgress = true;
     try {
-      const result: IServerResponse<IUser> = await this.resource.logIn(loginData);
-      console.log(result);
+      const result: IServerResponse<IUserDTO> = await this.resource.logIn(loginData);
+      this.isAuthenticationInProgress = false;
       if (result.data) {
         this.currentUser = new User(result.data);
         this.token = result.meta['api_token'];
@@ -60,6 +73,7 @@ export class AuthenticationService {
       }
     } catch (error) {
       console.error(error);
+      this.isAuthenticationInProgress = false;
       return null;
     }
   }
@@ -68,9 +82,12 @@ export class AuthenticationService {
    * Завершение текущей сессии
    * @returns {Promise<void>}
    */
-  async logout(): Promise<void> {
+  async logOut(): Promise<void> {
     try {
-      await this.resource.logOut();
+      if (window.localStorage && window.localStorage['api_token']) {
+        window.localStorage.removeItem('api_token');
+        this.currentUser = null;
+      }
     } catch (error) {
       console.error(error);
     }

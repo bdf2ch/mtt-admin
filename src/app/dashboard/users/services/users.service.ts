@@ -11,12 +11,13 @@ export class UsersService {
     this.users = [];
     this.users.push(new User({
       id: 0,
-      firstName: 'Иван',
-      secondName: 'Иванович',
-      lastName: 'Иванов',
+      first_name: 'Иван',
+      patronymic: 'Иванович',
+      last_name: 'Иванов',
       email: 'ivanov@testmail.ru',
       phone: '55-66-77',
-      password: 'test',
+      position: 'Директор',
+      //password: 'test',
       roles: []
     }));
   }

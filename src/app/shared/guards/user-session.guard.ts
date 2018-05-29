@@ -9,17 +9,19 @@ import { AuthenticationService } from '../../dashboard/authentication/services/a
 })
 export class UserSessionGuard implements CanActivate {
   constructor(private readonly router: Router,
-              private readonly authenticationService: AuthenticationService) {
-    console.log('resolve guard');
-  }
+              private readonly authenticationService: AuthenticationService) {}
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-    const result = this.authenticationService.check();
-    if (result) {
-      return true;
+    if (!this.authenticationService.getCurrentUser()) {
+      const result: User | null = await this.authenticationService.check();
+      if (result) {
+        return true;
+      } else {
+        this.router.navigate(['/auth']);
+        return false;
+      }
     } else {
-      this.router.navigate(['/auth']);
-      return false;
+      return true;
     }
   }
 }

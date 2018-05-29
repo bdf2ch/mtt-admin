@@ -4,6 +4,7 @@ import { ILogIn } from '../interfaces/log-in.interface';
 import { IUser } from '../../users/interfaces/user.interface';
 import { environment } from '../../../../environments/environment';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
+import {IUserDTO} from '../../users/dto/user.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,7 @@ export class AuthenticationResource extends Resource {
     method: ResourceRequestMethod.Get,
     withCredentials: true
   })
-  check: IResourceMethod<void, IServerResponse<IUser>>;
+  check: IResourceMethod<void, IServerResponse<IUserDTO>>;
 
   /**
    * Path: auth/login
@@ -40,16 +41,5 @@ export class AuthenticationResource extends Resource {
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
-  logIn: IResourceMethod<ILogIn, IServerResponse<IUser>>;
-
-  /**
-   * Path: auth/logout
-   * Method: POST
-   */
-  @ResourceAction({
-    path: 'logout',
-    method: ResourceRequestMethod.Post,
-    withCredentials: true
-  })
-  logOut: IResourceMethod<void, IServerResponse<void>>;
+  logIn: IResourceMethod<ILogIn, IServerResponse<IUserDTO>>;
 }

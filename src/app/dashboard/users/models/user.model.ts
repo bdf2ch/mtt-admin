@@ -1,5 +1,6 @@
 import { IUser } from '../interfaces/user.interface';
 import { IRole } from '../interfaces/role.interface';
+import {IUserDTO} from '../dto/user.dto';
 
 /**
  * Класс, реализующий интерфейс пользователя
@@ -13,19 +14,19 @@ export class User implements IUser {
   password: string;           // Пароль
   phone: string | null;       // Телефон
   roles: IRole[];             // Набор ролей
-  fio; string;                // ФИО
+  fio: string;                // ФИО
 
   /**
    * Конструктор
    * @param {IUser} config - Параметры инициализации
    */
-  constructor(config?: IUser) {
+  constructor(config?: IUserDTO) {
     this.id = config ? config.id : 0;
-    this.firstName = config ? config.firstName : '';
-    this.secondName = config ? config.secondName : '';
-    this.lastName = config ? config.lastName : '';
+    this.firstName = config ? config.first_name : '';
+    this.secondName = config ? config.patronymic : '';
+    this.lastName = config ? config.last_name : '';
     this.email = config ? config.email : '';
-    this.password = config ? config.password : '';
+    //this.password = config ? config.password : '';
     this.phone = config && config.phone ? config.phone : null;
     this.fio = `${this.firstName} ${this.secondName} ${this.lastName}`;
   }

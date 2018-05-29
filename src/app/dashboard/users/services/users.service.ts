@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import {User} from '../models/user.model';
+import { User } from '../models/user.model';
+import { UsersResource } from '../resources/users.resource';
+import {IUserDTO} from '../dto/user.dto';
+import {IServerResponse} from '../../../shared/interfaces/server-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -7,19 +10,8 @@ import {User} from '../models/user.model';
 export class UsersService {
   private users: User[];
 
-  constructor(public readonly usersService: UsersService) {
+  constructor(private readonly resource: UsersResource) {
     this.users = [];
-    this.users.push(new User({
-      id: 0,
-      first_name: 'Иван',
-      patronymic: 'Иванович',
-      last_name: 'Иванов',
-      email: 'ivanov@testmail.ru',
-      phone: '55-66-77',
-      position: 'Директор',
-      //password: 'test',
-      roles: []
-    }));
   }
 
   /**
@@ -28,6 +20,28 @@ export class UsersService {
    */
   getUserList(): User[] {
     return this.users;
+  }
+
+  /**
+   * Получение списка пользователей по идентификатору компании
+   * @param {number} companyId - Идентификатор компании
+   * @returns {Promise<User[]>}
+   */
+  async fetchUsersByCompanyId(companyId: number): Promise<User[]> {
+    try {
+      const result: IServerResponse<IUserDTO[]> = await this.resource.getUsersByCompanyId({companyId: companyId});
+      if (result.data) {
+        this.users = [];
+        result.data.forEach((item: IUserDTO) => {
+          const user = new User(item);
+          this.users.push(user);
+        });
+      }
+      return this.users;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   }
 
 }

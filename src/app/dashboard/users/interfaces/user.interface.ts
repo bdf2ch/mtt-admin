@@ -5,6 +5,7 @@ import { IRole } from './role.interface';
  */
 export interface IUser {
   id: number;             // Идентификатор
+  companyId: number;      // Идентификатор компании
   firstName: string;      // Имя
   secondName: string;     // Отество
   lastName: string;       // Фамилия

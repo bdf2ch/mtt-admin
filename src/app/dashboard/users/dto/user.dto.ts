@@ -3,7 +3,7 @@
  */
 export interface IUserDTO {
   id: number;             // Идентификатор
-  //company_id: number;     // Идентификатор компании
+  company_id: number;     // Идентификатор компании
   first_name: string;     // Имя
   patronymic: string;     // Отчество
   last_name: string;      // Фамилия

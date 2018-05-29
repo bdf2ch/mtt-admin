@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
+import { AuthenticationService } from '../../../authentication/services/authentication.service';
 
 @Component({
   selector: 'app-user-list',
@@ -9,16 +10,23 @@ import { UsersService } from '../../services/users.service';
 export class UserListComponent implements OnInit {
   addUserMode: boolean;
 
-  constructor(public readonly usersService: UsersService) {
+  constructor(private readonly authenticationService: AuthenticationService,
+              public readonly usersService: UsersService) {
     this.addUserMode = false;
   }
 
-  ngOnInit() {}
+  async ngOnInit() {}
 
+  /**
+   * Открфтие модальное окно добавления новго пользователя
+   */
   openAddUserDialog() {
     this.addUserMode = true;
   }
 
+  /**
+   * Закрытие модального окна добавления нового пользователя
+   */
   closeAddUserDialog() {
     console.log('emit recieved');
     this.addUserMode = false;

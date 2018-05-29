@@ -25,7 +25,6 @@
             "styles": [
               "src/styles/styles.scss",
               "node_modules/element-angular/theme/index.css"
-              //"node_modules/bootstrap/scss/bootstrap.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [

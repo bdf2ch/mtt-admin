@@ -14,21 +14,18 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserListComponent } from './dashboard/users/components/user-list/user-list.component';
 import { LogInComponent } from './dashboard/authentication/components/log-in/log-in.component';
+import { UserListGuard } from './dashboard/users/guards/user-list.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
-    canActivate: [UserSessionGuard]
-  },
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
     canActivate: [UserSessionGuard],
     children: [
       {
         path: 'users',
-        component: UserListComponent
+        component: UserListComponent,
+        resolve: [UserListGuard]
       }
     ]
   },

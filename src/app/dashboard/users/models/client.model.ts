@@ -1,8 +1,8 @@
 import { IClient } from '../interfaces/client.interface';
-import { ICompany } from '../../companies/interfaces/company.interface';
+import { ICompany } from '../../company/interfaces/company.interface';
 import { IRole } from '../interfaces/role.interface';
 import { User } from './user.model';
-import { Company } from '../../companies/models/company.model';
+import { Company } from '../../company/models/company.model';
 import { IClientDTO } from '../dto/client.dto';
 
 /**

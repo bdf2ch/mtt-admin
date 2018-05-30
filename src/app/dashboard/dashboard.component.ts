@@ -18,7 +18,10 @@ export class DashboardComponent implements OnInit {
   onMenuChange(index: string): void {
     console.log(index);
     switch (index) {
-      case '6-1':
+      case 'company':
+        this.router.navigate(['company']);
+        break;
+      case 'log-out':
         this.logOut();
         break;
     }

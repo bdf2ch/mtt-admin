@@ -6,7 +6,7 @@ export interface ICompanyDTO {
   name: string;                   // Наименование
   site: string | null;            // Сайт
   phone: string | null;           // Телефон
-  r_keeper_config: any | null;    // Конфигурация R-Keeper
+  r_keeper_config?: any | null;    // Конфигурация R-Keeper
   paymentRequisites?: {           // Платежные реквизиты
     data: any[];
   };

@@ -8,6 +8,7 @@ import { AuthenticationService } from './authentication/services/authentication.
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
+  selectedMenu: string;
 
   constructor (private readonly router: Router,
                public readonly authenticationService: AuthenticationService) {}
@@ -19,7 +20,14 @@ export class DashboardComponent implements OnInit {
     console.log(index);
     switch (index) {
       case 'company':
-        this.router.navigate(['company']);
+        this.router.navigate(['company']).then(() => {
+          this.selectedMenu = 'company';
+        });
+        break;
+      case 'users':
+        this.router.navigate(['users']).then(() => {
+          this.selectedMenu = 'users';
+        });
         break;
       case 'log-out':
         this.logOut();

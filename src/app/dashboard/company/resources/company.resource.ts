@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { IResourceMethodStrict, Resource, ResourceAction, ResourceHandler, ResourceParams, ResourceRequestMethod } from '@ngx-resource/core';
+import {
+  IResourceMethod,
+  IResourceMethodStrict,
+  Resource,
+  ResourceAction,
+  ResourceHandler,
+  ResourceParams,
+  ResourceRequestMethod
+} from '@ngx-resource/core';
 import { environment } from '../../../../environments/environment';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { ICompanyDTO } from '../dto/company.dto';
@@ -25,4 +33,10 @@ export class CompanyResource extends Resource {
     method: ResourceRequestMethod.Get
   })
   getCompanyById: IResourceMethodStrict<void, {withPaymentRequisites: any}, {id: number}, IServerResponse<ICompanyDTO>>;
+
+  @ResourceAction({
+    path: '/{!id}',
+    method: ResourceRequestMethod.Patch
+  })
+  editCompanyById: IResourceMethodStrict<ICompanyDTO, void, {id: number}, IServerResponse<ICompanyDTO>>;
 }

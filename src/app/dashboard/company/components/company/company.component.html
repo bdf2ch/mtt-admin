@@ -3,7 +3,7 @@
     <div class="col-6 p-4 d-flex flex-column align-items-center border-right">
       <h3 class="mb-4 align-self-start">О компании</h3>
 
-      <table class="table table-sm w-75 mt-4">
+      <table class="table table-sm mt-4">
         <tbody>
         <tr>
           <th scope="row">Наименование</th>
@@ -36,38 +36,124 @@
     </div>
     <div class="col-6 p-4">
       <h3 class="mb-4">Платежные реквизиты</h3>
+
+      <div *ngIf="companyService.getCompany().paymentRequisites.length === 0">
+        <h4 class="text-muted text-center mt-4 pt-4">Реквизиты отсутствуют</h4>
+      </div>
+      <div class="text-right pt-4">
+        <el-button type="primary" icon="plus" (click)="openAddPaymentRequisitesDialog()">&nbsp; Добавить реквизиты</el-button>
+      </div>
     </div>
   </div>
 </div>
 
 
 
+<!-- Start: Edit company dialog -->
+<el-dialog [(visible)]="isInEditCompanyMode" [width]="'450px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение данных о компании</span>
+  </ng-template>
 
-<el-dialog [title]="'Изменение данных о компании'" [(visible)]="isInEditCompanyMode">
-  <el-form [formGroup]="editCompanyForm" label-width="150px" size="small"
-           [show-icon]="true" [show-message]="true">
+  <el-form [formGroup]="editCompanyForm"
+           label-width="130px"
+           [label-position]="'left'"
+           size="small"
+           [show-icon]="true"
+           [show-message]="true">
 
-    <el-form-item label="Наименование" [required]="true"
-                  [status]="statusCtrl('title')" [error]="messageCtrl('title')">
-      <el-input formControlName="title"></el-input>
+    <el-form-item label="Наименование"
+                  [required]="true"
+                  [status]="editCompanyFormStatusCtrl('title')"
+                  [error]="editCompanyFormMessageCtrl('title')">
+      <el-input formControlName="title" [(model)]="companyData.name"></el-input>
     </el-form-item>
 
-    <el-form-item label="Телефон" [required]="true"
-                  [status]="statusCtrl('phone')" [error]="messageCtrl('phone')">
-      <el-input formControlName="phone"></el-input>
+    <el-form-item label="Телефон"
+                  [status]="editCompanyFormStatusCtrl('phone')"
+                  [error]="editCompanyFormMessageCtrl('phone')">
+      <el-input formControlName="phone" [(model)]="companyData.phone"></el-input>
     </el-form-item>
 
-    <el-form-item label="Сайт" [required]="true"
-                  [status]="statusCtrl('www')" [error]="messageCtrl('www')">
-      <el-input formControlName="www"></el-input>
+    <el-form-item label="Сайт"
+                  [status]="editCompanyFormStatusCtrl('www')"
+                  [error]="editCompanyFormMessageCtrl('www')">
+      <el-input formControlName="www" [(model)]="companyData.site"></el-input>
     </el-form-item>
 
     <el-form-item>
-      <div class="text-right">
-        <el-button type="success" (click)="submit()">Сохранить</el-button>
-        <el-button type="danger" (click)="cancel()">Отмена</el-button>
+      <div class="">
+        <el-button type="success"
+                   icon="check"
+                   [elDisabled]="editCompanyForm.invalid || editCompanyForm.pristine"
+                   [loading]="companyService.editingCompanyInProgress()"
+                   (click)="editCompany()">
+          &nbsp; Сохранить
+        </el-button>
+        <el-button type="danger"
+                   icon="close"
+                   (click)="closeEditCompanyDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </el-form-item>
 
   </el-form>
 </el-dialog>
+<!-- End: Edit company dialog -->
+
+
+<!-- Start: Add payment requisites dialog -->
+<el-dialog [(visible)]="isInAddPaymentRequisitesMode" [width]="'450px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление платежных реквизитов</span>
+  </ng-template>
+
+  <el-form [formGroup]="editCompanyForm"
+           label-width="130px"
+           [label-position]="'left'"
+           size="small"
+           [show-icon]="true"
+           [show-message]="true">
+
+    <el-form-item label="Наименование"
+                  [required]="true"
+                  [status]="addPaymentRequisitesFormStatusCtrl('title')"
+                  [error]="addPaymentRequisitesFormMessageCtrl('title')">
+      <el-input formControlName="title" [(model)]="companyData.name"></el-input>
+    </el-form-item>
+
+    <el-form-item label="Телефон"
+                  [status]="addPaymentRequisitesFormStatusCtrl('phone')"
+                  [error]="addPaymentRequisitesFormMessageCtrl('phone')">
+      <el-input formControlName="phone" [(model)]="companyData.phone"></el-input>
+    </el-form-item>
+
+    <el-form-item label="Сайт"
+                  [status]="addPaymentRequisitesFormStatusCtrl('www')"
+                  [error]="addPaymentRequisitesFormMessageCtrl('www')">
+      <el-input formControlName="www" [(model)]="companyData.site"></el-input>
+    </el-form-item>
+
+    <el-form-item>
+      <div class="">
+        <el-button type="success"
+                   icon="check"
+                   [elDisabled]="editCompanyForm.invalid || editCompanyForm.pristine"
+                   [loading]="companyService.editingCompanyInProgress()"
+                   (click)="submit()">
+          &nbsp; Сохранить
+        </el-button>
+        <el-button type="danger"
+                   icon="close"
+                   (click)="closeEditCompanyDialog()">
+          &nbsp; Отмена
+        </el-button>
+      </div>
+    </el-form-item>
+
+  </el-form>
+</el-dialog>
+<!-- End: Add payment requisites dialog -->

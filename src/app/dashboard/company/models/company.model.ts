@@ -4,6 +4,7 @@ import { IPaymentRequisites } from '../interfaces/payment-requisites.interface';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { PaymentRequisites } from './payment-requisites.model';
 import { ICompanyDTO } from '../dto/company.dto';
+import {IPaymentRequisitesDTO} from '../dto/payment-requisites.dto';
 
 /**
  * Класс, реализующий интерфейс компании
@@ -31,7 +32,7 @@ export class Company implements ICompany {
     this.paymentRequisites = [];
 
     if (config && config.paymentRequisites) {
-      config.paymentRequisites.data.forEach((item: IPaymentRequisites) => {
+      config.paymentRequisites.data.forEach((item: IPaymentRequisitesDTO) => {
         const paymentRequisites = new PaymentRequisites(item);
         this.paymentRequisites.push(paymentRequisites);
       });

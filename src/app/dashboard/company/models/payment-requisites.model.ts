@@ -1,4 +1,5 @@
 import { IPaymentRequisites } from '../interfaces/payment-requisites.interface';
+import {IPaymentRequisitesDTO} from '../dto/payment-requisites.dto';
 
 /**
  * Класс, реализующий интерфейс платежных реквизитов
@@ -19,16 +20,16 @@ export class PaymentRequisites implements IPaymentRequisites {
    * Конструктор
    * @param {IPaymentRequisites} config - Параметры инициализации
    */
-  constructor(config?: IPaymentRequisites) {
+  constructor(config?: IPaymentRequisitesDTO) {
     this.id = config ? config.id : 0;
-    this.businessTitle = config ? config.businessTitle : '';
-    this.INN = config ? config.INN : '';
-    this.KPP = config ? config.KPP : '';
-    this.businessAddress = config ? config.businessAddress : '';
-    this.address = config ? config.address : '';
-    this.bankTitle = config ? config.bankTitle : '';
-    this.account = config ? config.account : '';
-    this.correspondingAccount = config ? config.correspondingAccount : '';
-    this.BIK = config ? config.BIK : '';
+    this.businessTitle = config ? config.name : '';
+    this.INN = config ? config.inn : '';
+    this.KPP = config ? config.kpp : '';
+    this.businessAddress = config ? config.legal_address : '';
+    this.address = config ? config.actual_address : '';
+    this.bankTitle = config ? config.bank_name : '';
+    this.account = config ? config.checking_account : '';
+    this.correspondingAccount = config ? config.correspondent_account : '';
+    this.BIK = config ? config.bik : '';
   }
 }

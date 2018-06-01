@@ -10,6 +10,7 @@ import { AuthenticationModule } from './dashboard/authentication/authentication.
 import { UserSessionGuard } from './shared/guards/user-session.guard';
 import { UsersModule } from './dashboard/users/users.module';
 import { CompanyModule } from './dashboard/company/company.module';
+import { RestaurantsModule} from './dashboard/restaurants/restaurants.module';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -18,6 +19,8 @@ import { LogInComponent } from './dashboard/authentication/components/log-in/log
 import { UserListGuard } from './dashboard/users/guards/user-list.guard';
 import { CompanyComponent } from './dashboard/company/components/company/company.component';
 import { CompanyResolveGuard } from './dashboard/company/guards/company-resolve.guard';
+import { RestaurantListComponent } from './dashboard/restaurants/components/restaurant-list/restaurant-list.component';
+import { RestaurantsResolveGuard } from './dashboard/restaurants/guards/restaurants-resolve.guard';
 
 const routes: Routes = [
   {
@@ -29,6 +32,13 @@ const routes: Routes = [
         path: 'company',
         component: CompanyComponent,
         resolve: [CompanyResolveGuard]
+      },
+      {
+        path: 'restaurants',
+        component: RestaurantListComponent,
+        resolve: [
+          RestaurantsResolveGuard
+        ]
       },
       {
         path: 'users',
@@ -58,7 +68,8 @@ const routes: Routes = [
     ResourceModule.forRoot(),
     AuthenticationModule,
     UsersModule,
-    CompanyModule
+    CompanyModule,
+    RestaurantsModule
   ],
   exports: [
     ElModule,

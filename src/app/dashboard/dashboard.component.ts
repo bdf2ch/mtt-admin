@@ -24,6 +24,11 @@ export class DashboardComponent implements OnInit {
           this.selectedMenu = 'company';
         });
         break;
+      case 'restaurants':
+        this.router.navigate(['restaurants']).then(() => {
+          this.selectedMenu = 'restaurants';
+        });
+        break;
       case 'users':
         this.router.navigate(['users']).then(() => {
           this.selectedMenu = 'users';

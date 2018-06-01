@@ -7,7 +7,7 @@
 
   <div class="row pt-3">
     <div class="col-12">
-      <el-table [model]="usersService.getUserList()" [stripe]="true">
+      <el-table [model]="usersService.getUserList()" [stripe]="true" *ngIf="usersService.getUserList().length !== 0">
         <el-table-column model-key="fio" label="ФИО"></el-table-column>
         <!--<el-table-column model-key="date" label="Статус" width="140"></el-table-column>-->
         <el-table-column model-key="roles" label="Роль"></el-table-column>
@@ -21,6 +21,12 @@
           </ng-template>
         </el-table-column>
       </el-table>
+
+      <!-- Start: No users placeholder -->
+      <div *ngIf="usersService.getUserList().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Пользователи отсутствуют</p>
+      </div>
+      <!-- End: No users placeholder -->
     </div>
   </div>
 </div>

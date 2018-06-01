@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <el-button type="primary" icon="plus" (click)="openAddUserDialog()">&nbsp; Добавить ресторан</el-button>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <div class="col-12">
+      <el-table [model]="restaurantsService.getRestaurants()" [stripe]="true" *ngIf="restaurantsService.getRestaurants().length !== 0">
+        <el-table-column model-key="title" label="Наименование"></el-table-column>
+        <!--<el-table-column model-key="date" label="Статус" width="140"></el-table-column>-->
+        <el-table-column model-key="" label="Адрес"></el-table-column>
+        <el-table-column>
+          <ng-template #slot let-scope="scope">
+            <div class="text-right">
+              <el-button type="success" size="small" icon="edit" (click)="handle(scope)">&nbsp; Изменить</el-button>
+              <el-button type="danger" size="small" icon="delete" (click)="handle(scope)">&nbsp; Удалить</el-button>
+            </div>
+          </ng-template>
+        </el-table-column>
+      </el-table>
+
+      <!-- Start: No restaurants placeholder -->
+      <div *ngIf="restaurantsService.getRestaurants().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Рестораны отсутствуют</p>
+      </div>
+      <!-- End: No restaurants placeholder -->
+    </div>
+  </div>
+</div>

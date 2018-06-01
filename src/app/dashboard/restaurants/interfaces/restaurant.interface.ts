@@ -12,7 +12,7 @@ export interface IRestaurant {
   phone: string;              // Телефон
   www: string;                // Сайт
   rKeeperConfig: any;         // Конфигурация R-Keeper
-  address: IAddress;          // Адрес
-  timeTable: ITimeTable;      // Расписание работы
-  social: ISocialNetwork[];   // Набор социальных сетей
+  //address: IAddress;          // Адрес
+  //timeTable: ITimeTable;      // Расписание работы
+  //social: ISocialNetwork[];   // Набор социальных сетей
 }

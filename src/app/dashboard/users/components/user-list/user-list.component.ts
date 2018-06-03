@@ -15,7 +15,9 @@ export class UserListComponent implements OnInit {
     this.addUserMode = false;
   }
 
-  async ngOnInit() {}
+  async ngOnInit() {
+    console.log('/users');
+  }
 
   /**
    * Открфтие модальное окно добавления новго пользователя

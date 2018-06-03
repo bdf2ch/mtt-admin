@@ -1,7 +1,9 @@
 export interface IAddressDTO {
-  id: number;
-  restaurant_id: number;
+  id?: number;
   city: string;
   street: string;
   building_number: string;
+  latitude: number;
+  longitude: number;
+  comment?: string;
 }

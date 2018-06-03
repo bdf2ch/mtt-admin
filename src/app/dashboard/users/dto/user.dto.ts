@@ -10,5 +10,5 @@ export interface IUserDTO {
   position: string;       // Должность
   email: string;          // E-mail
   phone: string;          // Телефон
-  roles: any[];           // Роли пользователя
+  roles?: any[];          // Роли пользователя
 }

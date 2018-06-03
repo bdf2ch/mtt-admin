@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { IResourceMethod, Resource, ResourceAction, ResourceHandler, ResourceParams, ResourceRequestMethod } from '@ngx-resource/core';
+import {
+  IResourceMethod,
+  IResourceMethodStrict,
+  Resource,
+  ResourceAction,
+  ResourceHandler,
+  ResourceParams,
+  ResourceRequestMethod
+} from '@ngx-resource/core';
 import { environment } from '../../../../environments/environment';
 import { IRestaurant } from '../interfaces/restaurant.interface';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
@@ -26,4 +34,10 @@ export class RestaurantsResource extends Resource {
     method: ResourceRequestMethod.Get
   })
   getRestaurantsByCompanyId: IResourceMethod<{id: number}, IServerResponse<IRestaurantDTO[]>>;
+
+  @ResourceAction({
+    path: '/{!id}/restaurant',
+    method: ResourceRequestMethod.Post
+  })
+  addRestaurant: IResourceMethodStrict<IRestaurantDTO, void, {id: number}, IServerResponse<IRestaurantDTO>>;
 }

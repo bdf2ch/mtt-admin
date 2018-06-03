@@ -59,17 +59,20 @@ export class CompanyComponent implements OnInit {
       phone: [this.companyData.phone],
       www: [this.companyData.site]
     });
-
+    const INNRegExp = /^[0-9]{10}$|^[0-9]{12}$/;
+    const KPPRegExp = /^[0-9]{9}$/;
+    const accountRegExp = /^[0-9]{20}$/;
+    const BIKRegExp = /^[0-9]{9}$/;
     this.addPaymentRequisitesForm = this.builder.group({
       name: ['', Validators.required],
-      inn: ['', Validators.required],
-      kpp: ['', Validators.required],
+      inn: ['', [Validators.required, Validators.pattern(INNRegExp)]],
+      kpp: ['', [Validators.required, Validators.pattern(KPPRegExp)]],
       legal_address: ['', Validators.required],
       actual_address: [''],
       bank_name: ['', Validators.required],
-      checking_account: ['', Validators.required],
-      correspondent_account: ['', Validators.required],
-      bik: ['', Validators.required]
+      checking_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
+      correspondent_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
+      bik: ['', [Validators.required, Validators.pattern(BIKRegExp)]]
     });
   }
 
@@ -141,6 +144,7 @@ export class CompanyComponent implements OnInit {
    */
   openAddPaymentRequisitesDialog() {
     this.isInAddPaymentRequisitesMode = true;
+    this.addPaymentRequisitesForm.get('actual_address').clearValidators();
     this.addPaymentRequisitesForm.reset({
       name: '',
       inn: '',
@@ -168,8 +172,8 @@ export class CompanyComponent implements OnInit {
    */
   addPaymentRequisitesFormStatusCtrl(item: string): string {
     if (!this.addPaymentRequisitesForm.controls[item]) { return; }
-    const control: AbstractControl = this.addPaymentRequisitesForm.controls[item];
-    return control.dirty && control.hasError('required') ? 'error' : 'validating';
+    const c: AbstractControl = this.addPaymentRequisitesForm.controls[item];
+    return c.dirty && (c.hasError('required') || c.hasError('minlength') || c.hasError('maxlength')) || c.hasError('pattern') ? 'error' : 'validating';
   }
 
   /**
@@ -179,32 +183,35 @@ export class CompanyComponent implements OnInit {
    */
   addPaymentRequisitesFormMessageCtrl(item: string): string {
     if (!this.addPaymentRequisitesForm.controls[item]) { return; }
-    const control: AbstractControl = this.addPaymentRequisitesForm.controls[item];
+    const c: AbstractControl = this.addPaymentRequisitesForm.controls[item];
     let message = '';
     switch (item) {
       case 'name':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали наименование' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали наименование' : '';
         break;
       case 'inn':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали ИНН' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали ИНН' : c.hasError('pattern') ? 'ИНН должен содержать 10 или 12 символов' : '';
         break;
       case 'kpp':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали КПП' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали КПП' : c.hasError('pattern') ? 'КПП должен содержать 9 символов' : '';
         break;
       case 'legal_address':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали юридический адрес' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали юридический адрес' : '';
+        break;
+      case 'actual_address':
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали физический адрес' : '';
         break;
       case 'bank_name':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали наименование банка' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали наименование банка' : '';
         break;
       case 'checking_account':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали расчетный счет' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали расчетный счет' : c.hasError('pattern') ? 'Расчетный счет должен содержать 20 символов' : '';
         break;
       case 'correspondent_account':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали корреспондентский счет' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали корреспондентский счет' : c.hasError('pattern') ? 'Корреспондентсикй счет должен содержать 20 символов' : '';
         break;
       case 'bik':
-        message =  control.dirty && control.hasError('required') ? 'Вы не указали БИК' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали БИК' :c.hasError('pattern') ? 'БИК должен состоять из 9 символов' : '';
         break;
     }
     return message;
@@ -227,6 +234,7 @@ export class CompanyComponent implements OnInit {
    * @param {PaymentRequisites} paymentRequisites - Выбранные платежные реквизиты
    */
   openEditPaymentsRequisitesDialog(paymentRequisites: PaymentRequisites) {
+    this.addPaymentRequisitesForm.get('actual_address').setValidators(Validators.required);
     this.selectedPaymentRequisites = paymentRequisites;
     this.isInEditPaymentRequisitesMode = true;
     this.addPaymentRequisitesForm.reset({

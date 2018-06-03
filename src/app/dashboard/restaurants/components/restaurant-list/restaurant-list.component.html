@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
-      <el-button type="primary" icon="plus" (click)="openAddUserDialog()">&nbsp; Добавить ресторан</el-button>
+      <el-button type="primary" icon="plus" (click)="openAddRestaurantDialog()">&nbsp; Добавить ресторан</el-button>
     </div>
   </div>
 
@@ -29,3 +29,202 @@
     </div>
   </div>
 </div>
+
+
+
+<!-- Start: Add restaurant dialog -->
+<el-dialog [(visible)]="isInAddRestaurantMode"
+           [width]="'550px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление ресторана</span>
+  </ng-template>
+
+
+
+
+    <div class="container-fluid">
+
+      <!-- Start: Restaurant information -->
+      <div class="row">
+        <div class="col-12 border-bottom">
+          <h4 class="text-muted mb-3">Информация о ресторане</h4>
+
+          <el-form [formGroup]="restaurantForm"
+                   label-width="170px"
+                   [label-position]="'left'"
+                   size="small"
+                   [show-icon]="true"
+                   [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Наименование"
+                        [required]="true"
+                        [status]="restaurantFormStatusCtrl('name')"
+                        [error]="restaurantFormMessageCtrl('name')">
+            <el-input formControlName="name" [(model)]="restaurantData.name"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+          <!-- Start: Phone -->
+          <el-form-item label="Телефон"
+                        [status]="restaurantFormStatusCtrl('phone')"
+                        [error]="restaurantFormMessageCtrl('phone')">
+            <el-input formControlName="phone" [(model)]="restaurantData.phone"></el-input>
+          </el-form-item>
+          <!-- End: Phone -->
+
+          <!-- Start: Site -->
+          <el-form-item label="Сайт"
+                        [status]="restaurantFormStatusCtrl('site')"
+                        [error]="restaurantFormMessageCtrl('site')">
+            <el-input formControlName="site" [(model)]="restaurantData.site"></el-input>
+          </el-form-item>
+          <!-- End: Site -->
+          </el-form>
+        </div>
+      </div>
+      <!-- End: Restaurant information -->
+
+
+      <div class="row pt-3">
+        <div class="col-12 border-bottom">
+          <h4 class="text-muted mb-3">Адрес</h4>
+
+          <el-form [formGroup]="addressForm"
+                   label-width="170px"
+                   [label-position]="'left'"
+                   size="small"
+                   [show-icon]="true"
+                   [show-message]="true">
+
+            <!-- Start: City -->
+            <el-form-item label="Город"
+                          [required]="true"
+                          [status]="addressFormStatusCtrl('city')"
+                          [error]="addressFormMessageCtrl('city')">
+              <el-input formControlName="city" [(model)]="addressData.city"></el-input>
+            </el-form-item>
+            <!-- End: City -->
+
+            <!-- Start: Street -->
+            <el-form-item label="Улица"
+                          [required]="true"
+                          [status]="addressFormStatusCtrl('street')"
+                          [error]="addressFormMessageCtrl('street')">
+              <el-input formControlName="street" [(model)]="addressData.street"></el-input>
+            </el-form-item>
+            <!-- End: Street -->
+
+            <!-- Start: Building -->
+            <el-form-item label="Дом"
+                          [required]="true"
+                          [status]="addressFormStatusCtrl('building_number')"
+                          [error]="addressFormMessageCtrl('building_number')">
+              <el-input formControlName="building_number" [(model)]="addressData.building_number"></el-input>
+            </el-form-item>
+            <!-- End: Building -->
+          </el-form>
+        </div>
+      </div>
+
+      <!-- Start: Timetable-->
+      <div class="row pt-3">
+        <div class="col-12 border-bottom">
+          <h4 class="text-muted mb-3">Расписание работы</h4>
+
+          <el-form [formGroup]="timeTableForm"
+                   label-width="170px"
+                   [label-position]="'left'"
+                   size="small"
+                   [show-icon]="true"
+                   [show-message]="true">
+
+            <!-- Start: City -->
+            <el-form-item label="Начало работы"
+                          [required]="true"
+                          [status]="timeTableFormStatusCtrl('from')"
+                          [error]="timeTableFormMessageCtrl('from')">
+              <el-input formControlName="from" [(model)]="timeTableData.from"></el-input>
+            </el-form-item>
+            <!-- End: City -->
+
+            <!-- Start: Street -->
+            <el-form-item label="Окончание работы"
+                          [required]="true"
+                          [status]="timeTableFormStatusCtrl('to')"
+                          [error]="timeTableFormMessageCtrl('to')">
+              <el-input formControlName="to" [(model)]="timeTableData.to"></el-input>
+            </el-form-item>
+            <!-- End: Street -->
+
+            <!-- Start: Building -->
+            <el-form-item label="До последнего клиента"
+                          [status]="timeTableFormStatusCtrl('until_last_client')"
+                          [error]="timeTableFormMessageCtrl('until_last_client')">
+              <el-checkbox [model]="timeTableData.until_last_client"></el-checkbox>
+            </el-form-item>
+            <!-- End: Building -->
+          </el-form>
+        </div>
+      </div>
+      <!-- End: Timetable -->
+
+      <!-- Start: Social networks -->
+      <div class="row pt-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between mb-3">
+            <h4 class="text-muted mb-3">Социальные сети</h4>
+            <el-button type="primary" size="mini" icon="plus" (click)="pushSocialNetwork()">&nbsp; Добавить</el-button>
+          </div>
+          <div class="col-12" *ngFor="let network of socialNetworksData">
+            <div class="container-fluid p-0">
+              <div class="row">
+                <div class="col-4">
+                  <el-select [model]="network.network_type" placeholder="Соц. сеть" class="w-100" el-class="w-100">
+                    <el-option label="Facebook" value="fb"></el-option>
+                    <el-option label="VKontakte" value="vk"></el-option>
+                    <el-option label="Instagram" value="instagram"></el-option>
+                    <el-option label="Twitter" value="twitter"></el-option>
+                  </el-select>
+                </div>
+                <div class="col-6">
+                  <el-input [(model)]="network.url" placeholder="Введите URL"></el-input>
+                </div>
+                <div class="col-2">
+                  <el-button type="primary" size="small" icon="plus"></el-button>
+                  <el-button type="danger" size="small" icon="delete"></el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- End: Social networks -->
+
+    </div>
+
+
+  <!-- Start: Form controls -->
+  <div class="row">
+    <div class="col-12 mt-2 text-right">
+      <el-button type="success"
+                 icon="check"
+                 [elDisabled]="restaurantForm.invalid || restaurantForm.pristine"
+                 [loading]="restaurantsService.addingRestaurantInProgress()"
+                 (click)="addRestaurant()">
+        &nbsp; Сохранить
+      </el-button>
+      <el-button type="danger"
+                 icon="close"
+                 (click)="closeAddRestaurantDialog()">
+        &nbsp; Отмена
+      </el-button>
+    </div>
+  </div>
+  <!-- End: Form controls -->
+
+
+</el-dialog>
+<!-- End: Add restaurant dialog -->

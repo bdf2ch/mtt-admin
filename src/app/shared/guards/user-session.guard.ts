@@ -13,6 +13,7 @@ export class UserSessionGuard implements CanActivate {
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     if (!this.authenticationService.getCurrentUser()) {
+      console.log('auth check');
       const result: User | null = await this.authenticationService.check();
       if (result) {
         return true;

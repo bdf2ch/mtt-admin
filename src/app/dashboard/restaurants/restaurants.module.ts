@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ElModule } from 'element-angular';
 import { RestaurantListComponent } from './components/restaurant-list/restaurant-list.component';
 import { RestaurantsResolveGuard } from './guards/restaurants-resolve.guard';
@@ -9,6 +10,8 @@ import { RestaurantsService } from './services/restaurants.service';
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     ElModule
   ],
   declarations: [

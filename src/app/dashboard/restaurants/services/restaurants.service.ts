@@ -8,10 +8,20 @@ import { IRestaurantDTO } from '../dto/restaurant.dto';
   providedIn: 'root'
 })
 export class RestaurantsService {
-  restaurants: Restaurant[];
+  private restaurants: Restaurant[];
+  private isAddingRestaurantInProgress: boolean;
 
   constructor(private readonly resource: RestaurantsResource) {
     this.restaurants = [];
+    this.isAddingRestaurantInProgress = false;
+  }
+
+  /**
+   * Добавляется ли ресторан
+   * @returns {boolean}
+   */
+  addingRestaurantInProgress(): boolean {
+    return this.isAddingRestaurantInProgress;
   }
 
   /**
@@ -31,6 +41,29 @@ export class RestaurantsService {
       }
     } catch (error) {
       console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Добавление ресторана
+   * @param {IRestaurantDTO} restaurant - Информация о ресторане
+   * @param {number} companyId - Идентификатор ресторана
+   * @returns {Promise<Restaurant | null>}
+   */
+  async addRestaurant(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
+    this.isAddingRestaurantInProgress = true;
+    try {
+      const result = await this.resource.addRestaurant(restaurant, null, {id: companyId});
+      console.log(result);
+      if (result.data) {
+        const rest = new Restaurant(result.data);
+        this.restaurants.push(rest);
+        return rest;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isAddingRestaurantInProgress = false;
       return null;
     }
   }

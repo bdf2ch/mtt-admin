@@ -1,6 +1,6 @@
 <div id="company" class="container-fluid h-100">
   <div class="row h-100">
-    <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center border-right">
+    <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center">
       <h3 class="mb-4 w-100 d-flex justify-content-between">
         О компании
         <el-button type="primary" icon="edit" (click)="openEditCompanyDialog()">&nbsp; Изменить</el-button>
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Start: Payment requisites -->
-    <div class="col--12 col-lg-6 p-4">
+    <div class="col--12 col-lg-6 p-4 border-left">
 
       <!-- Start: Header -->
       <h3 class="mb-4 d-flex justify-content-between">
@@ -49,20 +49,22 @@
       <!-- End: No requisites placeholder -->
 
       <!-- Start: Requisites-->
-      <div class="container-fluid pl-0 pr-0">
+      <div class="container-fluid payment-requisites pl-0 pr-0">
         <div class="row mt-4">
           <div class="col-12 col-xl-6 mb-3" *ngFor="let item of companyService.getCompany().paymentRequisites">
             <el-card>
               <ng-template #header>
-                <div class="clearfix">
-                  <span style="line-height: 36px;">{{ item.businessTitle }}</span>
+                <div class="clearfix text-center">
+                  <span style="line-height: 36px;" class="text-muted">
+                    <strong>{{ item.businessTitle }}</strong>
+                  </span>
                 </div>
               </ng-template>
               <div class="text item">
                 <table class="table table-sm mb-0">
                   <tbody>
                   <tr>
-                    <td class="text-muted text-right border-top-0" style="width: 100px">ИНН</td>
+                    <td class="text-muted text-right border-top-0" style="width: 80px">ИНН</td>
                     <td class="border-top-0">{{ item.INN }}</td>
                   </tr>
                   <tr>
@@ -91,20 +93,24 @@
                   </tr>
                   <tr>
                     <td colspan="2" class="">
-                      <div class="container-fluid p-0">
-                        <div class="row pt-2">
-                          <div class="col-6">
-                            <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
-                          </div>
-                          <div class="col-6">
-                            <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
-                          </div>
-                        </div>
-                      </div>
+
                     </td>
                   </tr>
                   </tbody>
                 </table>
+
+                <div class="footer">
+                  <div class="container-fluid p-0">
+                    <div class="row">
+                      <div class="col-6">
+                        <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
+                      </div>
+                      <div class="col-6">
+                        <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </el-card>
           </div>
@@ -197,61 +203,98 @@
       <el-input formControlName="name" [(model)]="paymentRequisitesData.name"></el-input>
     </el-form-item>
 
+    <!-- Start: INN -->
     <el-form-item label="ИНН"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('inn')"
                   [error]="addPaymentRequisitesFormMessageCtrl('inn')">
-      <el-input formControlName="inn" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.inn"></el-input>
+      <el-input formControlName="inn"
+                native-type="number"
+                el-class="no-spinners"
+                [(model)]="paymentRequisitesData.inn">
+      </el-input>
     </el-form-item>
+    <!-- End: INN -->
 
+    <!-- Start: KPP -->
     <el-form-item label="КПП"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('kpp')"
                   [error]="addPaymentRequisitesFormMessageCtrl('kpp')">
-      <el-input formControlName="kpp" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.kpp"></el-input>
+      <el-input formControlName="kpp"
+                native-type="number"
+                el-class="no-spinners"
+                [(model)]="paymentRequisitesData.kpp">
+      </el-input>
     </el-form-item>
+    <!-- End: KPP -->
 
+    <!-- Start: Business address -->
     <el-form-item label="Юридический адрес"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('legal_address')"
                   [error]="addPaymentRequisitesFormMessageCtrl('legal_address')">
       <el-input formControlName="legal_address" [(model)]="paymentRequisitesData.legal_address"></el-input>
     </el-form-item>
+    <!-- End: Business address -->
 
+    <!-- Start: Actual address -->
     <el-form-item label="Физический адрес">
       <el-input formControlName="actual_address" [(model)]="paymentRequisitesData.actual_address"></el-input>
     </el-form-item>
+    <!-- End: Actual address -->
 
+    <!-- Start: Bank title -->
     <el-form-item label="Наименование банка"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('bank_name')"
                   [error]="addPaymentRequisitesFormMessageCtrl('bank_name')">
       <el-input formControlName="bank_name" [(model)]="paymentRequisitesData.bank_name"></el-input>
     </el-form-item>
+    <!-- End: Bank title -->
 
+    <!-- Start: Account -->
     <el-form-item label="Расчетный счет"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('checking_account')"
                   [error]="addPaymentRequisitesFormMessageCtrl('checking_account')">
-      <el-input formControlName="checking_account" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.checking_account"></el-input>
+      <el-input formControlName="checking_account"
+                native-type="number"
+                el-class="no-spinners"
+                [(model)]="paymentRequisitesData.checking_account">
+      </el-input>
     </el-form-item>
+    <!-- End: Account -->
 
+    <!-- Start: Corresponding account -->
     <el-form-item label="Корреспондентский счет"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('correspondent_account')"
                   [error]="addPaymentRequisitesFormMessageCtrl('correspondent_account')">
-      <el-input formControlName="correspondent_account" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.correspondent_account"></el-input>
+      <el-input formControlName="correspondent_account"
+                native-type="number"
+                el-class="no-spinners"
+                [(model)]="paymentRequisitesData.correspondent_account">
+      </el-input>
     </el-form-item>
+    <!-- End: Corresponding account -->
 
+    <!-- Start: BIK -->
     <el-form-item label="БИК"
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('bik')"
                   [error]="addPaymentRequisitesFormMessageCtrl('bik')">
-      <el-input formControlName="bik" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.bik"></el-input>
+      <el-input formControlName="bik"
+                native-type="number"
+                el-class="no-spinners"
+                [(model)]="paymentRequisitesData.bik">
+      </el-input>
     </el-form-item>
+    <!-- End: BIK -->
 
+    <!-- Start: Form controls -->
     <el-form-item>
-      <div class="">
+      <div class="mt-2">
         <el-button type="success"
                    icon="check"
                    [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine"
@@ -266,6 +309,7 @@
         </el-button>
       </div>
     </el-form-item>
+    <!-- End: Form controls -->
 
   </el-form>
 </el-dialog>
@@ -315,8 +359,13 @@
       <el-input formControlName="legal_address" [(model)]="paymentRequisitesData.legal_address"></el-input>
     </el-form-item>
 
-    <el-form-item label="Физический адрес">
-      <el-input formControlName="actual_address" [(model)]="paymentRequisitesData.actual_address"></el-input>
+    <el-form-item [required]="isInEditPaymentRequisitesMode"
+                  label="Физический адрес"
+                  [status]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormStatusCtrl('actual_address') : null"
+                  [error]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormMessageCtrl('actual_address') : null">
+      <el-input formControlName="actual_address"
+                [(model)]="paymentRequisitesData.actual_address"
+                ></el-input>
     </el-form-item>
 
     <el-form-item label="Наименование банка"
@@ -348,7 +397,7 @@
     </el-form-item>
 
     <el-form-item>
-      <div class="">
+      <div class="mt-2">
         <el-button type="success"
                    icon="check"
                    [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine"

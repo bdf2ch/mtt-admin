@@ -21,6 +21,8 @@ import { CompanyComponent } from './dashboard/company/components/company/company
 import { CompanyResolveGuard } from './dashboard/company/guards/company-resolve.guard';
 import { RestaurantListComponent } from './dashboard/restaurants/components/restaurant-list/restaurant-list.component';
 import { RestaurantsResolveGuard } from './dashboard/restaurants/guards/restaurants-resolve.guard';
+import { RolesListComponent } from './dashboard/users/components/roles-list/roles-list.component';
+import { UsersComponent } from './dashboard/users/components/users/users.component';
 
 const routes: Routes = [
   {
@@ -36,14 +38,22 @@ const routes: Routes = [
       {
         path: 'restaurants',
         component: RestaurantListComponent,
-        resolve: [
-          RestaurantsResolveGuard
-        ]
+        resolve: [RestaurantsResolveGuard]
       },
       {
         path: 'users',
-        component: UserListComponent,
-        resolve: [UserListGuard]
+        component: UsersComponent,
+        resolve: [UserListGuard],
+        children: [
+          {
+            path: '',
+            component: UserListComponent
+          },
+          {
+            path: 'roles',
+            component: RolesListComponent
+          }
+        ]
       }
     ]
   },

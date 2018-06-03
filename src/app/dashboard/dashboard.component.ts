@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from "@angular/router";
 import { AuthenticationService } from './authentication/services/authentication.service';
 
 @Component({
@@ -11,6 +11,7 @@ export class DashboardComponent implements OnInit {
   selectedMenu: string;
 
   constructor (private readonly router: Router,
+               private readonly route: ActivatedRoute,
                public readonly authenticationService: AuthenticationService) {}
 
   ngOnInit() {}
@@ -18,6 +19,7 @@ export class DashboardComponent implements OnInit {
 
   onMenuChange(index: string): void {
     console.log(index);
+    /*
     switch (index) {
       case 'company':
         this.router.navigate(['company']).then(() => {
@@ -34,10 +36,18 @@ export class DashboardComponent implements OnInit {
           this.selectedMenu = 'users';
         });
         break;
+      case 'roles':
+        console.log(this.route);
+        this.router.navigateByUrl('/users/roles').then(() => {
+          this.selectedMenu = 'roles';
+          console.log('succeed');
+        });
+        break;
       case 'log-out':
         this.logOut();
         break;
     }
+    */
   }
 
   logOut() {

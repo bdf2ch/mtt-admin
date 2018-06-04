@@ -3,6 +3,9 @@ import { RestaurantsResource } from '../resources/restaurants.resource';
 import { Restaurant  } from '../models/restaurant.model';
 import { IRestaurant } from '../interfaces/restaurant.interface';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
+import {TimeTable} from '../models/time-table.model';
+import {ITimeTableDTO} from '../dto/time-table.dto';
+import {PaymentRequisites} from '../../company/models/payment-requisites.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +13,7 @@ import { IRestaurantDTO } from '../dto/restaurant.dto';
 export class RestaurantsService {
   private restaurants: Restaurant[];
   private isAddingRestaurantInProgress: boolean;
+  private isDeletingRestaurantInProgress: boolean;
 
   constructor(private readonly resource: RestaurantsResource) {
     this.restaurants = [];
@@ -64,6 +68,57 @@ export class RestaurantsService {
     } catch (error) {
       console.error(error);
       this.isAddingRestaurantInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Удвление ресторана
+   * @param {number} companyId - Идентфикатор компании
+   * @param {number} restaurantId - Идентификатор ресторана
+   * @returns {Promise<boolean>}
+   */
+  async deleteRestaurant(companyId: number, restaurantId: number): Promise<boolean> {
+    this.isDeletingRestaurantInProgress = true;
+    try {
+      const result = await this.resource.deleteRestaurant(null, null, {companyId: companyId, restaurantId: restaurantId});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.restaurants.forEach((item: Restaurant, index: number, array: Restaurant[]) => {
+          if (item.id === restaurantId) {
+            array.splice(index, 1);
+          }
+        });
+        return true;
+      }
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+      this.isDeletingRestaurantInProgress = false;
+      return false;
+    }
+  }
+
+
+  /**
+   * Добавление расписания работы ресторана
+   * @param {ITimeTableDTO} timeTable - Расписание работы
+   * @param {number} restaurantId - Идентфикатор ресторана
+   * @returns {Promise<TimeTable | null>}
+   */
+  async addTimeTable(timeTable: ITimeTableDTO, restaurantId: number): Promise<TimeTable | null> {
+    try {
+      const result = await this.resource.addTimeTable(timeTable, null, {id: restaurantId});
+      if (result.data) {
+        const timeTable_ = new TimeTable(result.data);
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.timeTable = timeTable_;
+          }
+        });
+        return timeTable_;
+      }
+    } catch (error) {
+      console.error(error);
       return null;
     }
   }

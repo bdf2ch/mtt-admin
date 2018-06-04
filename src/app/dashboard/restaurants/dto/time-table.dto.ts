@@ -2,9 +2,8 @@
  * TimeTable DTO interface
  */
 export interface ITimeTableDTO {
-  id: number;
-  restaurant_id: number;
-  from: string;
-  to?: string;
-  until_last_client: boolean;
+  id: number;                       // Идентификатор
+  from: string;                     // Время начала работы
+  to?: string;                      // Время окончания работы
+  until_last_client?: boolean;      // До последнего клиента
 }

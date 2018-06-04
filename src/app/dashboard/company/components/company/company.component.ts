@@ -173,7 +173,10 @@ export class CompanyComponent implements OnInit {
   addPaymentRequisitesFormStatusCtrl(item: string): string {
     if (!this.addPaymentRequisitesForm.controls[item]) { return; }
     const c: AbstractControl = this.addPaymentRequisitesForm.controls[item];
-    return c.dirty && (c.hasError('required') || c.hasError('minlength') || c.hasError('maxlength')) || c.hasError('pattern') ? 'error' : 'validating';
+    return c.dirty && (c.hasError('required') ||
+      c.hasError('minlength') ||
+      c.hasError('maxlength')) ||
+    c.hasError('pattern') ? 'error' : 'validating';
   }
 
   /**
@@ -211,7 +214,7 @@ export class CompanyComponent implements OnInit {
         message =  c.dirty && c.hasError('required') ? 'Вы не указали корреспондентский счет' : c.hasError('pattern') ? 'Корреспондентсикй счет должен содержать 20 символов' : '';
         break;
       case 'bik':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали БИК' :c.hasError('pattern') ? 'БИК должен состоять из 9 символов' : '';
+        message =  c.dirty && c.hasError('required') ? 'Вы не указали БИК' : c.hasError('pattern') ? 'БИК должен состоять из 9 символов' : '';
         break;
     }
     return message;

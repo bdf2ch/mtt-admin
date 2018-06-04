@@ -108,6 +108,12 @@ export class CompanyService {
     }
   }
 
+  /**
+   * Удаление платежных реквизитов
+   * @param {number} companyId - Идентификатор компании
+   * @param {number} requisitesId - Идентификатор платежных реквизитов
+   * @returns {Promise<boolean>}
+   */
   async deletePaymentRequisites(companyId: number, requisitesId: number): Promise<boolean> {
     this.isDeletingPaymentRequisitesInProgress = true;
     try {

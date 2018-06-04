@@ -5,4 +5,5 @@ export interface ISocialNetworkDTO {
   restaurant_id: number;
   network_type: ESocialNetwork;
   url: string;
+  timeCreated?: number;
 }

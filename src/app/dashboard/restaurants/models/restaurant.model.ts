@@ -12,14 +12,13 @@ import { IRestaurantDTO } from '../dto/restaurant.dto';
  */
 export class Restaurant implements IRestaurant {
   id: number;                 // Идентфиикатор
-  companyId: number;          // Идентификатор компании
   title: string;              // Наименование
   phone: string;              // Телефон
   www: string;                // Сайт
   rKeeperConfig: any;         // Конфигурация R-Keeper
-  //address: IAddress;          // Адрес
-  //timeTable: ITimeTable;      // Расписание работы
-  //social: ISocialNetwork[];   // Набор социальных сетей
+  // address: IAddress;          // Адрес
+  timeTable: ITimeTable;      // Расписание работы
+  // social: ISocialNetwork[];   // Набор социальных сетей
 
   /**
    * Конструктор
@@ -27,14 +26,13 @@ export class Restaurant implements IRestaurant {
    */
   constructor(config?: IRestaurantDTO) {
     this.id = config ? config.id : 0;
-    this.companyId = config ? config.company_id : 0;
     this.title = config ? config.name : '';
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
     this.rKeeperConfig = config ? config.r_keeper_config : {};
-    //this.address = config ? new Address(config.address) : new Address();
-    //this.timeTable = config ? new TimeTable(config.timeTable) : new TimeTable();
-    //this.social = [];
+    // this.address = config ? new Address(config.address) : new Address();
+    this.timeTable = config ? new TimeTable(config.work_interval) : new TimeTable();
+    // this.social = [];
 
     /*
     if (config) {

@@ -7,19 +7,33 @@
 
   <div class="row pt-3">
     <div class="col-12">
-      <el-table [model]="restaurantsService.getRestaurants()" [stripe]="true" *ngIf="restaurantsService.getRestaurants().length !== 0">
-        <el-table-column model-key="title" label="Наименование"></el-table-column>
-        <!--<el-table-column model-key="date" label="Статус" width="140"></el-table-column>-->
-        <el-table-column model-key="" label="Адрес"></el-table-column>
-        <el-table-column>
-          <ng-template #slot let-scope="scope">
-            <div class="text-right">
-              <el-button type="success" size="small" icon="edit" (click)="handle(scope)">&nbsp; Изменить</el-button>
-              <el-button type="danger" size="small" icon="delete" (click)="handle(scope)">&nbsp; Удалить</el-button>
+      <table class="restaurants-table table-hover w-100">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">Наименование</th>
+          <th class="p-3">Адрес</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let restaurant of restaurantsService.getRestaurants(); let i = index;">
+          <td class="p-3">{{ i + 1 }}</td>
+          <td class="p-3">{{ restaurant.title }}</td>
+          <td class="p-3"></td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success" size="small" icon="edit" (click)="handle(scope)">&nbsp; Изменить</el-button>
+                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteRestaurantDialog(restaurant)">&nbsp; Удалить</el-button>
+                </div>
+              </div>
             </div>
-          </ng-template>
-        </el-table-column>
-      </el-table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
 
       <!-- Start: No restaurants placeholder -->
       <div *ngIf="restaurantsService.getRestaurants().length === 0">
@@ -34,7 +48,7 @@
 
 <!-- Start: Add restaurant dialog -->
 <el-dialog [(visible)]="isInAddRestaurantMode"
-           [width]="'550px'">
+           [width]="'580px'">
   <ng-template #title>
     <span class="el-icon-plus"></span>&nbsp;
     <span>Добавление ресторана</span>
@@ -140,31 +154,32 @@
                    [show-icon]="true"
                    [show-message]="true">
 
-            <!-- Start: City -->
+            <!-- Start: From -->
             <el-form-item label="Начало работы"
                           [required]="true"
                           [status]="timeTableFormStatusCtrl('from')"
                           [error]="timeTableFormMessageCtrl('from')">
               <el-input formControlName="from" [(model)]="timeTableData.from"></el-input>
             </el-form-item>
-            <!-- End: City -->
+            <!-- End: From -->
 
-            <!-- Start: Street -->
+            <!-- Start: To -->
             <el-form-item label="Окончание работы"
-                          [required]="true"
+                          [hidden]="timeTableData.until_last_client"
+                          [required]="!timeTableData.until_last_client ? true : false"
                           [status]="timeTableFormStatusCtrl('to')"
                           [error]="timeTableFormMessageCtrl('to')">
               <el-input formControlName="to" [(model)]="timeTableData.to"></el-input>
             </el-form-item>
-            <!-- End: Street -->
+            <!-- End: To -->
 
-            <!-- Start: Building -->
+            <!-- Start: Until last client -->
             <el-form-item label="До последнего клиента"
                           [status]="timeTableFormStatusCtrl('until_last_client')"
                           [error]="timeTableFormMessageCtrl('until_last_client')">
-              <el-checkbox [model]="timeTableData.until_last_client"></el-checkbox>
+              <el-switch type="primary" [(model)]="timeTableData.until_last_client" (modelChange)="onChangeUntilLastClient($event)"></el-switch>
             </el-form-item>
-            <!-- End: Building -->
+            <!-- End: Until last client -->
           </el-form>
         </div>
       </div>
@@ -172,36 +187,80 @@
 
       <!-- Start: Social networks -->
       <div class="row pt-3">
-        <div class="col-12">
+        <div class="col-12 border-bottom">
           <div class="d-flex justify-content-between mb-3">
             <h4 class="text-muted mb-3">Социальные сети</h4>
-            <el-button type="primary" size="mini" icon="plus" (click)="pushSocialNetwork()">&nbsp; Добавить</el-button>
+            <el-button type="primary" size="mini" icon="plus" (click)="appendSocialNetwork()" [size]="'small'">&nbsp; Добавить</el-button>
           </div>
-          <div class="col-12" *ngFor="let network of socialNetworksData">
-            <div class="container-fluid p-0">
-              <div class="row">
-                <div class="col-4">
-                  <el-select [model]="network.network_type" placeholder="Соц. сеть" class="w-100" el-class="w-100">
-                    <el-option label="Facebook" value="fb"></el-option>
-                    <el-option label="VKontakte" value="vk"></el-option>
-                    <el-option label="Instagram" value="instagram"></el-option>
-                    <el-option label="Twitter" value="twitter"></el-option>
-                  </el-select>
-                </div>
-                <div class="col-6">
-                  <el-input [(model)]="network.url" placeholder="Введите URL"></el-input>
-                </div>
-                <div class="col-2">
-                  <el-button type="primary" size="small" icon="plus"></el-button>
-                  <el-button type="danger" size="small" icon="delete"></el-button>
+
+
+
+
+
+              <div class="row no-gutters" *ngFor="let network of socialNetworksData">
+                <div class="col-12">
+                  <el-form [formGroup]="socialNetworksForm"
+                           [inline]="true"
+                           label-width="170px"
+                           [label-position]="'left'"
+                           size="small"
+                           [show-icon]="true"
+                           [show-message]="true">
+                    <el-form-item [required]="true"
+                                  [status]="socialNetworksFormStatusCtrl('socialNetworkType' + network.timeCreated.toString())"
+                                  [error]="timeTableFormMessageCtrl('socialNetworkType' + network.timeCreated.toString())">
+                      <el-select [model]="network.network_type" placeholder="Соц. сеть">
+                        <el-option label="Facebook" value="1"></el-option>
+                        <el-option label="VKontakte" value="2"></el-option>
+                        <el-option label="Instagram" value="3"></el-option>
+                        <el-option label="Twitter" value="4"></el-option>
+                      </el-select>
+                    </el-form-item>
+
+                    <el-form-item [required]="true"
+                                  [status]="socialNetworksFormStatusCtrl('socialNetworkUrl' + network.timeCreated.toString())"
+                                  [error]="socialNetworksFormMessageCtrl('socialNetworkUrl' + network.timeCreated.toString())">
+                      <el-input formControlName="{{'socialNetworkUrl' + network.timeCreated.toString()}}" [(model)]="network.url"></el-input>
+                    </el-form-item>
+
+                    <el-form-item>
+                      <el-button type="danger" icon="delete">&nbsp; Удалить</el-button>
+                    </el-form-item>
+
+
+                  </el-form>
                 </div>
               </div>
-            </div>
-          </div>
 
         </div>
       </div>
       <!-- End: Social networks -->
+
+      <!-- Start: R-Keeper config -->
+      <div class="row pt-3">
+        <div class="col-12 border-bottom">
+          <h4 class="text-muted mb-3">Конфигурация R-Keeper</h4>
+
+          <el-form [formGroup]="rKeeperForm"
+                   label-width="170px"
+                   [label-position]="'left'"
+                   size="small"
+                   [show-icon]="true"
+                   [show-message]="true">
+
+            <!-- Start: Name -->
+            <el-form-item label="Конфигурация"
+                          [required]="!companyService.getCompany().rKeeperConfig"
+                          [status]="rKeeperFormStatusCtrl('config')"
+                          [error]="rKeeperFormMessageCtrl('config')">
+              <el-input formControlName="config" [(model)]="restaurantData.r_keeper_config"></el-input>
+            </el-form-item>
+            <!-- End: Name -->
+
+          </el-form>
+        </div>
+      </div>
+      <!-- End: R-Keeper config -->
 
     </div>
 
@@ -211,7 +270,7 @@
     <div class="col-12 mt-2 text-right">
       <el-button type="success"
                  icon="check"
-                 [elDisabled]="restaurantForm.invalid || restaurantForm.pristine"
+                 [elDisabled]="restaurantForm.invalid || restaurantForm.pristine || rKeeperForm.invalid || rKeeperForm.pristine || timeTableForm.invalid || timeTableForm.pristine"
                  [loading]="restaurantsService.addingRestaurantInProgress()"
                  (click)="addRestaurant()">
         &nbsp; Сохранить
@@ -228,3 +287,30 @@
 
 </el-dialog>
 <!-- End: Add restaurant dialog -->
+
+
+
+
+<!-- Start: Delete restaurant confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteRestaurantMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление ресторана</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="selectedRestaurant">
+    <div class="row">
+      <div class="col-12">
+        Удалить ресторан {{ selectedRestaurant.title }}?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success" icon="check" class="w-100" (click)="deleteRestaurant()">&nbsp; Удалить</el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteRestaurantDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete restaurant confirmation dialog -->

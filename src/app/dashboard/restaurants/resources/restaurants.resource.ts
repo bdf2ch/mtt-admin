@@ -13,6 +13,7 @@ import { IRestaurant } from '../interfaces/restaurant.interface';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
 import {ITimeTableDTO} from '../dto/time-table.dto';
+import {ISocialNetworkDTO} from "../dto/social-network.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -55,4 +56,11 @@ export class RestaurantsResource extends Resource {
     withCredentials: true
   })
   addTimeTable: IResourceMethodStrict<ITimeTableDTO, void, {id: number}, IServerResponse<ITimeTableDTO>>;
+
+  @ResourceAction({
+    path: '/restaurant/{!id}/social-network',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addSocialNetwork: IResourceMethodStrict<ISocialNetworkDTO, void, {id: number}, IServerResponse<ISocialNetworkDTO>>;
 }

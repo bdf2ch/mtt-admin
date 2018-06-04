@@ -6,18 +6,45 @@ import { IRestaurantDTO } from '../dto/restaurant.dto';
 import {TimeTable} from '../models/time-table.model';
 import {ITimeTableDTO} from '../dto/time-table.dto';
 import {PaymentRequisites} from '../../company/models/payment-requisites.model';
+import {ISocialNetworkDTO} from '../dto/social-network.dto';
+import {SocialNetwork} from '../models/social-network.model';
+import {SocialNetworkType} from '../models/social-network-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestaurantsService {
   private restaurants: Restaurant[];
+  private socialNetworkTypes: SocialNetworkType[];
   private isAddingRestaurantInProgress: boolean;
   private isDeletingRestaurantInProgress: boolean;
 
   constructor(private readonly resource: RestaurantsResource) {
     this.restaurants = [];
+    this.socialNetworkTypes = [];
     this.isAddingRestaurantInProgress = false;
+
+    this.socialNetworkTypes.push(
+      new SocialNetworkType({
+          id: 1,
+          index: 'fb',
+          title: 'Facebook'
+        }),
+      new SocialNetworkType({
+        id: 2,
+        index: 'vk',
+        title: 'VKontakte'
+      }),
+      new SocialNetworkType({
+        id: 3,
+        index: 'instagram',
+        title: 'Instagram'
+      }),
+      new SocialNetworkType({
+        id: 4,
+        index: 'twitter',
+        title: 'Twitter'
+      }));
   }
 
   /**
@@ -98,7 +125,6 @@ export class RestaurantsService {
     }
   }
 
-
   /**
    * Добавление расписания работы ресторана
    * @param {ITimeTableDTO} timeTable - Расписание работы
@@ -124,10 +150,38 @@ export class RestaurantsService {
   }
 
   /**
+   * Добавление социальнйо сети
+   * @param {ISocialNetworkDTO} network - Социальная сеть
+   * @param {number} restaurantId - Идентификатор ресторана
+   * @returns {Promise<SocialNetwork | null>}
+   */
+  async addSocialNetwork(network: ISocialNetworkDTO, restaurantId: number): Promise<SocialNetwork | null> {
+    try {
+      const result = await this.resource.addSocialNetwork(network, null, {id: restaurantId});
+      if (result.data) {
+        const network_ = new SocialNetwork(result.data);
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.social.push(network_);
+          }
+        });
+        return network_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
    * Возвращает список всех ресторанов
    * @returns {Restaurant[]}
    */
   getRestaurants(): Restaurant[] {
     return this.restaurants;
+  }
+
+  getSocialNetworkTypes(): SocialNetworkType[] {
+    return this.socialNetworkTypes;
   }
 }

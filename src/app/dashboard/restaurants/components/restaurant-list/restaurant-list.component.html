@@ -187,50 +187,50 @@
 
       <!-- Start: Social networks -->
       <div class="row pt-3">
-        <div class="col-12 border-bottom">
+        <div class="col-12 border-bottom social-networks">
           <div class="d-flex justify-content-between mb-3">
             <h4 class="text-muted mb-3">Социальные сети</h4>
-            <el-button type="primary" size="mini" icon="plus" (click)="appendSocialNetwork()" [size]="'small'">&nbsp; Добавить</el-button>
+            <el-button type="text" size="mini" icon="plus" (click)="appendSocialNetwork()" [size]="'small'">&nbsp; Добавить</el-button>
+          </div>
+          <div el-row *ngIf="socialNetworksData.length === 0">
+            <div el-col span="24" class="text-center text-muted pl-4 pr-4 pb-4">Социальные сети отсутствуют</div>
           </div>
 
-
-
-
-
-              <div class="row no-gutters" *ngFor="let network of socialNetworksData">
-                <div class="col-12">
-                  <el-form [formGroup]="socialNetworksForm"
+          <el-form [formGroup]="socialNetworksForm"
                            [inline]="true"
-                           label-width="170px"
-                           [label-position]="'left'"
                            size="small"
                            [show-icon]="true"
                            [show-message]="true">
-                    <el-form-item [required]="true"
-                                  [status]="socialNetworksFormStatusCtrl('socialNetworkType' + network.timeCreated.toString())"
-                                  [error]="timeTableFormMessageCtrl('socialNetworkType' + network.timeCreated.toString())">
-                      <el-select [model]="network.network_type" placeholder="Соц. сеть">
-                        <el-option label="Facebook" value="1"></el-option>
-                        <el-option label="VKontakte" value="2"></el-option>
-                        <el-option label="Instagram" value="3"></el-option>
-                        <el-option label="Twitter" value="4"></el-option>
-                      </el-select>
-                    </el-form-item>
+                    <div *ngFor="let network of socialNetworksData">
 
-                    <el-form-item [required]="true"
-                                  [status]="socialNetworksFormStatusCtrl('socialNetworkUrl' + network.timeCreated.toString())"
-                                  [error]="socialNetworksFormMessageCtrl('socialNetworkUrl' + network.timeCreated.toString())">
-                      <el-input formControlName="{{'socialNetworkUrl' + network.timeCreated.toString()}}" [(model)]="network.url"></el-input>
-                    </el-form-item>
+                      <div el-row type="flex" justify="space-between" *ngIf="socialNetworksData.length !== 0">
+                        <div el-col span="8">
+                          <el-form-item [required]="true"
+                                        [status]="socialNetworksFormStatusCtrl('socialNetworkType' + network.timeCreated.toString())"
+                                        [error]="timeTableFormMessageCtrl('socialNetworkType' + network.timeCreated.toString())">
+                            <el-select [(model)]="network.network_type" placeholder="Соц. сеть">
+                              <el-option *ngFor="let socType of restaurantsService.getSocialNetworkTypes()" label="{{ socType.title }}" value="{{ socType.id }}"></el-option>
+                            </el-select>
+                          </el-form-item>
+                        </div>
+                        <div el-col span="12">
+                          <el-form-item [required]="true"
+                                        [status]="socialNetworksFormStatusCtrl('socialNetworkUrl' + network.timeCreated.toString())"
+                                        [error]="socialNetworksFormMessageCtrl('socialNetworkUrl' + network.timeCreated.toString())">
+                            <el-input formControlName="{{'socialNetworkUrl' + network.timeCreated.toString()}}" [(model)]="network.url"></el-input>
+                          </el-form-item>
+                        </div>
+                        <div el-col span="4" align="right">
+                          <el-form-item>
+                            <el-button type="danger" icon="delete"></el-button>
+                          </el-form-item>
+                        </div>
+                      </div>
 
-                    <el-form-item>
-                      <el-button type="danger" icon="delete">&nbsp; Удалить</el-button>
-                    </el-form-item>
+                    </div>
 
 
                   </el-form>
-                </div>
-              </div>
 
         </div>
       </div>

@@ -18,7 +18,7 @@ export class Restaurant implements IRestaurant {
   rKeeperConfig: any;         // Конфигурация R-Keeper
   // address: IAddress;          // Адрес
   timeTable: ITimeTable;      // Расписание работы
-  // social: ISocialNetwork[];   // Набор социальных сетей
+  social: ISocialNetwork[];   // Набор социальных сетей
 
   /**
    * Конструктор

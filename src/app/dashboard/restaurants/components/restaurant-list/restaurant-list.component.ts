@@ -288,7 +288,7 @@ export class RestaurantListComponent implements OnInit {
     const network = {
       id: 0,
       restaurant_id: 0,
-      network_type: null,
+      network_type: this.restaurantsService.getSocialNetworkTypes()[0].id,
       url: '',
       timeCreated: new Date().getTime()
     };

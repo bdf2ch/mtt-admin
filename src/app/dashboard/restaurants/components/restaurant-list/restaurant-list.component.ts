@@ -135,9 +135,11 @@ export class RestaurantListComponent implements OnInit {
     await this.restaurantsService.addAddress(this.addressData, rest.id);
     await this.restaurantsService.addTimeTable(this.timeTableData, rest.id);
 
+    /*
     this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
       await this.restaurantsService.addSocialNetwork(item, rest.id);
     });
+    */
   }
 
   /**
@@ -299,7 +301,7 @@ export class RestaurantListComponent implements OnInit {
     const network = {
       id: 0,
       restaurant_id: 0,
-      network_type: this.restaurantsService.getSocialNetworkTypes()[0].id,
+      network_type: this.restaurantsService.getSocialNetworkTypes()[0].code,
       url: '',
       timeCreated: new Date().getTime()
     };

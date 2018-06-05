@@ -11,6 +11,10 @@ import {SocialNetwork} from '../models/social-network.model';
 import {SocialNetworkType} from '../models/social-network-type.model';
 import {IAddressDTO} from '../dto/address.dto';
 import {Address} from '../models/address.model';
+import {ISocialNetworkTypeDTO} from "../dto/social-network-type.dto";
+import {analyzeFileForInjectables} from "@angular/compiler";
+import {ISocialNetwork} from "../interfaces/social-network.interface";
+import {ISocialNetworkType} from "../interfaces/social-network-type.interface";
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +33,7 @@ export class RestaurantsService {
     this.isEditingRestaurantInProgress = false;
 
     this.socialNetworkTypes.push(
+      /*
       new SocialNetworkType({
           id: 1,
           index: 'fb',
@@ -49,6 +54,7 @@ export class RestaurantsService {
         index: 'twitter',
         title: 'Twitter'
       }));
+      */
   }
 
   /**
@@ -254,6 +260,30 @@ export class RestaurantsService {
           }
         });
         return timeTable_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Получение списка всех типов социальных сетей
+   * @returns {Promise<SocialNetworkType[] | null>}
+   */
+  async fetchSocialNetworkTypes(): Promise<SocialNetworkType[] | null> {
+    try {
+      const result = await this.resource.getSocialNetworkTypes();
+      if (result.data) {
+        for (const network in result.data) {
+          const socialNetworkType: ISocialNetworkType = {
+            code: network,
+            title: result.data[network]
+          };
+          this.socialNetworkTypes.push(socialNetworkType);
+        }
+
+        return this.socialNetworkTypes;
       }
     } catch (error) {
       console.error(error);

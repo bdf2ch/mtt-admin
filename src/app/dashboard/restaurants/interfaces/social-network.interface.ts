@@ -6,6 +6,6 @@ import {SocialNetworkType} from "../models/social-network-type.model";
  */
 export interface ISocialNetwork {
   id: number;                   // Идентификатор
-  type: number;                 // Тип
+  type: string;                 // Тип
   url: string;                  // Ссылка
 }

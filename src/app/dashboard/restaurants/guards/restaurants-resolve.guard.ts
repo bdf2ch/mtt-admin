@@ -17,6 +17,7 @@ export class RestaurantsResolveGuard implements Resolve<Promise<Restaurant[]>> {
     if (!this.companyService.getCompany()) {
       await this.companyService.fetchCompanyById(this.authenticationService.getCurrentUser().companyId);
     }
+    await this.restaurantsService.fetchSocialNetworkTypes();
     const result = await this.restaurantsService.fetchRestaurantsByCompanyId(this.authenticationService.getCurrentUser().companyId);
     return result;
   }

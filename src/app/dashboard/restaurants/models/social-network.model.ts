@@ -8,7 +8,7 @@ import { SocialNetworkType } from './social-network-type.model';
  */
 export class SocialNetwork implements ISocialNetwork {
   id: number;                   // Идентификатор
-  type: number;                 // Тип
+  type: string;                 // Тип
   url: string;                  // Ссылка
 
   /**
@@ -17,7 +17,7 @@ export class SocialNetwork implements ISocialNetwork {
    */
   constructor(config?: ISocialNetworkDTO) {
     this.id = config ? config.id : 0;
-    this.type = config ? config.network_type : 0;
+    this.type = config ? config.network_type : '';
     this.url = config ? config.url : '';
   }
 }

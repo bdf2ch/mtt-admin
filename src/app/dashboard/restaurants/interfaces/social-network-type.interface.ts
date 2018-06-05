@@ -1,5 +1,4 @@
 export interface ISocialNetworkType {
-  id: number;
-  index: string;
+  code: string;
   title: string;
 }

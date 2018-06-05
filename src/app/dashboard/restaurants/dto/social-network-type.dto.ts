@@ -1,5 +1,4 @@
 export interface ISocialNetworkTypeDTO {
-  id: number;
-  index: string;
+  code: string;
   title: string;
 }

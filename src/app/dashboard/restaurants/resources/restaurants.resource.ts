@@ -86,6 +86,12 @@ export class RestaurantsResource extends Resource {
   editTimeTable: IResourceMethodStrict<ITimeTableDTO, void, {restaurantId: number, timeTableId: number}, IServerResponse<ITimeTableDTO>>;
 
   @ResourceAction({
+    path: '/restaurant/social-network/available',
+    method: ResourceRequestMethod.Get
+  })
+  getSocialNetworkTypes: IResourceMethod<void, IServerResponse<any>>;
+
+  @ResourceAction({
     path: '/restaurant/{!restaurantId}/social-network',
     method: ResourceRequestMethod.Post,
     withCredentials: true

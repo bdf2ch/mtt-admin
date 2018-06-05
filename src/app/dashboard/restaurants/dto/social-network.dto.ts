@@ -5,7 +5,7 @@ import {ISocialNetworkTypeDTO} from "./social-network-type.dto";
 export interface ISocialNetworkDTO {
   id: number;
   restaurant_id: number;
-  network_type: number;
+  network_type: string;
   url: string;
   timeCreated?: number;
 }

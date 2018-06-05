@@ -214,7 +214,7 @@
                             <el-select [(model)]="network.network_type" formControlName="{{'socialNetworkType' + network.timeCreated.toString()}}" placeholder="Соц. сеть">
                               <el-option *ngFor="let socType of restaurantsService.getSocialNetworkTypes()"
                                          [label]="socType.title"
-                                         [value]="socType.id">
+                                         [value]="socType.code">
                               </el-option>
                             </el-select>
                           </el-form-item>

@@ -101,6 +101,7 @@
       <!-- End: Restaurant information -->
 
 
+      <!-- Start: Restaurant address -->
       <div class="row pt-3">
         <div class="col-12 border-bottom">
           <h4 class="text-muted mb-3">Адрес</h4>
@@ -141,6 +142,8 @@
           </el-form>
         </div>
       </div>
+      <!-- End: Restaurant address -->
+
 
       <!-- Start: Timetable-->
       <div class="row pt-3">
@@ -207,9 +210,12 @@
                         <div el-col span="8">
                           <el-form-item [required]="true"
                                         [status]="socialNetworksFormStatusCtrl('socialNetworkType' + network.timeCreated.toString())"
-                                        [error]="timeTableFormMessageCtrl('socialNetworkType' + network.timeCreated.toString())">
-                            <el-select [(model)]="network.network_type" placeholder="Соц. сеть">
-                              <el-option *ngFor="let socType of restaurantsService.getSocialNetworkTypes()" label="{{ socType.title }}" value="{{ socType.id }}"></el-option>
+                                        [error]="socialNetworksFormMessageCtrl('socialNetworkType' + network.timeCreated.toString())">
+                            <el-select [(model)]="network.network_type" formControlName="{{'socialNetworkType' + network.timeCreated.toString()}}" placeholder="Соц. сеть">
+                              <el-option *ngFor="let socType of restaurantsService.getSocialNetworkTypes()"
+                                         [label]="socType.title"
+                                         [value]="socType.id">
+                              </el-option>
                             </el-select>
                           </el-form-item>
                         </div>
@@ -222,7 +228,7 @@
                         </div>
                         <div el-col span="4" align="right">
                           <el-form-item>
-                            <el-button type="danger" icon="delete"></el-button>
+                            <el-button type="danger" icon="delete" (click)="removeSocialNetwork(network)"></el-button>
                           </el-form-item>
                         </div>
                       </div>
@@ -270,7 +276,16 @@
     <div class="col-12 mt-2 text-right">
       <el-button type="success"
                  icon="check"
-                 [elDisabled]="restaurantForm.invalid || restaurantForm.pristine || rKeeperForm.invalid || rKeeperForm.pristine || timeTableForm.invalid || timeTableForm.pristine"
+                 [elDisabled]="
+                    restaurantForm.invalid
+                 || restaurantForm.pristine
+                 || addressForm.invalid
+                 || addressForm.pristine
+                 || timeTableForm.invalid
+                 || timeTableForm.pristine
+                 || socialNetworksForm.invalid
+                 || rKeeperForm.invalid
+                 || rKeeperForm.pristine"
                  [loading]="restaurantsService.addingRestaurantInProgress()"
                  (click)="addRestaurant()">
         &nbsp; Сохранить

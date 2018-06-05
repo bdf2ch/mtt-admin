@@ -9,6 +9,8 @@ import {PaymentRequisites} from '../../company/models/payment-requisites.model';
 import {ISocialNetworkDTO} from '../dto/social-network.dto';
 import {SocialNetwork} from '../models/social-network.model';
 import {SocialNetworkType} from '../models/social-network-type.model';
+import {IAddressDTO} from '../dto/address.dto';
+import {Address} from '../models/address.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +19,14 @@ export class RestaurantsService {
   private restaurants: Restaurant[];
   private socialNetworkTypes: SocialNetworkType[];
   private isAddingRestaurantInProgress: boolean;
+  private isEditingRestaurantInProgress: boolean;
   private isDeletingRestaurantInProgress: boolean;
 
   constructor(private readonly resource: RestaurantsResource) {
     this.restaurants = [];
     this.socialNetworkTypes = [];
     this.isAddingRestaurantInProgress = false;
+    this.isEditingRestaurantInProgress = false;
 
     this.socialNetworkTypes.push(
       new SocialNetworkType({
@@ -48,11 +52,19 @@ export class RestaurantsService {
   }
 
   /**
-   * Добавляется ли ресторан
+   * Выполняется ли добавление данных о ресторане
    * @returns {boolean}
    */
   addingRestaurantInProgress(): boolean {
     return this.isAddingRestaurantInProgress;
+  }
+
+  /**
+   * Выполняется ли сохранение данных о ресторане
+   * @returns {boolean}
+   */
+  editingRestaurantInProgress(): boolean {
+    return this.isEditingRestaurantInProgress;
   }
 
   /**
@@ -100,6 +112,33 @@ export class RestaurantsService {
   }
 
   /**
+   * Изменение информации о ресторвне
+   * @param {IRestaurantDTO} restaurant - Ресторан
+   * @param {number} companyId - Идентификатор компании
+   * @returns {Promise<Restaurant | null>}
+   */
+  async editRestaurant(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
+    this.isEditingRestaurantInProgress = true;
+    try {
+      const result = await this.resource.editRestaurant(restaurant, null, {companyId: companyId, restaurantId: restaurant.id});
+      if (result.data) {
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurant.id) {
+            item.title = restaurant.name;
+            item.phone = restaurant.phone;
+            item.www = restaurant.site;
+            return item;
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingRestaurantInProgress = false;
+      return null;
+    }
+  }
+
+  /**
    * Удвление ресторана
    * @param {number} companyId - Идентфикатор компании
    * @param {number} restaurantId - Идентификатор ресторана
@@ -125,6 +164,55 @@ export class RestaurantsService {
     }
   }
 
+
+  /**
+   * Добавление адреса ресторана
+   * @param {IAddressDTO} address - Адрес ресторана
+   * @param {number} restaurantId - Идентификатор ресторана
+   * @returns {Promise<Address | null>}
+   */
+  async addAddress(address: IAddressDTO, restaurantId: number): Promise<Address | null> {
+    try {
+      const result = await this.resource.addAddress(address, null, {restaurantId: restaurantId});
+      if (result.data) {
+        const address_ = new Address(result.data);
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.address = address_;
+          }
+        });
+        return address_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Изменение адреса ресторана
+   * @param {IAddressDTO} address - Адрес ресторана
+   * @param {number} restaurantId - Идентификатор ресторана
+   * @returns {Promise<Address | null>}
+   */
+  async editAddress(address: IAddressDTO, restaurantId: number): Promise<Address | null> {
+    try {
+      const result = await this.resource.editAddress(address, null, {restaurantId: restaurantId, addressId: address.id});
+      if (result.data) {
+        const address_ = new Address(result.data);
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.address = address_;
+          }
+        });
+        return address_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
   /**
    * Добавление расписания работы ресторана
    * @param {ITimeTableDTO} timeTable - Расписание работы
@@ -133,7 +221,31 @@ export class RestaurantsService {
    */
   async addTimeTable(timeTable: ITimeTableDTO, restaurantId: number): Promise<TimeTable | null> {
     try {
-      const result = await this.resource.addTimeTable(timeTable, null, {id: restaurantId});
+      const result = await this.resource.addTimeTable(timeTable, null, {restaurantId: restaurantId});
+      if (result.data) {
+        const timeTable_ = new TimeTable(result.data);
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.timeTable = timeTable_;
+          }
+        });
+        return timeTable_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Изменение расписания работы ресторана
+   * @param {ITimeTableDTO} timeTable - Расписание работы
+   * @param {number} restaurantId - Идентификатор ресторан
+   * @returns {Promise<TimeTable | null>}
+   */
+  async editTimeTable(timeTable: ITimeTableDTO, restaurantId: number): Promise<TimeTable | null> {
+    try {
+      const result = await this.resource.editTimeTable(timeTable, null, {timeTableId: timeTable.id, restaurantId: restaurantId});
       if (result.data) {
         const timeTable_ = new TimeTable(result.data);
         this.restaurants.forEach((item: Restaurant) => {
@@ -157,7 +269,7 @@ export class RestaurantsService {
    */
   async addSocialNetwork(network: ISocialNetworkDTO, restaurantId: number): Promise<SocialNetwork | null> {
     try {
-      const result = await this.resource.addSocialNetwork(network, null, {id: restaurantId});
+      const result = await this.resource.addSocialNetwork(network, null, {restaurantId: restaurantId});
       if (result.data) {
         const network_ = new SocialNetwork(result.data);
         this.restaurants.forEach((item: Restaurant) => {
@@ -174,6 +286,34 @@ export class RestaurantsService {
   }
 
   /**
+   * Удаление соцмальной сети
+   * @param {ISocialNetworkDTO} socialNetwork - Социальная сеть
+   * @param {number} restaurantId - Идентификатор ресторана
+   * @returns {Promise<boolean>}
+   */
+  async deleteSocialNetwork(socialNetwork: ISocialNetworkDTO, restaurantId: number): Promise<boolean> {
+    try {
+      const result = await this.resource.deleteSocialNetwork({restaurantId: restaurantId, socialNetworkId: socialNetwork.id});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.restaurants.forEach((item: Restaurant) => {
+          if (item.id === restaurantId) {
+            item.social.forEach((social: SocialNetwork, index: number, array: SocialNetwork[]) => {
+              if (social.id === socialNetwork.id) {
+                array.splice(index, 1);
+              }
+            });
+          }
+        });
+        return true;
+      }
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  /**
    * Возвращает список всех ресторанов
    * @returns {Restaurant[]}
    */
@@ -181,6 +321,10 @@ export class RestaurantsService {
     return this.restaurants;
   }
 
+  /**
+   * Возвращает список всех типов социальных сетей
+   * @returns {SocialNetworkType[]}
+   */
   getSocialNetworkTypes(): SocialNetworkType[] {
     return this.socialNetworkTypes;
   }

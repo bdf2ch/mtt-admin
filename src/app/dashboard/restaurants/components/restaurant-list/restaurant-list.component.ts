@@ -132,7 +132,12 @@ export class RestaurantListComponent implements OnInit {
       this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     }
     const rest = await this.restaurantsService.addRestaurant(this.restaurantData, this.authenticationService.getCurrentUser().companyId);
-    const time = await this.restaurantsService.addTimeTable(this.timeTableData, rest.id);
+    await this.restaurantsService.addAddress(this.addressData, rest.id);
+    await this.restaurantsService.addTimeTable(this.timeTableData, rest.id);
+
+    this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
+      await this.restaurantsService.addSocialNetwork(item, rest.id);
+    });
   }
 
   /**
@@ -212,9 +217,13 @@ export class RestaurantListComponent implements OnInit {
     const control: AbstractControl = this.timeTableForm.controls[item];
     switch (item) {
       case 'from':
-        return control.dirty && control.hasError('required') ? 'Вы не указали время начала работы' : control.hasError('pattern') ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали время начала работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
       case 'to':
-        return control.dirty && control.hasError('required') ? 'Вы не указали время окончания работы' : control.hasError('pattern') ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали время окончания работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
     }
   }
 
@@ -239,7 +248,9 @@ export class RestaurantListComponent implements OnInit {
     const control: AbstractControl = this.socialNetworksForm.controls[item];
     switch (item) {
       default:
-        return control.dirty && control.hasError('required') ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern') ? 'Вы указали адрес в соц. сети некорректно' : '';
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')
+            ? 'Вы указали адрес в соц. сети некорректно' : '';
     }
   }
 
@@ -270,8 +281,8 @@ export class RestaurantListComponent implements OnInit {
 
   onChangeUntilLastClient(value: boolean) {
     console.log(value);
-    //this.timeTableData.to = null;
-    //this.timeTableForm.get('to').setValue(null);
+    // this.timeTableData.to = null;
+    // this.timeTableForm.get('to').setValue(null);
     if (value) {
       this.timeTableForm.get('to').clearValidators();
       this.timeTableForm.get('to').reset();
@@ -293,10 +304,10 @@ export class RestaurantListComponent implements OnInit {
       timeCreated: new Date().getTime()
     };
     console.log(network);
-    const siteRegExp = /^https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,}$/;
+    const siteRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]!\$&'\(\)\*\+,;=.]+$/;
     this.socialNetworksForm.addControl(
       `socialNetworkType${network.timeCreated}`,
-      new FormControl('', [Validators.required])
+      new FormControl(network.network_type, [Validators.required])
     );
     this.socialNetworksForm.addControl(
       `socialNetworkUrl${network.timeCreated}`,
@@ -304,6 +315,24 @@ export class RestaurantListComponent implements OnInit {
     );
     this.socialNetworksData.push(network);
     console.log(this.socialNetworksForm);
+  }
+
+
+  /**
+   * Удаление социальной сети из списка формы добавлении ресторана
+   * @param {ISocialNetworkDTO} network
+   */
+  removeSocialNetwork(network: ISocialNetworkDTO) {
+    this.socialNetworksData.forEach((item: ISocialNetworkDTO, index: number, array: ISocialNetworkDTO[]) => {
+      if (item.timeCreated === network.timeCreated) {
+        array.splice(index, 1);
+        this.socialNetworksForm.removeControl(`socialNetworkType${network.timeCreated}`);
+        this.socialNetworksForm.removeControl(`socialNetworkUrl${network.url}`);
+      }
+      if (this.socialNetworksData.length === 0) {
+        this.socialNetworksForm.reset();
+      }
+    });
   }
 
 

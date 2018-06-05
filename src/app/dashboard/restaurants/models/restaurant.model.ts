@@ -16,7 +16,7 @@ export class Restaurant implements IRestaurant {
   phone: string;              // Телефон
   www: string;                // Сайт
   rKeeperConfig: any;         // Конфигурация R-Keeper
-  // address: IAddress;          // Адрес
+  address: IAddress;          // Адрес
   timeTable: ITimeTable;      // Расписание работы
   social: ISocialNetwork[];   // Набор социальных сетей
 
@@ -30,7 +30,7 @@ export class Restaurant implements IRestaurant {
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
     this.rKeeperConfig = config ? config.r_keeper_config : {};
-    // this.address = config ? new Address(config.address) : new Address();
+    this.address = config ? new Address(config.address) : new Address();
     this.timeTable = config ? new TimeTable(config.work_interval) : new TimeTable();
     // this.social = [];
 

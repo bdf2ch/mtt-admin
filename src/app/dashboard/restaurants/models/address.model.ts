@@ -1,4 +1,5 @@
 import { IAddress } from '../interfaces/address.interface';
+import { IAddressDTO } from '../dto/address.dto';
 
 /**
  * Класс, реализующий интерфейс адрема ресторана
@@ -16,11 +17,11 @@ export class Address implements IAddress {
    * Конструктор
    * @param {IAddress} config - Параметры инициализации
    */
-  constructor(config?: IAddress) {
+  constructor(config?: IAddressDTO) {
     this.id = config ? config.id : 0;
     this.city = config ? config.city : '';
     this.street = config ? config.street : '';
-    this.building = config ? config.building : '';
+    this.building = config ? config.building_number : '';
     this.comment = config ? config.comment : '';
     this.latitude = config ? config.latitude : 0;
     this.longitude = config ? config.longitude : 0;

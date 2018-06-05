@@ -9,11 +9,11 @@ import {
   ResourceRequestMethod
 } from '@ngx-resource/core';
 import { environment } from '../../../../environments/environment';
-import { IRestaurant } from '../interfaces/restaurant.interface';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
-import {ITimeTableDTO} from '../dto/time-table.dto';
-import {ISocialNetworkDTO} from "../dto/social-network.dto";
+import { ITimeTableDTO } from '../dto/time-table.dto';
+import { ISocialNetworkDTO } from '../dto/social-network.dto';
+import { IAddressDTO } from '../dto/address.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -45,22 +45,57 @@ export class RestaurantsResource extends Resource {
 
   @ResourceAction({
     path: '/company/{!companyId}/restaurant/{!restaurantId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editRestaurant: IResourceMethodStrict<IRestaurantDTO, void, {companyId: number, restaurantId: number}, IServerResponse<IRestaurantDTO>>;
+
+  @ResourceAction({
+    path: '/company/{!companyId}/restaurant/{!restaurantId}',
     method: ResourceRequestMethod.Delete,
     withCredentials: true
   })
   deleteRestaurant: IResourceMethod<{companyId: number, restaurantId: number}, IServerResponse<boolean>>;
 
   @ResourceAction({
-    path: '/restaurant/{!id}/work-interval',
+    path: '/restaurant/{!restaurantId}/address',
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
-  addTimeTable: IResourceMethodStrict<ITimeTableDTO, void, {id: number}, IServerResponse<ITimeTableDTO>>;
+  addAddress: IResourceMethodStrict<IAddressDTO, void, {restaurantId: number}, IServerResponse<IAddressDTO>>;
 
   @ResourceAction({
-    path: '/restaurant/{!id}/social-network',
+    path: '/restaurant/{!restaurantId}/address/{!addressId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editAddress: IResourceMethodStrict<IAddressDTO, void, {restaurantId: number, addressId: number}, IServerResponse<IAddressDTO>>;
+
+  @ResourceAction({
+    path: '/restaurant/{!restaurantId}/work-interval',
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
-  addSocialNetwork: IResourceMethodStrict<ISocialNetworkDTO, void, {id: number}, IServerResponse<ISocialNetworkDTO>>;
+  addTimeTable: IResourceMethodStrict<ITimeTableDTO, void, {restaurantId: number}, IServerResponse<ITimeTableDTO>>;
+
+  @ResourceAction({
+    path: '/restaurant/{!restaurantId}/work-interval/{!timeTableId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editTimeTable: IResourceMethodStrict<ITimeTableDTO, void, {restaurantId: number, timeTableId: number}, IServerResponse<ITimeTableDTO>>;
+
+  @ResourceAction({
+    path: '/restaurant/{!restaurantId}/social-network',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addSocialNetwork: IResourceMethodStrict<ISocialNetworkDTO, void, {restaurantId: number}, IServerResponse<ISocialNetworkDTO>>;
+
+  @ResourceAction({
+    path: '/restaurant/{!restaurantId}/social-network/{!socialNetworkId}',
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
+  })
+  deleteSocialNetwork: IResourceMethod<{restaurantId: number, socialNetworkId: number}, IServerResponse<boolean>>;
 }

@@ -11,6 +11,7 @@ import { UserSessionGuard } from './shared/guards/user-session.guard';
 import { UsersModule } from './dashboard/users/users.module';
 import { CompanyModule } from './dashboard/company/company.module';
 import { RestaurantsModule} from './dashboard/restaurants/restaurants.module';
+import { SurveysModule } from './dashboard/surveys/surveys.module';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -23,6 +24,8 @@ import { RestaurantListComponent } from './dashboard/restaurants/components/rest
 import { RestaurantsResolveGuard } from './dashboard/restaurants/guards/restaurants-resolve.guard';
 import { RolesListComponent } from './dashboard/users/components/roles-list/roles-list.component';
 import { UsersComponent } from './dashboard/users/components/users/users.component';
+import { SurveysComponent } from './dashboard/surveys/components/surveys/surveys.component';
+import { SurveysListComponent } from './dashboard/surveys/components/surveys-list/surveys-list.component';
 
 const routes: Routes = [
   {
@@ -30,6 +33,16 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [UserSessionGuard],
     children: [
+      {
+        path: 'surveys',
+        component: SurveysComponent,
+        children: [
+          {
+            path: '',
+            component: SurveysListComponent
+          }
+        ]
+      },
       {
         path: 'company',
         component: CompanyComponent,
@@ -79,7 +92,8 @@ const routes: Routes = [
     AuthenticationModule,
     UsersModule,
     CompanyModule,
-    RestaurantsModule
+    RestaurantsModule,
+    SurveysModule
   ],
   exports: [
     ElModule,

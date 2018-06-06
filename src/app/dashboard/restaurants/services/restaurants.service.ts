@@ -14,7 +14,7 @@ import {Address} from '../models/address.model';
 import {ISocialNetworkTypeDTO} from "../dto/social-network-type.dto";
 import {analyzeFileForInjectables} from "@angular/compiler";
 import {ISocialNetwork} from "../interfaces/social-network.interface";
-import {ISocialNetworkType} from "../interfaces/social-network-type.interface";
+import { ISocialNetworkType } from '../interfaces/social-network-type.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -31,30 +31,6 @@ export class RestaurantsService {
     this.socialNetworkTypes = [];
     this.isAddingRestaurantInProgress = false;
     this.isEditingRestaurantInProgress = false;
-
-    this.socialNetworkTypes.push(
-      /*
-      new SocialNetworkType({
-          id: 1,
-          index: 'fb',
-          title: 'Facebook'
-        }),
-      new SocialNetworkType({
-        id: 2,
-        index: 'vk',
-        title: 'VKontakte'
-      }),
-      new SocialNetworkType({
-        id: 3,
-        index: 'instagram',
-        title: 'Instagram'
-      }),
-      new SocialNetworkType({
-        id: 4,
-        index: 'twitter',
-        title: 'Twitter'
-      }));
-      */
   }
 
   /**
@@ -106,6 +82,7 @@ export class RestaurantsService {
       const result = await this.resource.addRestaurant(restaurant, null, {id: companyId});
       console.log(result);
       if (result.data) {
+        this.isAddingRestaurantInProgress = false;
         const rest = new Restaurant(result.data);
         this.restaurants.push(rest);
         return rest;

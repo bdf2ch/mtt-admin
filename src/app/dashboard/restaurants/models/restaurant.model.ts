@@ -6,6 +6,7 @@ import { Address } from './address.model';
 import { TimeTable } from './time-table.model';
 import { SocialNetwork } from './social-network.model';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
+import {ISocialNetworkDTO} from '../dto/social-network.dto';
 
 /**
  * Класс, реализующий интерфейс ресторана
@@ -30,17 +31,16 @@ export class Restaurant implements IRestaurant {
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
     this.rKeeperConfig = config ? config.r_keeper_config : {};
-    this.address = config ? new Address(config.address) : new Address();
-    this.timeTable = config ? new TimeTable(config.work_interval) : new TimeTable();
-    // this.social = [];
+    this.address = config ? new Address(config.address['data']) : new Address();
+    this.timeTable = config ? new TimeTable(config.work_intervals[0]) : new TimeTable();
+    this.social = [];
 
-    /*
     if (config) {
-      config.social.forEach((item: ISocialNetwork) => {
+      config.social_networks.forEach((item: ISocialNetworkDTO) => {
         const social = new SocialNetwork(item);
         this.social.push(social);
       });
     }
-    */
+    console.log(this);
   }
 }

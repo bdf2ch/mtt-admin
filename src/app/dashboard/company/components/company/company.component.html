@@ -28,6 +28,13 @@
             <span *ngIf="!companyService.getCompany().www" class="text-muted">Не указан</span>
           </td>
         </tr>
+        <tr>
+          <th scope="row">Конфигурация R-Keeper</th>
+          <td>
+            <span *ngIf="companyService.getCompany().rKeeperConfig">{{ companyService.getCompany().rKeeperConfig }}</span>
+            <span *ngIf="!companyService.getCompany().rKeeperConfig" class="text-muted">Не указана</span>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -140,25 +147,40 @@
            [show-icon]="true"
            [show-message]="true">
 
+    <!-- Start: Name -->
     <el-form-item label="Наименование"
                   [required]="true"
                   [status]="editCompanyFormStatusCtrl('title')"
                   [error]="editCompanyFormMessageCtrl('title')">
       <el-input formControlName="title" [(model)]="companyData.name"></el-input>
     </el-form-item>
+    <!-- End: Name -->
 
+    <!-- Start: Phone -->
     <el-form-item label="Телефон"
                   [status]="editCompanyFormStatusCtrl('phone')"
                   [error]="editCompanyFormMessageCtrl('phone')">
       <el-input formControlName="phone" [(model)]="companyData.phone"></el-input>
     </el-form-item>
+    <!-- End: Phone -->
 
+    <!-- Start: WWW -->
     <el-form-item label="Сайт"
                   [status]="editCompanyFormStatusCtrl('www')"
                   [error]="editCompanyFormMessageCtrl('www')">
       <el-input formControlName="www" [(model)]="companyData.site"></el-input>
     </el-form-item>
+    <!-- End: WWW -->
 
+    <!-- Start: R-Keeper Configuration -->
+    <el-form-item label="Конф. R-Keeper"
+                  [status]="editCompanyFormStatusCtrl('r_keeper_config')"
+                  [error]="editCompanyFormMessageCtrl('r_keeper_config')">
+      <el-input formControlName="r_keeper_config" [(model)]="companyData.r_keeper_config"></el-input>
+    </el-form-item>
+    <!-- End: R-Keeper Configuration -->
+
+    <!-- Start: Controls -->
     <el-form-item>
       <div class="">
         <el-button type="success"
@@ -175,6 +197,7 @@
         </el-button>
       </div>
     </el-form-item>
+    <!-- End: Controls -->
 
   </el-form>
 </el-dialog>

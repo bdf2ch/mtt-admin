@@ -57,7 +57,8 @@ export class CompanyComponent implements OnInit {
     this.editCompanyForm = this.builder.group({
       title: [this.companyData.name, Validators.required],
       phone: [this.companyData.phone],
-      www: [this.companyData.site]
+      www: [this.companyData.site],
+      r_keeper_config: [this.companyData.r_keeper_config]
     });
     const INNRegExp = /^[0-9]{10}$|^[0-9]{12}$/;
     const KPPRegExp = /^[0-9]{9}$/;
@@ -84,6 +85,7 @@ export class CompanyComponent implements OnInit {
     this.companyData.name = this.companyService.getCompany().title;
     this.companyData.phone = this.companyService.getCompany().phone;
     this.companyData.site = this.companyService.getCompany().www;
+    this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     this.isInEditCompanyMode = true;
   }
 
@@ -91,10 +93,10 @@ export class CompanyComponent implements OnInit {
    * Закрытие диалогового окна изменения данных о компании
    */
   closeEditCompanyDialog() {
-    console.log('close dialog');
     this.companyData.name = this.companyService.getCompany().title;
     this.companyData.phone = this.companyService.getCompany().phone;
     this.companyData.site = this.companyService.getCompany().www;
+    this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     this.isInEditCompanyMode = false;
   }
 
@@ -106,7 +108,7 @@ export class CompanyComponent implements OnInit {
   editCompanyFormStatusCtrl(item: string): string {
     if (!this.editCompanyForm.controls[item]) { return; }
     const control: AbstractControl = this.editCompanyForm.controls[item];
-    return control.dirty && control.hasError('required') ? 'invalid' : 'validating';
+    return control.dirty && control.hasError('required') ? 'error' : 'validating';
   }
 
   /**
@@ -193,10 +195,14 @@ export class CompanyComponent implements OnInit {
         message =  c.dirty && c.hasError('required') ? 'Вы не указали наименование' : '';
         break;
       case 'inn':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали ИНН' : c.hasError('pattern') ? 'ИНН должен содержать 10 или 12 символов' : '';
+        message =  c.dirty && c.hasError('required')
+          ? 'Вы не указали ИНН' : c.hasError('pattern')
+            ? 'ИНН должен содержать 10 или 12 символов' : '';
         break;
       case 'kpp':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали КПП' : c.hasError('pattern') ? 'КПП должен содержать 9 символов' : '';
+        message =  c.dirty && c.hasError('required')
+          ? 'Вы не указали КПП' : c.hasError('pattern')
+            ? 'КПП должен содержать 9 символов' : '';
         break;
       case 'legal_address':
         message =  c.dirty && c.hasError('required') ? 'Вы не указали юридический адрес' : '';
@@ -208,13 +214,19 @@ export class CompanyComponent implements OnInit {
         message =  c.dirty && c.hasError('required') ? 'Вы не указали наименование банка' : '';
         break;
       case 'checking_account':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали расчетный счет' : c.hasError('pattern') ? 'Расчетный счет должен содержать 20 символов' : '';
+        message =  c.dirty && c.hasError('required')
+          ? 'Вы не указали расчетный счет' : c.hasError('pattern')
+            ? 'Расчетный счет должен содержать 20 символов' : '';
         break;
       case 'correspondent_account':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали корреспондентский счет' : c.hasError('pattern') ? 'Корреспондентсикй счет должен содержать 20 символов' : '';
+        message =  c.dirty && c.hasError('required')
+          ? 'Вы не указали корреспондентский счет' : c.hasError('pattern')
+            ? 'Корреспондентсикй счет должен содержать 20 символов' : '';
         break;
       case 'bik':
-        message =  c.dirty && c.hasError('required') ? 'Вы не указали БИК' : c.hasError('pattern') ? 'БИК должен состоять из 9 символов' : '';
+        message =  c.dirty && c.hasError('required')
+          ? 'Вы не указали БИК' : c.hasError('pattern')
+            ? 'БИК должен состоять из 9 символов' : '';
         break;
     }
     return message;

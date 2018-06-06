@@ -4,7 +4,7 @@ import { ITimeTableDTO } from '../dto/time-table.dto';
 /**
  * Класс, реализцющий интерфейс времени работы ресторана
  */
-export class TimeTable implements  ITimeTable {
+export class TimeTable implements ITimeTable {
   id: number;                 // Идентификатор
   opening: string;            // открытие
   closing: string;            // Закрытие

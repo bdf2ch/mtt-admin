@@ -18,14 +18,14 @@
         </thead>
         <tbody>
         <tr *ngFor="let restaurant of restaurantsService.getRestaurants(); let i = index;">
-          <td class="p-3">{{ i + 1 }}</td>
+          <td class="p-3">{{ i + 1 }}.</td>
           <td class="p-3">{{ restaurant.title }}</td>
-          <td class="p-3"></td>
+          <td class="p-3">{{ restaurant.address.addressLabel }}</td>
           <td>
             <div class="container-fluid">
               <div class="row">
                 <div class="col-12 d-flex justify-content-between">
-                  <el-button type="success" size="small" icon="edit" (click)="handle(scope)">&nbsp; Изменить</el-button>
+                  <el-button type="success" size="small" icon="edit" (click)="openEditRestaurantDialog(restaurant)">&nbsp; Изменить</el-button>
                   <el-button type="danger" size="small" icon="delete" (click)="openDeleteRestaurantDialog(restaurant)">&nbsp; Удалить</el-button>
                 </div>
               </div>
@@ -57,7 +57,7 @@
 
 
 
-    <div class="container-fluid">
+    <div class="container-fluid" *ngIf="isInAddRestaurantMode">
 
       <!-- Start: Restaurant information -->
       <div class="row">
@@ -278,14 +278,10 @@
                  icon="check"
                  [elDisabled]="
                     restaurantForm.invalid
-                 || restaurantForm.pristine
                  || addressForm.invalid
-                 || addressForm.pristine
                  || timeTableForm.invalid
-                 || timeTableForm.pristine
                  || socialNetworksForm.invalid
-                 || rKeeperForm.invalid
-                 || rKeeperForm.pristine"
+                 || rKeeperForm.invalid"
                  [loading]="restaurantsService.addingRestaurantInProgress()"
                  (click)="addRestaurant()">
         &nbsp; Сохранить
@@ -304,6 +300,261 @@
 <!-- End: Add restaurant dialog -->
 
 
+
+<!-- Start: Edit restaurant dialog -->
+<el-dialog [(visible)]="isInEditRestaurantMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение ресторана</span>
+  </ng-template>
+
+
+  <div class="container-fluid">
+
+    <!-- Start: Restaurant information -->
+    <div class="row">
+      <div class="col-12 border-bottom">
+        <h4 class="text-muted mb-3">Информация о ресторане</h4>
+
+        <el-form [formGroup]="restaurantForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Наименование"
+                        [required]="true"
+                        [status]="restaurantFormStatusCtrl('name')"
+                        [error]="restaurantFormMessageCtrl('name')">
+            <el-input formControlName="name" [(model)]="restaurantData.name"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+          <!-- Start: Phone -->
+          <el-form-item label="Телефон"
+                        [status]="restaurantFormStatusCtrl('phone')"
+                        [error]="restaurantFormMessageCtrl('phone')">
+            <el-input formControlName="phone" [(model)]="restaurantData.phone"></el-input>
+          </el-form-item>
+          <!-- End: Phone -->
+
+          <!-- Start: Site -->
+          <el-form-item label="Сайт"
+                        [status]="restaurantFormStatusCtrl('site')"
+                        [error]="restaurantFormMessageCtrl('site')">
+            <el-input formControlName="site" [(model)]="restaurantData.site"></el-input>
+          </el-form-item>
+          <!-- End: Site -->
+        </el-form>
+      </div>
+    </div>
+    <!-- End: Restaurant information -->
+
+
+    <!-- Start: Restaurant address -->
+    <div class="row pt-3">
+      <div class="col-12 border-bottom">
+        <h4 class="text-muted mb-3">Адрес</h4>
+
+        <el-form [formGroup]="addressForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: City -->
+          <el-form-item label="Город"
+                        [required]="true"
+                        [status]="addressFormStatusCtrl('city')"
+                        [error]="addressFormMessageCtrl('city')">
+            <el-input formControlName="city" [(model)]="addressData.city"></el-input>
+          </el-form-item>
+          <!-- End: City -->
+
+          <!-- Start: Street -->
+          <el-form-item label="Улица"
+                        [required]="true"
+                        [status]="addressFormStatusCtrl('street')"
+                        [error]="addressFormMessageCtrl('street')">
+            <el-input formControlName="street" [(model)]="addressData.street"></el-input>
+          </el-form-item>
+          <!-- End: Street -->
+
+          <!-- Start: Building -->
+          <el-form-item label="Дом"
+                        [required]="true"
+                        [status]="addressFormStatusCtrl('building_number')"
+                        [error]="addressFormMessageCtrl('building_number')">
+            <el-input formControlName="building_number" [(model)]="addressData.building_number"></el-input>
+          </el-form-item>
+          <!-- End: Building -->
+        </el-form>
+      </div>
+    </div>
+    <!-- End: Restaurant address -->
+
+
+    <!-- Start: Timetable-->
+    <div class="row pt-3">
+      <div class="col-12 border-bottom">
+        <h4 class="text-muted mb-3">Расписание работы</h4>
+
+        <el-form [formGroup]="timeTableForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: From -->
+          <el-form-item label="Начало работы"
+                        [required]="true"
+                        [status]="timeTableFormStatusCtrl('from')"
+                        [error]="timeTableFormMessageCtrl('from')">
+            <el-input formControlName="from" [(model)]="timeTableData.from"></el-input>
+          </el-form-item>
+          <!-- End: From -->
+
+          <!-- Start: To -->
+          <el-form-item label="Окончание работы"
+                        [hidden]="timeTableData.until_last_client"
+                        [required]="!timeTableData.until_last_client ? true : false"
+                        [status]="timeTableFormStatusCtrl('to')"
+                        [error]="timeTableFormMessageCtrl('to')">
+            <el-input formControlName="to" [(model)]="timeTableData.to"></el-input>
+          </el-form-item>
+          <!-- End: To -->
+
+          <!-- Start: Until last client -->
+          <el-form-item label="До последнего клиента"
+                        [status]="timeTableFormStatusCtrl('until_last_client')"
+                        [error]="timeTableFormMessageCtrl('until_last_client')">
+            <el-switch type="primary" [(model)]="timeTableData.until_last_client" (modelChange)="onChangeUntilLastClient($event)"></el-switch>
+          </el-form-item>
+          <!-- End: Until last client -->
+        </el-form>
+      </div>
+    </div>
+    <!-- End: Timetable -->
+
+    <!-- Start: Social networks -->
+    <div class="row pt-3">
+      <div class="col-12 border-bottom social-networks">
+        <div class="d-flex justify-content-between mb-3">
+          <h4 class="text-muted mb-3">Социальные сети</h4>
+          <el-button type="text" size="mini" icon="plus" (click)="appendSocialNetwork()" [size]="'small'">&nbsp; Добавить</el-button>
+        </div>
+        <div el-row *ngIf="socialNetworksData.length === 0">
+          <div el-col span="24" class="text-center text-muted pl-4 pr-4 pb-4">Социальные сети отсутствуют</div>
+        </div>
+
+        <el-form [formGroup]="socialNetworksForm"
+                 [inline]="true"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+          <div *ngFor="let network of socialNetworksData">
+
+            <div el-row type="flex" justify="space-between" *ngIf="socialNetworksData.length !== 0">
+              <div el-col span="8">
+                <el-form-item [required]="true"
+                              [status]="socialNetworksFormStatusCtrl('socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))"
+                              [error]="socialNetworksFormMessageCtrl('socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))">
+                  <el-select [(model)]="network.network_type" formControlName="{{'socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString())}}" placeholder="Соц. сеть">
+                    <el-option *ngFor="let socType of restaurantsService.getSocialNetworkTypes()"
+                               [label]="socType.title"
+                               [value]="socType.code">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+              <div el-col span="12">
+                <el-form-item [required]="true"
+                              [status]="socialNetworksFormStatusCtrl('socialNetworkUrl' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))"
+                              [error]="socialNetworksFormMessageCtrl('socialNetworkUrl' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))">
+                  <el-input formControlName="{{'socialNetworkUrl' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString())}}" [(model)]="network.url"></el-input>
+                </el-form-item>
+              </div>
+              <div el-col span="4" align="right">
+                <el-form-item>
+                  <el-button type="danger" icon="delete" (click)="removeSocialNetwork(network)"></el-button>
+                </el-form-item>
+              </div>
+            </div>
+
+          </div>
+
+
+        </el-form>
+
+      </div>
+    </div>
+    <!-- End: Social networks -->
+
+    <!-- Start: R-Keeper config -->
+    <div class="row pt-3">
+      <div class="col-12 border-bottom">
+        <h4 class="text-muted mb-3">Конфигурация R-Keeper</h4>
+
+        <el-form [formGroup]="rKeeperForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Конфигурация"
+                        [required]="!companyService.getCompany().rKeeperConfig"
+                        [status]="rKeeperFormStatusCtrl('config')"
+                        [error]="rKeeperFormMessageCtrl('config')">
+            <el-input formControlName="config" [(model)]="restaurantData.r_keeper_config"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+        </el-form>
+      </div>
+    </div>
+    <!-- End: R-Keeper config -->
+
+  </div>
+
+
+  <!-- Start: Form controls -->
+  <div class="row">
+    <div class="col-12 mt-2 text-right">
+      <el-button type="success"
+                 icon="check"
+                 [elDisabled]="
+                    restaurantForm.invalid
+                 || restaurantForm.pristine
+                 || addressForm.invalid
+                 || addressForm.pristine
+                 || timeTableForm.invalid
+                 || timeTableForm.pristine
+                 || socialNetworksForm.invalid
+                 || socialNetworksData.length !== selectedRestaurant.social.length
+                 || rKeeperForm.invalid
+                 || rKeeperForm.pristine"
+                 [loading]="restaurantsService.addingRestaurantInProgress()"
+                 (click)="addRestaurant()">
+        &nbsp; Сохранить
+      </el-button>
+      <el-button type="danger"
+                 icon="close"
+                 (click)="closeAddRestaurantDialog()">
+        &nbsp; Отмена
+      </el-button>
+    </div>
+  </div>
+  <!-- End: Form controls -->
+
+
+</el-dialog>
+<!-- End: Edit restaurant dialog -->
 
 
 <!-- Start: Delete restaurant confirmation dialog -->

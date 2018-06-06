@@ -12,6 +12,7 @@ export class Address implements IAddress {
   comment: string;        // Примечание
   latitude: number;       // Широта
   longitude: number;      // Долгота
+  addressLabel: string;
 
   /**
    * Конструктор
@@ -25,5 +26,6 @@ export class Address implements IAddress {
     this.comment = config ? config.comment : '';
     this.latitude = config ? config.latitude : 0;
     this.longitude = config ? config.longitude : 0;
+    this.addressLabel = `${this.city}, ${this.street}, д. ${this.building}`;
   }
 }

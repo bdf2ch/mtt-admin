@@ -83,20 +83,6 @@ export class RestaurantListComponent implements OnInit {
       until_last_client: [this.timeTableData.until_last_client],
       config: [this.restaurantData.r_keeper_config]
     });
-    this.addressForm = this.builder.group({
-      city: [this.addressData.city, Validators.required],
-      street: [this.addressData.street, Validators.required],
-      building_number: [this.addressData.building_number, Validators.required]
-    });
-    this.timeTableForm = this.builder.group({
-      from: [this.timeTableData.from, [Validators.required, Validators.pattern(timeRegExp)]],
-      to: [this.timeTableData.to, [Validators.required, Validators.pattern(timeRegExp)]],
-      until_last_client: [this.timeTableData.until_last_client, Validators.required]
-    });
-    this.socialNetworksForm = this.builder.group({});
-    this.rKeeperForm = this.builder.group({
-      config: [this.restaurantData.r_keeper_config]
-    });
   }
 
   /**
@@ -122,16 +108,18 @@ export class RestaurantListComponent implements OnInit {
       to: null,
       until_last_client: false
     };
-    for (const item in this.socialNetworksForm.controls) {
-      this.socialNetworksForm.removeControl(item);
+    for (const item in this.restaurantForm.controls) {
+      if (item.indexOf('socialNetwork') !== -1) {
+        this.restaurantForm.removeControl(item);
+      }
     }
     this.socialNetworksData = [];
-    this.isInAddRestaurantMode = true;
     if (!this.companyService.getCompany().rKeeperConfig) {
-      this.rKeeperForm.get('config').setValidators(Validators.required);
+      this.restaurantForm.get('config').setValidators(Validators.required);
     } else {
-      this.rKeeperForm.get('config').clearValidators();
+      this.restaurantForm.get('config').clearValidators();
     }
+    this.isInAddRestaurantMode = true;
   }
 
   /**
@@ -162,7 +150,7 @@ export class RestaurantListComponent implements OnInit {
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
       this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     }
-    await this.restaurantsService.addRestaurant(this.restaurantData, this.authenticationService.getCurrentUser().companyId)
+    await this.restaurantsService.addRestaurantInfo(this.restaurantData, this.authenticationService.getCurrentUser().companyId)
       .then(async (restaurant: Restaurant) => {
         console.log(restaurant);
         const address = await this.restaurantsService.addAddress(this.addressData, restaurant.id);
@@ -171,8 +159,7 @@ export class RestaurantListComponent implements OnInit {
         restaurant.timeTable = timeTable;
         this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
           item.url = item.url.indexOf('http') === -1 ? 'http://' + item.url : item.url;
-          const social = await this.restaurantsService.addSocialNetwork(item, restaurant.id);
-          restaurant.social.push(social);
+          await this.restaurantsService.addSocialNetwork(item, restaurant.id);
         });
         this.closeAddRestaurantDialog();
         this.message['success']('Ресторан добавлен');
@@ -190,9 +177,11 @@ export class RestaurantListComponent implements OnInit {
     this.restaurantData.phone = restaurant.phone;
     this.restaurantData.site = restaurant.www;
     this.restaurantData.r_keeper_config = JSON.stringify(restaurant.rKeeperConfig);
+    this.addressData.id = restaurant.address.id;
     this.addressData.city = restaurant.address.city;
     this.addressData.street = restaurant.address.street;
     this.addressData.building_number = restaurant.address.building;
+    this.timeTableData.id = restaurant.timeTable.id;
     this.timeTableData.from = restaurant.timeTable.opening;
     this.timeTableData.to = restaurant.timeTable.closing;
     this.timeTableData.until_last_client = restaurant.timeTable.untilLastClient;
@@ -248,9 +237,51 @@ export class RestaurantListComponent implements OnInit {
 
 
   async editRestaurant() {
-    await this.restaurantsService.editRestaurant(this.restaurantData, this.authenticationService.getCurrentUser().companyId).then(() => {
-      this.res
-   restaurantsService.editAddress()
+    if (!this.restaurantData.phone) {
+      delete this.restaurantData.phone;
+    }
+    if (!this.restaurantData.site) {
+      delete this.restaurantData.site;
+    } else {
+      this.restaurantData.site = this.restaurantData.site.indexOf('http') === -1
+        ? 'http://' + this.restaurantData.site
+        : this.restaurantData.site;
+    }
+    if (this.timeTableData.until_last_client) {
+      delete this.timeTableData.to;
+    }
+    if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
+      this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
+    }
+    await this.restaurantsService.editRestaurantInfo(this.restaurantData, this.authenticationService.getCurrentUser().companyId).then(async () => {
+      await this.restaurantsService.editAddress(this.addressData, this.selectedRestaurant.id);
+      await this.restaurantsService.editTimeTable(this.timeTableData, this.selectedRestaurant.id);
+      this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
+        let found = false;
+        this.selectedRestaurant.social.forEach( (social: SocialNetwork) => {
+          if (item.id === social.id) {
+            found = true;
+          }
+        });
+        if (!found) {
+          item.url = item.url.indexOf('http') === -1
+            ? 'http://' + item.url
+            : item.url;
+          await this.restaurantsService.addSocialNetwork(item, this.selectedRestaurant.id);
+        }
+      });
+    });
+
+    this.selectedRestaurant.social.forEach(async (social: SocialNetwork) => {
+      let found = null;
+      this.socialNetworksData.forEach((item: ISocialNetworkDTO) => {
+        if (item.id === social.id) {
+          found = item;
+        }
+      });
+      if (!found) {
+        await this.restaurantsService.deleteSocialNetwork(social.id, this.selectedRestaurant.id);
+      }
     });
   }
 
@@ -301,131 +332,6 @@ export class RestaurantListComponent implements OnInit {
     }
   }
 
-  /**
-   * Получение статуса элемента формы редактирования данных об адреме ресторана
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  addressFormStatusCtrl(item: string): string {
-    if (!this.addressForm.controls[item]) { return; }
-    const control: AbstractControl = this.addressForm.controls[item];
-    return control.dirty && control.hasError('required') ? 'error' : 'validating';
-  }
-
-  /**
-   * Получение сообщения об ошибке элемента формы изменения данных о ресторане
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  addressFormMessageCtrl(item: string): string {
-    if (!this.addressForm.controls[item]) { return; }
-    const control: AbstractControl = this.addressForm.controls[item];
-    switch (item) {
-      case 'city':
-        return control.dirty && control.hasError('required') ? 'Вы не указали город' : '';
-      case 'street':
-        return control.dirty && control.hasError('required') ? 'Вы не указали улицу' : '';
-      case 'building_number':
-        return control.dirty && control.hasError('required') ? 'Вы не указали дом' : '';
-      case 'from':
-        return control.dirty && control.hasError('required')
-          ? 'Вы не указали время начала работы' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
-      case 'to':
-        return control.dirty && control.hasError('required') ?
-          'Вы не указали время окончания работы' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
-      case 'config':
-        return control.dirty && control.hasError('required') ? 'Вы не указали конфигурацию R-Keeper' : '';
-      default:
-        return control.dirty && control.hasError('required')
-          ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')
-            ? 'Вы указали адрес в соц. сети некорректно' : '';
-    }
-  }
-
-  /**
-   * Получение статуса элемента формы редактирования данных о времени работы ресторана
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  timeTableFormStatusCtrl(item: string): string {
-    if (!this.timeTableForm.controls[item]) { return; }
-    const control: AbstractControl = this.timeTableForm.controls[item];
-    return control.dirty && control.hasError('required') || control.hasError('pattern') ? 'error' : 'validating';
-  }
-
-  /**
-   * Получение сообщения об ошибке элемента формы изменения данных о времени работы ресторане
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  timeTableFormMessageCtrl(item: string): string {
-    if (!this.timeTableForm.controls[item]) { return; }
-    const control: AbstractControl = this.timeTableForm.controls[item];
-    switch (item) {
-      case 'from':
-        return control.dirty && control.hasError('required')
-          ? 'Вы не указали время начала работы' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
-      case 'to':
-        return control.dirty && control.hasError('required') ?
-          'Вы не указали время окончания работы' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
-    }
-  }
-
-  /**
-   * Получение статуса элемента формы социальных сетей ресторана
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  socialNetworksFormStatusCtrl(item: string): string {
-    if (!this.socialNetworksForm.controls[item]) { return; }
-    const control: AbstractControl = this.socialNetworksForm.controls[item];
-    return control.dirty && control.hasError('required') || control.hasError('pattern') ? 'error' : 'validating';
-  }
-
-  /**
-   * Получение сообщения об ошибке элемента формы социальных сетей ресторана
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  socialNetworksFormMessageCtrl(item: string): string {
-    if (!this.socialNetworksForm.controls[item]) { return; }
-    const control: AbstractControl = this.socialNetworksForm.controls[item];
-    switch (item) {
-      default:
-        return control.dirty && control.hasError('required')
-          ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')
-            ? 'Вы указали адрес в соц. сети некорректно' : '';
-    }
-  }
-
-  /**
-   * Получение статуса элемента формы конфигурации R-Keeper
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  rKeeperFormStatusCtrl(item: string): string {
-    if (!this.rKeeperForm.controls[item]) { return; }
-    const control: AbstractControl = this.rKeeperForm.controls[item];
-    return control.dirty && control.hasError('required') ? 'error' : 'validating';
-  }
-
-  /**
-   * Получение сообщения об ошибке элемента формы конфигурации R-Keeper
-   * @param {string} item - Имя элемента формы
-   * @returns {string}
-   */
-  rKeeperFormMessageCtrl(item: string): string {
-    if (!this.rKeeperForm.controls[item]) { return; }
-    const control: AbstractControl = this.rKeeperForm.controls[item];
-    switch (item) {
-      case 'config':
-        return control.dirty && control.hasError('required') ? 'Вы не указали конфигурацию R-Keeper' : '';
-    }
-  }
 
   /**
    * Изменение состояние переключателя времени работы до последнего клиента
@@ -434,13 +340,13 @@ export class RestaurantListComponent implements OnInit {
   onChangeUntilLastClient(value: boolean) {
     if (value) {
       this.restaurantForm.get('to').clearValidators();
-      this.restaurantForm.get('to').reset();
+      this.restaurantForm.get('to').reset('');
     } else {
       const timeRegExp = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
       this.restaurantForm.get('to').setValidators([Validators.required, Validators.pattern(timeRegExp)]);
       this.restaurantForm.get('to').reset('');
     }
-    this.restaurantForm.updateValueAndValidity();
+    this.restaurantForm.markAsDirty();
   }
 
   /**
@@ -464,6 +370,7 @@ export class RestaurantListComponent implements OnInit {
       new FormControl('', [Validators.required, Validators.pattern(siteRegExp)])
     );
     this.socialNetworksData.push(network);
+    this.restaurantForm.markAsDirty();
   }
 
   /**
@@ -477,6 +384,7 @@ export class RestaurantListComponent implements OnInit {
         array.splice(index, 1);
         this.restaurantForm.removeControl(`socialNetworkType${network.id !== 0 ? network.id : network.timeCreated}`);
         this.restaurantForm.removeControl(`socialNetworkUrl${network.id !== 0 ? network.id : network.timeCreated}`);
+        this.restaurantForm.markAsDirty();
       }
       if (this.socialNetworksData.length === 0) {
         //this.restaurantForm.reset();

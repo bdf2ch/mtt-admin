@@ -31,11 +31,11 @@ export class Restaurant implements IRestaurant {
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
     this.rKeeperConfig = config ? config.r_keeper_config : {};
-    this.address = config ? new Address(config.address['data']) : new Address();
-    this.timeTable = config ? new TimeTable(config.work_intervals[0]) : new TimeTable();
+    this.address = config && config.address ? new Address(config.address['data']) : new Address();
+    this.timeTable = config && config.work_intervals ? new TimeTable(config.work_intervals[0]) : new TimeTable();
     this.social = [];
 
-    if (config) {
+    if (config && config.social_networks) {
       config.social_networks.forEach((item: ISocialNetworkDTO) => {
         const social = new SocialNetwork(item);
         this.social.push(social);

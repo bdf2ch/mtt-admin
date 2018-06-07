@@ -1,19 +1,14 @@
 import { Injectable } from '@angular/core';
 import { RestaurantsResource } from '../resources/restaurants.resource';
 import { Restaurant  } from '../models/restaurant.model';
-import { IRestaurant } from '../interfaces/restaurant.interface';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
-import {TimeTable} from '../models/time-table.model';
-import {ITimeTableDTO} from '../dto/time-table.dto';
-import {PaymentRequisites} from '../../company/models/payment-requisites.model';
-import {ISocialNetworkDTO} from '../dto/social-network.dto';
-import {SocialNetwork} from '../models/social-network.model';
-import {SocialNetworkType} from '../models/social-network-type.model';
-import {IAddressDTO} from '../dto/address.dto';
-import {Address} from '../models/address.model';
-import {ISocialNetworkTypeDTO} from "../dto/social-network-type.dto";
-import {analyzeFileForInjectables} from "@angular/compiler";
-import {ISocialNetwork} from "../interfaces/social-network.interface";
+import { TimeTable } from '../models/time-table.model';
+import { ITimeTableDTO } from '../dto/time-table.dto';
+import { ISocialNetworkDTO } from '../dto/social-network.dto';
+import { SocialNetwork } from '../models/social-network.model';
+import { SocialNetworkType } from '../models/social-network-type.model';
+import { IAddressDTO } from '../dto/address.dto';
+import { Address } from '../models/address.model';
 import { ISocialNetworkType } from '../interfaces/social-network-type.interface';
 
 @Injectable({
@@ -58,6 +53,7 @@ export class RestaurantsService {
     try {
       const result = await this.resource.getRestaurantsByCompanyId({ id: companyId });
       if (result.data) {
+        this.restaurants = [];
         result.data.forEach((item: IRestaurantDTO) => {
           const restaurant = new Restaurant(item);
           this.restaurants.push(restaurant);
@@ -76,7 +72,7 @@ export class RestaurantsService {
    * @param {number} companyId - Идентификатор ресторана
    * @returns {Promise<Restaurant | null>}
    */
-  async addRestaurant(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
+  async addRestaurantInfo(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
     this.isAddingRestaurantInProgress = true;
     try {
       const result = await this.resource.addRestaurant(restaurant, null, {id: companyId});
@@ -100,7 +96,7 @@ export class RestaurantsService {
    * @param {number} companyId - Идентификатор компании
    * @returns {Promise<Restaurant | null>}
    */
-  async editRestaurant(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
+  async editRestaurantInfo(restaurant: IRestaurantDTO, companyId: number): Promise<Restaurant | null> {
     this.isEditingRestaurantInProgress = true;
     try {
       const result = await this.resource.editRestaurant(restaurant, null, {companyId: companyId, restaurantId: restaurant.id});
@@ -298,14 +294,14 @@ export class RestaurantsService {
    * @param {number} restaurantId - Идентификатор ресторана
    * @returns {Promise<boolean>}
    */
-  async deleteSocialNetwork(socialNetwork: ISocialNetworkDTO, restaurantId: number): Promise<boolean> {
+  async deleteSocialNetwork(socialNetworkId: number, restaurantId: number): Promise<boolean> {
     try {
-      const result = await this.resource.deleteSocialNetwork({restaurantId: restaurantId, socialNetworkId: socialNetwork.id});
+      const result = await this.resource.deleteSocialNetwork({restaurantId: restaurantId, socialNetworkId: socialNetworkId});
       if (result.meta['success'] && result.meta['success'] === true) {
         this.restaurants.forEach((item: Restaurant) => {
           if (item.id === restaurantId) {
             item.social.forEach((social: SocialNetwork, index: number, array: SocialNetwork[]) => {
-              if (social.id === socialNetwork.id) {
+              if (social.id === socialNetworkId) {
                 array.splice(index, 1);
               }
             });
@@ -318,6 +314,15 @@ export class RestaurantsService {
       console.error(error);
       return false;
     }
+  }
+
+
+  async addRestaurant(companyId: number, info: IRestaurantDTO, address: IAddressDTO, timeTable: ITimeTableDTO, social: ISocialNetworkDTO[]) {
+    this.isAddingRestaurantInProgress = true;
+    const restaurant = await this.addRestaurantInfo(info, companyId);
+    await this.addAddress(address, restaurant.id);
+    await this.addTimeTable(timeTable, restaurant.id);
+
   }
 
   /**

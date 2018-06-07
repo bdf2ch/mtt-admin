@@ -28,7 +28,7 @@ export class Company implements ICompany {
     this.title = config ? config.name : '';
     this.www = config ? config.site : '';
     this.phone = config ? config.phone : '';
-    this.rKeeperConfig = config ? JSON.stringify(config.r_keeper_config) : null;
+    this.rKeeperConfig = config && config.r_keeper_config ? JSON.stringify(config.r_keeper_config) : null;
     this.restaurants = [];
     this.paymentRequisites = [];
 

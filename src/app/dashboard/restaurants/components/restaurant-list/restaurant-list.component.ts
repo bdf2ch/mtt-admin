@@ -74,7 +74,14 @@ export class RestaurantListComponent implements OnInit {
     this.restaurantForm = this.builder.group({
       name: [this.restaurantData.name, Validators.required],
       phone: [this.restaurantData.phone],
-      site: [this.restaurantData.site, Validators.pattern(siteRegExp)]
+      site: [this.restaurantData.site, Validators.pattern(siteRegExp)],
+      city: [this.addressData.city, Validators.required],
+      street: [this.addressData.street, Validators.required],
+      building_number: [this.addressData.building_number, Validators.required],
+      from: [this.timeTableData.from, [Validators.required, Validators.pattern(timeRegExp)]],
+      to: [this.timeTableData.to, [Validators.required, Validators.pattern(timeRegExp)]],
+      until_last_client: [this.timeTableData.until_last_client],
+      config: [this.restaurantData.r_keeper_config]
     });
     this.addressForm = this.builder.group({
       city: [this.addressData.city, Validators.required],
@@ -183,33 +190,19 @@ export class RestaurantListComponent implements OnInit {
     this.restaurantData.phone = restaurant.phone;
     this.restaurantData.site = restaurant.www;
     this.restaurantData.r_keeper_config = JSON.stringify(restaurant.rKeeperConfig);
-    this.restaurantForm.reset({
-      id: this.restaurantData.id,
-      name: this.restaurantData.name,
-      phone: this.restaurantData.phone,
-      site: this.restaurantData.site
-    });
     this.addressData.city = restaurant.address.city;
     this.addressData.street = restaurant.address.street;
     this.addressData.building_number = restaurant.address.building;
-    this.addressForm.reset({
-      city: this.addressData.city,
-      street: this.addressData.street,
-      building_number: this.addressData.building_number
-    });
     this.timeTableData.from = restaurant.timeTable.opening;
     this.timeTableData.to = restaurant.timeTable.closing;
     this.timeTableData.until_last_client = restaurant.timeTable.untilLastClient;
-    this.timeTableForm.reset({
-      from: this.timeTableData.from,
-      to: this.timeTableData.to,
-      until_last_client: this.timeTableData.until_last_client
-    });
     this.socialNetworksData = [];
-    for (const item in this.socialNetworksForm.controls) {
-      this.socialNetworksForm.removeControl(item);
+    for (const item in this.restaurantForm.controls) {
+      if (item.indexOf('socialNetwork') !== -1) {
+        this.restaurantForm.removeControl(item);
+      }
     }
-    this.socialNetworksForm.reset('');
+    const siteRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]!\$&'\(\)\*\+,;=.]+$/;
     restaurant.social.forEach((item: SocialNetwork) => {
       const social: ISocialNetworkDTO = {
         id: item.id,
@@ -217,9 +210,30 @@ export class RestaurantListComponent implements OnInit {
         network_type: item.type,
         url: item.url
       };
-      this.socialNetworksForm.addControl(`socialNetworkType${social.id}`, new FormControl(social.network_type));
-      this.socialNetworksForm.addControl(`socialNetworkUrl${social.id}`, new FormControl(social.url));
+      this.restaurantForm.addControl(`socialNetworkType${social.id}`, new FormControl(''));
+      this.restaurantForm.addControl(
+        `socialNetworkUrl${social.id}`,
+        new FormControl('', [Validators.required, Validators.pattern(siteRegExp)])
+      );
+      this.restaurantForm.get(`socialNetworkType${social.id}`).reset(social.network_type);
+      this.restaurantForm.get(`socialNetworkUrl${social.id}`).reset(social.url);
       this.socialNetworksData.push(social);
+    });
+    this.restaurantForm.reset({
+      id: this.restaurantData.id,
+      name: this.restaurantData.name,
+      phone: this.restaurantData.phone,
+      site: this.restaurantData.site,
+      city: this.addressData.city,
+      street: this.addressData.street,
+      building_number: this.addressData.building_number,
+      from: this.timeTableData.from,
+      to: this.timeTableData.to,
+      until_last_client: this.timeTableData.until_last_client
+    });
+    this.socialNetworksData.forEach((item: ISocialNetworkDTO) => {
+      this.restaurantForm.get(`socialNetworkType${item.id}`).reset(item.network_type);
+      this.restaurantForm.get(`socialNetworkUrl${item.id}`).reset(item.url);
     });
     this.isInEditRestaurantMode = true;
   }
@@ -234,7 +248,10 @@ export class RestaurantListComponent implements OnInit {
 
 
   async editRestaurant() {
-
+    await this.restaurantsService.editRestaurant(this.restaurantData, this.authenticationService.getCurrentUser().companyId).then(() => {
+      this.res
+   restaurantsService.editAddress()
+    });
   }
 
   /**
@@ -261,6 +278,26 @@ export class RestaurantListComponent implements OnInit {
         return control.dirty && control.hasError('required') ? 'Вы не указали наименование' : '';
       case 'site':
         return control.dirty && control.hasError('pattern') ? 'Адрес сайта указан некорректно' : '';
+      case 'city':
+        return control.dirty && control.hasError('required') ? 'Вы не указали город' : '';
+      case 'street':
+        return control.dirty && control.hasError('required') ? 'Вы не указали улицу' : '';
+      case 'building_number':
+        return control.dirty && control.hasError('required') ? 'Вы не указали дом' : '';
+      case 'from':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали время начала работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+      case 'to':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали время окончания работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+      case 'config':
+        return control.dirty && control.hasError('required') ? 'Вы не указали конфигурацию R-Keeper' : '';
+      default:
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')
+            ? 'Вы указали адрес в соц. сети некорректно' : '';
     }
   }
 
@@ -290,6 +327,20 @@ export class RestaurantListComponent implements OnInit {
         return control.dirty && control.hasError('required') ? 'Вы не указали улицу' : '';
       case 'building_number':
         return control.dirty && control.hasError('required') ? 'Вы не указали дом' : '';
+      case 'from':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали время начала работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+      case 'to':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали время окончания работы' : control.hasError('pattern')
+            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+      case 'config':
+        return control.dirty && control.hasError('required') ? 'Вы не указали конфигурацию R-Keeper' : '';
+      default:
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')
+            ? 'Вы указали адрес в соц. сети некорректно' : '';
     }
   }
 
@@ -382,13 +433,14 @@ export class RestaurantListComponent implements OnInit {
    */
   onChangeUntilLastClient(value: boolean) {
     if (value) {
-      this.timeTableForm.get('to').clearValidators();
-      this.timeTableForm.get('to').reset();
+      this.restaurantForm.get('to').clearValidators();
+      this.restaurantForm.get('to').reset();
     } else {
       const timeRegExp = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-      this.timeTableForm.get('to').setValidators([Validators.required, Validators.pattern(timeRegExp)]);
-      this.timeTableForm.get('to').reset('');
+      this.restaurantForm.get('to').setValidators([Validators.required, Validators.pattern(timeRegExp)]);
+      this.restaurantForm.get('to').reset('');
     }
+    this.restaurantForm.updateValueAndValidity();
   }
 
   /**
@@ -403,11 +455,11 @@ export class RestaurantListComponent implements OnInit {
       timeCreated: new Date().getTime()
     };
     const siteRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]!\$&'\(\)\*\+,;=.]+$/;
-    this.socialNetworksForm.addControl(
+    this.restaurantForm.addControl(
       `socialNetworkType${network.timeCreated}`,
       new FormControl(network.network_type, [Validators.required])
     );
-    this.socialNetworksForm.addControl(
+    this.restaurantForm.addControl(
       `socialNetworkUrl${network.timeCreated}`,
       new FormControl('', [Validators.required, Validators.pattern(siteRegExp)])
     );
@@ -423,11 +475,12 @@ export class RestaurantListComponent implements OnInit {
     this.socialNetworksData.forEach((item: ISocialNetworkDTO, index: number, array: ISocialNetworkDTO[]) => {
       if ((item.id !== 0 && item.id === network.id) || (item.id === 0 && item.timeCreated && item.timeCreated === network.timeCreated)) {
         array.splice(index, 1);
-        this.socialNetworksForm.removeControl(`socialNetworkType${network.id !== 0 ? network.id : network.timeCreated}`);
-        this.socialNetworksForm.removeControl(`socialNetworkUrl${network.id !== 0 ? network.id : network.timeCreated}`);
+        this.restaurantForm.removeControl(`socialNetworkType${network.id !== 0 ? network.id : network.timeCreated}`);
+        this.restaurantForm.removeControl(`socialNetworkUrl${network.id !== 0 ? network.id : network.timeCreated}`);
       }
       if (this.socialNetworksData.length === 0) {
-        this.socialNetworksForm.reset();
+        //this.restaurantForm.reset();
+        this.restaurantForm.updateValueAndValidity();
       }
     });
   }

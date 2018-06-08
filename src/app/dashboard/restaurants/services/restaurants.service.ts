@@ -316,15 +316,61 @@ export class RestaurantsService {
     }
   }
 
-
-  async addRestaurant(companyId: number, info: IRestaurantDTO, address: IAddressDTO, timeTable: ITimeTableDTO, social: ISocialNetworkDTO[]) {
-    this.isAddingRestaurantInProgress = true;
-    const restaurant = await this.addRestaurantInfo(info, companyId);
-    await this.addAddress(address, restaurant.id);
-    await this.addTimeTable(timeTable, restaurant.id);
-
+  /**
+   * Добавление ресторана
+   * @param {number} companyId - Идентфиикатор компании
+   * @param {IRestaurantDTO} info - Информация о ресторане
+   * @param {IAddressDTO} address - Адрес ресторана
+   * @param {ITimeTableDTO} time - Расписание работы ресторана
+   * @param {ISocialNetworkDTO[]} socials - Список социальный сетей
+   * @returns {Promise<void>}
+   */
+  async addRestaurant(companyId: number, info: IRestaurantDTO, address: IAddressDTO, time: ITimeTableDTO, socials: ISocialNetworkDTO[]) {
+      this.isAddingRestaurantInProgress = true;
+      const restaurant = await this.addRestaurantInfo(info, companyId);
+      await this.addAddress(address, restaurant.id);
+      await this.addTimeTable(time, restaurant.id);
+      socials.forEach(async (social: ISocialNetworkDTO) => {
+        await this.addSocialNetwork(social, restaurant.id);
+      });
+      this.isAddingRestaurantInProgress = false;
   }
 
+
+  /**
+   * Изменение ресторана
+   * @param {number} companyId - Идентификатор клмпании
+   * @param {IRestaurantDTO} info - Информация о ресторане
+   * @param {IAddressDTO} address - Адрес ресторана
+   * @param {ITimeTableDTO} time - Расписание работы ресторана
+   * @param {ISocialNetworkDTO[]} socials - Список социальных сетей
+   * @returns {Promise<void>}
+   */
+  async editRestaurant(companyId: number, info: IRestaurantDTO, address: IAddressDTO, time: ITimeTableDTO, socials: ISocialNetworkDTO[]) {
+    const findRestaurantById = (item: Restaurant) => item.id === info.id;
+    const restaurant = this.restaurants.find(findRestaurantById);
+    if (restaurant) {
+      this.isEditingRestaurantInProgress = true;
+      await this.editRestaurantInfo(info, companyId);
+      await this.editAddress(address, restaurant.id);
+      await this.editTimeTable(time, restaurant.id);
+      restaurant.social.forEach(async (item: SocialNetwork) => {
+        const findSocialNetworkById = (social: ISocialNetworkDTO) => item.id === social.id;
+        const socialNetwork = socials.find(findSocialNetworkById);
+        if (!socialNetwork) {
+          await this.deleteSocialNetwork(item.id, restaurant.id);
+        }
+      });
+      socials.forEach(async (item: ISocialNetworkDTO) => {
+        const findSocialNetworkById = (social: SocialNetwork) => item.id === social.id;
+        const socialNetwork = restaurant.social.find(findSocialNetworkById);
+        if (!socialNetwork) {
+          await this.addSocialNetwork(item, restaurant.id);
+        }
+      });
+      this.isEditingRestaurantInProgress = false;
+    }
+  }
   /**
    * Возвращает список всех ресторанов
    * @returns {Restaurant[]}

@@ -1,18 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { RestaurantsService } from '../../services/restaurants.service';
-import {FormGroup, FormBuilder, Validators, AbstractControl, FormControl} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
 import { IRestaurantDTO } from '../../dto/restaurant.dto';
 import { AuthenticationService } from '../../../authentication/services/authentication.service';
 import { IAddressDTO } from '../../dto/address.dto';
 import { ITimeTableDTO } from '../../dto/time-table.dto';
 import { ISocialNetworkDTO } from '../../dto/social-network.dto';
-import { ESocialNetwork } from '../../enums/social-network.enum';
-import {CompanyService} from '../../../company/services/company.service';
-import {IRKeeperConfig} from '../../../company/interfaces/r-keeper-config.interface';
-import {PaymentRequisites} from '../../../company/models/payment-requisites.model';
-import {Restaurant} from '../../models/restaurant.model';
-import {ElMessageService} from 'element-angular/release/message/message.service';
-import {SocialNetwork} from '../../models/social-network.model';
+import { CompanyService } from '../../../company/services/company.service';
+import { Restaurant } from '../../models/restaurant.model';
+import { ElMessageService } from 'element-angular/release/message/message.service';
+import { SocialNetwork } from '../../models/social-network.model';
 
 @Component({
   selector: 'app-restaurant-list',
@@ -25,10 +22,6 @@ export class RestaurantListComponent implements OnInit {
   isInDeleteRestaurantMode: boolean;
   selectedRestaurant: Restaurant | null;
   restaurantForm: FormGroup;
-  addressForm: FormGroup;
-  timeTableForm: FormGroup;
-  socialNetworksForm: FormGroup;
-  rKeeperForm: FormGroup;
   restaurantData: IRestaurantDTO;
   addressData: IAddressDTO;
   timeTableData: ITimeTableDTO;
@@ -93,7 +86,8 @@ export class RestaurantListComponent implements OnInit {
       id: 0,
       name: '',
       phone: null,
-      site: null
+      site: null,
+      r_keeper_config: null,
     };
     this.addressData = {
       city: '',
@@ -119,6 +113,8 @@ export class RestaurantListComponent implements OnInit {
     } else {
       this.restaurantForm.get('config').clearValidators();
     }
+    this.restaurantForm.get('config').updateValueAndValidity();
+    this.restaurantForm.updateValueAndValidity();
     this.isInAddRestaurantMode = true;
   }
 
@@ -150,20 +146,18 @@ export class RestaurantListComponent implements OnInit {
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
       this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     }
-    await this.restaurantsService.addRestaurantInfo(this.restaurantData, this.authenticationService.getCurrentUser().companyId)
-      .then(async (restaurant: Restaurant) => {
-        console.log(restaurant);
-        const address = await this.restaurantsService.addAddress(this.addressData, restaurant.id);
-        restaurant.address = address;
-        const timeTable = await this.restaurantsService.addTimeTable(this.timeTableData, restaurant.id);
-        restaurant.timeTable = timeTable;
-        this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
-          item.url = item.url.indexOf('http') === -1 ? 'http://' + item.url : item.url;
-          await this.restaurantsService.addSocialNetwork(item, restaurant.id);
-        });
-        this.closeAddRestaurantDialog();
-        this.message['success']('Ресторан добавлен');
-      });
+    this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
+      item.url = item.url.indexOf('http') === -1 ? 'http://' + item.url : item.url;
+    });
+    await this.restaurantsService.addRestaurant(
+      this.authenticationService.getCurrentUser().companyId,
+      this.restaurantData,
+      this.addressData,
+      this.timeTableData,
+      this.socialNetworksData
+    );
+    this.closeAddRestaurantDialog();
+    this.message['success']('Ресторан добавлен');
   }
 
   /**
@@ -235,7 +229,10 @@ export class RestaurantListComponent implements OnInit {
     this.selectedRestaurant = null;
   }
 
-
+  /**
+   * Изменение ресторана
+   * @returns {Promise<void>}
+   */
   async editRestaurant() {
     if (!this.restaurantData.phone) {
       delete this.restaurantData.phone;
@@ -253,36 +250,18 @@ export class RestaurantListComponent implements OnInit {
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
       this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     }
-    await this.restaurantsService.editRestaurantInfo(this.restaurantData, this.authenticationService.getCurrentUser().companyId).then(async () => {
-      await this.restaurantsService.editAddress(this.addressData, this.selectedRestaurant.id);
-      await this.restaurantsService.editTimeTable(this.timeTableData, this.selectedRestaurant.id);
-      this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
-        let found = false;
-        this.selectedRestaurant.social.forEach( (social: SocialNetwork) => {
-          if (item.id === social.id) {
-            found = true;
-          }
-        });
-        if (!found) {
-          item.url = item.url.indexOf('http') === -1
-            ? 'http://' + item.url
-            : item.url;
-          await this.restaurantsService.addSocialNetwork(item, this.selectedRestaurant.id);
-        }
-      });
+    this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
+      item.url = item.url.indexOf('http') === -1 ? 'http://' + item.url : item.url;
     });
-
-    this.selectedRestaurant.social.forEach(async (social: SocialNetwork) => {
-      let found = null;
-      this.socialNetworksData.forEach((item: ISocialNetworkDTO) => {
-        if (item.id === social.id) {
-          found = item;
-        }
-      });
-      if (!found) {
-        await this.restaurantsService.deleteSocialNetwork(social.id, this.selectedRestaurant.id);
-      }
-    });
+    await this.restaurantsService.editRestaurant(
+      this.authenticationService.getCurrentUser().companyId,
+      this.restaurantData,
+      this.addressData,
+      this.timeTableData,
+      this.socialNetworksData
+    );
+    this.closeEditRestaurantDialog();
+    this.message['success']('Ресторан изменен');
   }
 
   /**
@@ -378,7 +357,6 @@ export class RestaurantListComponent implements OnInit {
    * @param {ISocialNetworkDTO} network - Социальная сеть
    */
   removeSocialNetwork(network: ISocialNetworkDTO) {
-    console.log(network);
     this.socialNetworksData.forEach((item: ISocialNetworkDTO, index: number, array: ISocialNetworkDTO[]) => {
       if ((item.id !== 0 && item.id === network.id) || (item.id === 0 && item.timeCreated && item.timeCreated === network.timeCreated)) {
         array.splice(index, 1);
@@ -387,7 +365,6 @@ export class RestaurantListComponent implements OnInit {
         this.restaurantForm.markAsDirty();
       }
       if (this.socialNetworksData.length === 0) {
-        //this.restaurantForm.reset();
         this.restaurantForm.updateValueAndValidity();
       }
     });

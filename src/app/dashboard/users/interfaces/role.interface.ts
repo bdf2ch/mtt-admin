@@ -5,4 +5,6 @@ export interface IRole {
   id: number;             // Идентфиикатор роли
   companyId?: number;     // Идентфикатор компании
   title: string;          // Наименование
+  description: string;    // Описание роли
+  code: string;           // Код роли
 }

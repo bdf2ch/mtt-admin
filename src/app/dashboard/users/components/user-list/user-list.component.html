@@ -1,26 +1,48 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
-      <el-button type="primary" icon="plus" (click)="openAddUserDialog()">&nbsp; Добавить сотрудника</el-button>
+      <el-button type="primary" icon="plus" (click)="openAddUserDialog()">&nbsp; Добавить пользователя</el-button>
     </div>
   </div>
 
   <div class="row pt-3">
     <div class="col-12">
-      <el-table [model]="usersService.getUserList()" [stripe]="true" *ngIf="usersService.getUserList().length !== 0">
-        <el-table-column model-key="fio" label="ФИО"></el-table-column>
-        <!--<el-table-column model-key="date" label="Статус" width="140"></el-table-column>-->
-        <el-table-column model-key="roles" label="Роль"></el-table-column>
-        <el-table-column model-key="email" label="E-mail"></el-table-column>
-        <el-table-column>
-          <ng-template #slot let-scope="scope">
-            <div class="text-right">
-              <el-button type="success" size="small" icon="edit" (click)="handle(scope)">&nbsp; Изменить</el-button>
-              <el-button type="danger" size="small" icon="delete" (click)="handle(scope)">&nbsp; Удалить</el-button>
+      <table class="users-table table-hover w-100" *ngIf="usersService.getUserList().length > 0">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">ФИО</th>
+          <th class="p-3">E-mail</th>
+          <th class="p-3">Телефон</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of usersService.getUserList(); let i = index;">
+          <td class="p-3">{{ i + 1 }}.</td>
+          <td class="p-3">
+            <div>{{ user.fio }}</div>
+            <div class="role-description text-muted">Список ролей пользователя</div>
+          </td>
+          <td>
+            <div>{{ user.email }}</div>
+          </td>
+          <td>
+            <div>{{ user.phone }}</div>
+          </td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success" size="small" icon="edit" (click)="openEditUserDialog(user)">&nbsp; Изменить</el-button>
+                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteUserDialog(user)">&nbsp; Удалить</el-button>
+                </div>
+              </div>
             </div>
-          </ng-template>
-        </el-table-column>
-      </el-table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
 
       <!-- Start: No users placeholder -->
       <div *ngIf="usersService.getUserList().length === 0">
@@ -32,15 +54,170 @@
 </div>
 
 
-<el-dialog [(visible)]="addUserMode">
+
+<!-- Start: Add user dialog -->
+<el-dialog [(visible)]="isInAddUserMode" [width]="'580px'">
   <ng-template #title>
-    <span>Новый сотрудник</span>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление пользователя</span>
   </ng-template>
+
   <div class="container-fluid">
-    content
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="userForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: User information -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Личные данные пользователя</h4>
+
+              <!-- Start: First name -->
+              <el-form-item label="Имя"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('first_name')"
+                            [error]="userFormMessageCtrl('first_name')">
+                <el-input formControlName="first_name" [(model)]="userData.first_name"></el-input>
+              </el-form-item>
+              <!-- End: Name -->
+
+              <!-- Start: Second name -->
+              <el-form-item label="Отчество"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('patronymic')"
+                            [error]="userFormMessageCtrl('patronymic')">
+                <el-input formControlName="patronymic" [(model)]="userData.patronymic"></el-input>
+              </el-form-item>
+              <!-- End: Second name -->
+
+              <!-- Start: Last name -->
+              <el-form-item label="Фамилия"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('last_name')"
+                            [error]="userFormMessageCtrl('last_name')">
+                <el-input formControlName="last_name" [(model)]="userData.last_name"></el-input>
+              </el-form-item>
+              <!-- End: last name -->
+
+              <!-- Start: E-mail -->
+              <el-form-item label="E-mail"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('email')"
+                            [error]="userFormMessageCtrl('email')">
+                <el-input formControlName="email" [(model)]="userData.email"></el-input>
+              </el-form-item>
+              <!-- End: E-mail -->
+
+              <!-- Start: Phone -->
+              <el-form-item label="Телефон"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('phone')"
+                            [error]="userFormMessageCtrl('phone')">
+                <el-input formControlName="phone" [(model)]="userData.phone"></el-input>
+              </el-form-item>
+              <!-- End: Phone -->
+
+              <!-- Start: Password -->
+              <el-form-item label="Пароль"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('password')"
+                            [error]="userFormMessageCtrl('password')">
+                <el-input native-type="password" formControlName="password" [(model)]="userData.password"></el-input>
+              </el-form-item>
+              <!-- End: Password -->
+
+              <!-- Start: Confirm password -->
+              <el-form-item label="Пароль еще раз"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('confirm_password')"
+                            [error]="userFormMessageCtrl('confirm_password')">
+                <el-input formControlName="confirm_password" [(model)]="confirmPassword"></el-input>
+              </el-form-item>
+              <!-- End: Confirm password -->
+
+            </div>
+          </div>
+          <!-- End: User information -->
+
+          <!-- Start: Role permissions -->
+          <div class="row pt-3">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Роли пользователя</h4>
+
+              <table class="table table-sm table-striped roles-table">
+                <tbody>
+                <tr *ngFor="let role of usersService.getRoleList()">
+                  <td>{{ role.title }}</td>
+                  <td class="text-right">
+                    <el-checkbox [(model)]="role.isEnabled" (modelChange)="changeRoleStatus($event)"></el-checkbox>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <!-- End: Role permissions -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="userForm.invalid"
+                       [loading]="usersService.addingUserInProgress()"
+                       (click)="addUser()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeAddUserDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
   </div>
-  <ng-template #footer>
-    <el-button type="success" (click)="card.toggle2 = false">Добавить</el-button>
-    <el-button type="danger" (click)="closeAddUserDialog()">Отмена</el-button>
-  </ng-template>
 </el-dialog>
+<!-- End: Add user dialog -->
+
+
+<!-- Start: Delete user confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteUserMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление пользователя</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="selectedUser">
+    <div class="row">
+      <div class="col-12">
+        Удалить сотрудника {{ selectedUser.fio }}?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="usersService.deletingUserInProgress()"
+                   (click)="deleteUser()">
+          &nbsp; Удалить
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteUserDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete user confirmation dialog -->

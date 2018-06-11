@@ -1,3 +1,6 @@
+import { IRoleDTO } from './role.dto';
+
+
 /**
  * User Data transfer object interface
  */
@@ -7,8 +10,10 @@ export interface IUserDTO {
   first_name: string;     // Имя
   patronymic: string;     // Отчество
   last_name: string;      // Фамилия
-  position: string;       // Должность
   email: string;          // E-mail
   phone: string;          // Телефон
-  roles?: any[];          // Роли пользователя
+  password?: string;      // Пароль
+  roles?: {               // Набор ролей пользователя
+    data: IRoleDTO[];
+  };
 }

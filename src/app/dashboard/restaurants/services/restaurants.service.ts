@@ -45,6 +45,14 @@ export class RestaurantsService {
   }
 
   /**
+   * Выполняется ли удаление ресторана
+   * @returns {boolean}
+   */
+  deletingRestaurantInProgress(): boolean {
+    return this.isDeletingRestaurantInProgress;
+  }
+
+  /**
    * Получение списка ресторанов по идентификатору компании
    * @param {number} companyId - Идентификатор компании
    * @returns {Promise<Restaurant[] | null>}

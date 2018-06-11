@@ -26,7 +26,7 @@ export class RolesListComponent implements OnInit {
               private readonly message: ElMessageService) {
     this.isInAddRoleMode = false;
     this.isInEditRoleMode = false;
-    this.isInDeleteRoleMode = true;
+    this.isInDeleteRoleMode = false;
     this.selectedRole = null;
     this.userRoleData = {
       id: 0,
@@ -79,6 +79,22 @@ export class RolesListComponent implements OnInit {
    */
   openEditRoleDialog(role: Role) {
     this.selectedRole = role;
+    this.userRoleData = {
+      id: role.id,
+      name: role.code,
+      display_name: role.title,
+      description: role.description
+    };
+    this.userRoleForm.reset({
+      name: this.userRoleData.name,
+      display_name: this.userRoleData.display_name,
+      description: this.userRoleData.description
+    });
+    this.usersService.getPermissionList().forEach((item: Permission) => {
+      const findPermissionById = (perm: Permission) => perm.id === item.id;
+      const permission = this.selectedRole.permissions.find(findPermissionById);
+      item.isEnabled = permission ? true : false;
+    });
     this.isInEditRoleMode = true;
   }
 
@@ -95,6 +111,7 @@ export class RolesListComponent implements OnInit {
    * @param {Role} role
    */
   openDeleteRoleDialog(role: Role) {
+    this.selectedRole = role;
     this.isInDeleteRoleMode = true;
   }
 
@@ -149,9 +166,42 @@ export class RolesListComponent implements OnInit {
    */
   async addUserRole() {
     await this.usersService.addUserRole(this.userRoleData, this.authenticationService.getCurrentUser().companyId)
-      .then(() => {
+      .then(async (role: Role) => {
+        console.log(role);
+        const permissionIds = [];
+        this.usersService.getPermissionList().forEach((item: Permission) => {
+          if (item.isEnabled) {
+            permissionIds.push(item.id);
+          }
+        });
+        console.log(permissionIds);
+        await this.usersService.addPermissions(permissionIds, role.id);
         this.closeAddRoleDialog();
         this.message['success']('Роль пользователя добавлена');
+      });
+  }
+
+  /**
+   * Изменение роли пользователя
+   * @returns {Promise<void>}
+   */
+  async editUserRole(role: Role, companyId: number) {
+    await this.usersService.editUserRole(this.userRoleData, this.authenticationService.getCurrentUser().companyId)
+      .then(() => {
+        this.closeEditRoleDialog();
+        this.message['success']('Роль пользователя изменена');
+      });
+  }
+
+  /**
+   * Удаление роли порльзователя
+   * @returns {Promise<void>}
+   */
+  async deleteUserRole() {
+    await this.usersService.deleteUserRole(this.authenticationService.getCurrentUser().companyId, this.selectedRole.id)
+      .then(() => {
+        this.closeDeleteRoleDialog();
+        this.message['success']('Роль пользователя удалена');
       });
   }
 }

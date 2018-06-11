@@ -10,7 +10,7 @@ export interface IUser {
   secondName: string;     // Отество
   lastName: string;       // Фамилия
   email: string;          // E-mail
-  password: string;       // Пароль
+  password?: string;      // Пароль
   phone?: string;         // Телефон
   roles: IRole[];         // Набор ролей
 }

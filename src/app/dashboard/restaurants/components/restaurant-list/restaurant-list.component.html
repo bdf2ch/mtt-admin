@@ -481,7 +481,13 @@
     </div>
     <div class="row mt-4">
       <div class="col-6">
-        <el-button type="success" icon="check" class="w-100" (click)="deleteRestaurant()">&nbsp; Удалить</el-button>
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="restaurantsService.deletingRestaurantInProgress()"
+                   (click)="deleteRestaurant()">
+          &nbsp; Удалить
+        </el-button>
       </div>
       <div class="col-6">
         <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteRestaurantDialog()">&nbsp; Отмена</el-button>

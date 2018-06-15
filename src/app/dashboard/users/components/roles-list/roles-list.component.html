@@ -1,3 +1,280 @@
-<p>
-  roles-list works!
-</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <el-button type="primary" icon="plus" (click)="openAddRoleDialog()">&nbsp; Добавить роль пользователя</el-button>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <div class="col-12">
+      <table class="roles-table table-hover w-100" *ngIf="usersService.getRoleList().length > 0">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">Наименование</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let role of usersService.getRoleList(); let i = index;">
+          <td class="p-3">{{ i + 1 }}.</td>
+          <td class="p-3">
+            <div>{{ role.title }}</div>
+            <div class="role-description text-muted">{{ role.description }}</div>
+          </td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success" size="small" icon="edit" (click)="openEditRoleDialog(role)">&nbsp; Изменить</el-button>
+                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteRoleDialog(role)">&nbsp; Удалить</el-button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- Start: No user roles placeholder -->
+      <div *ngIf="usersService.getRoleList().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Роли пользователей отсутствуют</p>
+      </div>
+      <!-- End: No user roles placeholder -->
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Start: Add user role dialog -->
+<el-dialog [(visible)]="isInAddRoleMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление роли пользователя</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="userRoleForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Role information -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Информация о роли</h4>
+
+              <!-- Start: Name -->
+              <el-form-item label="Код"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('name')"
+                            [error]="userRoleFormMessageCtrl('name')">
+                <el-input formControlName="name" [(model)]="userRoleData.name"></el-input>
+              </el-form-item>
+              <!-- End: Name -->
+
+              <!-- Start: Display name -->
+              <el-form-item label="Наименование"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('display_name')"
+                            [error]="userRoleFormMessageCtrl('display_name')">
+                <el-input formControlName="display_name" [(model)]="userRoleData.display_name"></el-input>
+              </el-form-item>
+              <!-- End: Display name -->
+
+              <!-- Start: Description -->
+              <el-form-item label="Описание"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('description')"
+                            [error]="userRoleFormMessageCtrl('description')">
+                <el-input formControlName="description" [(model)]="userRoleData.description"></el-input>
+              </el-form-item>
+              <!-- End: Description -->
+
+            </div>
+          </div>
+          <!-- End: Role information -->
+
+          <!-- Start: Role permissions -->
+          <div class="row pt-3">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Права роли</h4>
+
+              <table class="table table-sm table-striped permissions-table">
+                <tbody>
+                <tr *ngFor="let permission of usersService.getPermissionList()">
+                  <td>{{ permission.title }}</td>
+                  <td class="text-right">
+                    <el-checkbox [(model)]="permission.isEnabled" (modelChange)="changePermissionStatus($event)"></el-checkbox>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <!-- End: Role permissions -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="userRoleForm.invalid"
+                       [loading]="usersService.addingRoleInProgress()"
+                       (click)="addUserRole()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeAddRoleDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Add user role dialog -->
+
+
+<!-- Start: Edit user role dialog -->
+<el-dialog [(visible)]="isInEditRoleMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение роли пользователя</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="userRoleForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Role information -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Информация о роли</h4>
+
+              <!-- Start: Name -->
+              <el-form-item label="Код"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('name')"
+                            [error]="userRoleFormMessageCtrl('name')">
+                <el-input formControlName="name" [(model)]="userRoleData.name"></el-input>
+              </el-form-item>
+              <!-- End: Name -->
+
+              <!-- Start: Display name -->
+              <el-form-item label="Наименование"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('display_name')"
+                            [error]="userRoleFormMessageCtrl('display_name')">
+                <el-input formControlName="display_name" [(model)]="userRoleData.display_name"></el-input>
+              </el-form-item>
+              <!-- End: Display name -->
+
+              <!-- Start: Description -->
+              <el-form-item label="Описание"
+                            [required]="true"
+                            [status]="userRoleFormStatusCtrl('description')"
+                            [error]="userRoleFormMessageCtrl('description')">
+                <el-input formControlName="description" [(model)]="userRoleData.description"></el-input>
+              </el-form-item>
+              <!-- End: Description -->
+
+            </div>
+          </div>
+          <!-- End: Role information -->
+
+          <!-- Start: Role permissions -->
+          <div class="row pt-3">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Права роли</h4>
+
+              <table class="table table-sm table-striped permissions-table">
+                <tbody>
+                <tr *ngFor="let permission of usersService.getPermissionList()">
+                  <td>{{ permission.title }}</td>
+                  <td class="text-right">
+                    <el-checkbox [(model)]="permission.isEnabled" (modelChange)="changePermissionStatus($event)"></el-checkbox>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <!-- End: Role permissions -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="userRoleForm.invalid || userRoleForm.pristine"
+                       [loading]="usersService.editingRoleInProgress()"
+                       (click)="editUserRole()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditRoleDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Edit user role dialog -->
+
+
+<!-- Start: Delete user role confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteRoleMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление роли пользователя</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="selectedRole">
+    <div class="row">
+      <div class="col-12">
+        Удалить роль {{ selectedRole.title }}?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="usersService.deletingRoleInProgress()"
+                   (click)="deleteUserRole()">
+          &nbsp; Удалить
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteRoleDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete user role confirmation dialog -->

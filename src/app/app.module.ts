@@ -12,7 +12,6 @@ import { UsersModule } from './dashboard/users/users.module';
 import { CompanyModule } from './dashboard/company/company.module';
 import { RestaurantsModule} from './dashboard/restaurants/restaurants.module';
 import { SurveysModule } from './dashboard/surveys/surveys.module';
-
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserListComponent } from './dashboard/users/components/user-list/user-list.component';
@@ -26,6 +25,7 @@ import { RolesListComponent } from './dashboard/users/components/roles-list/role
 import { UsersComponent } from './dashboard/users/components/users/users.component';
 import { SurveysComponent } from './dashboard/surveys/components/surveys/surveys.component';
 import { SurveysListComponent } from './dashboard/surveys/components/surveys-list/surveys-list.component';
+import { RoleListGuard } from './dashboard/users/guards/role-list.guard';
 
 const routes: Routes = [
   {
@@ -64,7 +64,8 @@ const routes: Routes = [
           },
           {
             path: 'roles',
-            component: RolesListComponent
+            component: RolesListComponent,
+            resolve: [RoleListGuard]
           }
         ]
       }

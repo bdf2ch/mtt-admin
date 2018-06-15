@@ -12,6 +12,9 @@ export class UserListGuard implements Resolve<User[]> {
               private readonly usersService: UsersService) {}
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<User[]> {
+    if (this.usersService.getRoleList().length === 0) {
+      await this.usersService.fetchUserRolesByCompanyId(this.authenticationService.getCurrentUser().companyId);
+    }
     await this.usersService.fetchUsersByCompanyId(this.authenticationService.getCurrentUser().companyId);
     return this.usersService.getUserList();
   }

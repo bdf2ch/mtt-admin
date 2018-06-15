@@ -12,7 +12,7 @@ export class User implements IUser {
   secondName: string;         // Отчество
   lastName: string;           // Фамилия
   email: string;              // E-mail
-  password: string;           // Пароль
+  // password: string;           // Пароль
   phone: string | null;       // Телефон
   roles: IRole[];             // Набор ролей
   fio: string;                // ФИО

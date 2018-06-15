@@ -26,6 +26,8 @@ import { UsersComponent } from './dashboard/users/components/users/users.compone
 import { SurveysComponent } from './dashboard/surveys/components/surveys/surveys.component';
 import { SurveysListComponent } from './dashboard/surveys/components/surveys-list/surveys-list.component';
 import { RoleListGuard } from './dashboard/users/guards/role-list.guard';
+import { RewardsListComponent } from './dashboard/surveys/components/rewards-list/rewards-list.component';
+import { RewardsResolveGuard } from './dashboard/surveys/guards/rewards-resolve.guard';
 
 const routes: Routes = [
   {
@@ -40,6 +42,11 @@ const routes: Routes = [
           {
             path: '',
             component: SurveysListComponent
+          },
+          {
+            path: 'rewards',
+            component: RewardsListComponent,
+            resolve: [RewardsResolveGuard]
           }
         ]
       },

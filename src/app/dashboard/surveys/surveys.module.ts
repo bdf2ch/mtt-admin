@@ -9,6 +9,8 @@ import { SurveysComponent } from './components/surveys/surveys.component';
 import { SurveysListComponent } from './components/surveys-list/surveys-list.component';
 import { SurveysResource } from './resources/surveys.resource';
 import { SurveysService } from './services/surveys.service';
+import { RewardsListComponent } from './components/rewards-list/rewards-list.component';
+import { RewardsResolveGuard } from './guards/rewards-resolve.guard';
 
 @NgModule({
   imports: [
@@ -22,11 +24,14 @@ import { SurveysService } from './services/surveys.service';
   ],
   declarations: [
     SurveysComponent,
-    SurveysListComponent
+    SurveysListComponent,
+    RewardsListComponent
   ],
   providers: [
     SurveysResource,
-    SurveysService
+    SurveysService,
+    RewardsResolveGuard,
+    RewardsResolveGuard
   ],
   exports: [
     SurveysComponent,

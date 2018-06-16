@@ -1,3 +1,188 @@
-<p>
-  rewards-list works!
-</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <el-button type="primary" icon="plus" (click)="openAddRewardDialog()">&nbsp; Добавить вознаграждение</el-button>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <div class="col-12">
+      <table class="rewards-table table-hover w-100" *ngIf="rewardsService.getRewardsList().length > 0">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">Наименование</th>
+          <th class="p-3">Дата начала</th>
+          <th class="p-3">Дата окончания</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let reward of rewardsService.getRewardsList(); let i = index;">
+          <td class="p-3">{{ i + 1 }}.</td>
+          <td class="p-3">
+            <div>{{ reward.title }}</div>
+            <div class="reward-description text-muted" *ngIf="reward.description">{{ reward.description }}</div>
+          </td>
+          <td class="p-3">{{ reward.start | date: 'dd.MM.yyyy' }}</td>
+          <td class="p-3">
+            <span class="text-muted" *ngIf="!reward.end">Не задана</span>
+            <span *ngIf="reward.end">{{ reward.end | date: 'dd.MM.yyyy' }}</span>
+          </td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success" size="small" icon="edit" (click)="openEditRewardDialog(reward)">&nbsp; Изменить</el-button>
+                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteRewardDialog(reward)">&nbsp; Удалить</el-button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- Start: No user roles placeholder -->
+      <div *ngIf="rewardsService.getRewardsList().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Вознаграждения отсутствуют</p>
+      </div>
+      <!-- End: No user roles placeholder -->
+    </div>
+  </div>
+</div>
+
+
+<!-- Start: Add reward dialog -->
+<el-dialog [(visible)]="isInAddRewardMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление вознаграждения</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="rewardForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+              <!-- Start: Name -->
+              <el-form-item label="Наименование"
+                            [required]="true"
+                            [status]="rewardFormStatusCtrl('name')"
+                            [error]="rewardFormMessageCtrl('name')">
+                <el-input formControlName="name" [(model)]="rewardData.name"></el-input>
+              </el-form-item>
+              <!-- End: Name -->
+
+              <!-- Start: Description -->
+              <el-form-item label="Описание"
+                            [status]="rewardFormStatusCtrl('description')"
+                            [error]="rewardFormMessageCtrl('description')">
+                <el-input formControlName="description" [(model)]="rewardData.description"></el-input>
+              </el-form-item>
+              <!-- End: Description -->
+
+              <!-- Start: Type -->
+              <el-form-item label="Тип вознаграждения"
+                            [status]="rewardFormStatusCtrl('type')"
+                            [error]="rewardFormMessageCtrl('type')">
+                <el-select [(model)]="rewardData.type" formControlName="type" placeholder="Тип вознаграждения">
+                  <el-option *ngFor="let rewardType of rewardsService.getRewardTypes()"
+                             [label]="rewardType.title"
+                             [value]="rewardType.code">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <!-- End: Type -->
+
+              <!-- Start: Start date -->
+              <el-form-item label="Дата начала"
+                            [required]="true"
+                            [status]="rewardFormStatusCtrl('from')"
+                            [error]="rewardFormMessageCtrl('from')">
+                <el-input formControlName="from" [(model)]="rewardData.from"></el-input>
+                <!--<el-date-picker [(model)]="rewardData.from" placeholder="Дата начала"></el-date-picker>-->
+              </el-form-item>
+              <!-- End: Start date -->
+
+              <!-- Start: End date -->
+              <el-form-item label="Дата окончания"
+                            [required]="false"
+                            [status]="rewardFormStatusCtrl('to')"
+                            [error]="rewardFormMessageCtrl('to')">
+                <el-input formControlName="to" [(model)]="rewardData.to"></el-input>
+              </el-form-item>
+              <!-- End: End date -->
+
+              <!-- Start: Value -->
+              <el-form-item label="Величина"
+                            [required]="true"
+                            [status]="rewardFormStatusCtrl('value')"
+                            [error]="rewardFormMessageCtrl('value')">
+                <el-input formControlName="value" [(model)]="rewardData.value"></el-input>
+              </el-form-item>
+              <!-- End: Value -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="rewardForm.invalid"
+                       [loading]="rewardsService.addingRewardInProgress()"
+                       (click)="addReward()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeAddRewardDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Add reward dialog -->
+
+
+
+<!-- Start: Delete reward confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteRewardMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление вознаграждения</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="selectedReward">
+    <div class="row">
+      <div class="col-12">
+        Удалить вознаграждение {{ selectedReward.title }}?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="rewardsService.deletingRewardInProgress()"
+                   (click)="deleteReward()">
+          &nbsp; Удалить
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100" (click)="closeDeleteRewardDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete reward confirmation dialog -->

@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { IResourceMethod, Resource, ResourceAction, ResourceHandler, ResourceParams, ResourceRequestMethod } from '@ngx-resource/core';
+import {
+  IResourceMethod,
+  IResourceMethodStrict,
+  Resource,
+  ResourceAction,
+  ResourceHandler,
+  ResourceParams,
+  ResourceRequestMethod
+} from '@ngx-resource/core';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { environment } from '../../../../environments/environment';
 import { IRewardDTO } from '../dto/reward.dto';
@@ -42,4 +50,26 @@ export class RewardsResource extends Resource {
     withCredentials: true
   })
   getRewards: IResourceMethod<{companyId: number}, IServerResponse<IRewardDTO[]>>;
+
+  /**
+   * Path: company/{!companyId}/reward
+   * Method: POST
+   */
+  @ResourceAction({
+    path: 'company/{!companyId}/reward',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addReward: IResourceMethodStrict<IRewardDTO, void, {companyId: number}, IServerResponse<IRewardDTO>>;
+
+  /**
+   * Path: company/{!companyId}/reward/{!rewardId}
+   * Method: DELETE
+   */
+  @ResourceAction({
+    path: 'company/{!companyId}/reward/{!rewardId}',
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
+  })
+  deleteReward: IResourceMethod<{companyId: number, rewardId: number}, IServerResponse<boolean>>;
 }

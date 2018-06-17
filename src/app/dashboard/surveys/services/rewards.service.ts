@@ -3,7 +3,7 @@ import { RewardsResource } from '../resources/rewards.resource';
 import { RewardType } from '../models/reward-type.model';
 import { IRewardType } from '../interfaces/reward-type.interface';
 import { Reward } from '../models/reward.model';
-import {IRewardDTO} from '../dto/reward.dto';
+import { IRewardDTO } from '../dto/reward.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,8 @@ export class RewardsService {
     this.rewardTypes = [];
     this.rewards = [];
     this.isAddingRewardInProgress = false;
+    this.isEditingRewardInProgress = false;
+    this.isDeletingRewardInProgress = false;
   }
 
   /**
@@ -36,6 +38,7 @@ export class RewardsService {
           };
           this.rewardTypes.push(rewardType);
         }
+        console.log(this.rewardTypes);
         return this.rewardTypes;
       }
     } catch (error) {
@@ -73,14 +76,49 @@ export class RewardsService {
    */
   async addReward(reward: IRewardDTO, companyId: number): Promise<Reward | null> {
     try {
+      this.isAddingRewardInProgress = true;
       const result = await this.resource.addReward(reward, null, {companyId: companyId});
       if (result.data) {
+        this.isAddingRewardInProgress = false;
         const reward_ = new Reward(result.data);
         this.rewards.push(reward_);
         return reward_;
       }
     } catch (error) {
       console.log(error);
+      this.isAddingRewardInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Изменение вознаграждения
+   * @param {IRewardDTO} reward - Вознаграждение
+   * @param {number} companyId - Идентификатор компании
+   * @returns {Promise<Reward | null>}
+   */
+  async editReward(reward: IRewardDTO, companyId: number): Promise<Reward | null> {
+    try {
+      this.isEditingRewardInProgress = true;
+      const result = await this.resource.editReward(reward, null, {companyId: companyId, rewardId: reward.id});
+      if (result.data) {
+        this.isEditingRewardInProgress = false;
+        this.rewards.forEach((item: Reward) => {
+          if (item.id === reward.id) {
+            console.log('reward found', item);
+            item.title = reward.name;
+            item.description = reward.description ? reward.description : null;
+            item.type = reward.type;
+            item.start = new Date(reward.from);
+            item.end = reward.to ? new Date(reward.to) : null;
+            item.value = reward.value;
+            return item;
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingRewardInProgress = false;
       return null;
     }
   }
@@ -93,8 +131,10 @@ export class RewardsService {
    */
   async deleteReward(reward: Reward, companyId: number): Promise<boolean> {
     try {
+      this.isDeletingRewardInProgress = true;
       const result = await this.resource.deleteReward({companyId: companyId, rewardId: reward.id});
       if (result.meta['success'] && result.meta['success'] === true) {
+        this.isDeletingRewardInProgress = false;
         this.rewards.forEach((item: Reward, index: number, array: Reward[]) => {
           if (item.id === reward.id) {
             array.splice(index, 1);
@@ -105,6 +145,7 @@ export class RewardsService {
       }
     } catch (error) {
       console.error(error);
+      this.isDeletingRewardInProgress = false;
       return false;
     }
   }

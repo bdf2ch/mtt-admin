@@ -183,7 +183,8 @@
 
                 <div el-row *ngIf="socialNetworksData.length !== 0">
                   <div el-col span="8">
-                    <el-form-item [required]="true"label-width="0"
+                    <el-form-item [required]="true"
+                                  label-width="0"
                                   [status]="restaurantFormStatusCtrl('socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))"
                                   [error]="restaurantFormMessageCtrl('socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString()))">
                       <el-select [(model)]="network.network_type" formControlName="{{'socialNetworkType' + (network.id !== 0 ? network.id.toString() : network.timeCreated.toString())}}" placeholder="Соц. сеть">

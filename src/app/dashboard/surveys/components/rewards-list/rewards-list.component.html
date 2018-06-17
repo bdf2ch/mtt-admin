@@ -90,9 +90,10 @@
 
               <!-- Start: Type -->
               <el-form-item label="Тип вознаграждения"
-                            [status]="rewardFormStatusCtrl('type')"
-                            [error]="rewardFormMessageCtrl('type')">
-                <el-select [(model)]="rewardData.type" formControlName="type" placeholder="Тип вознаграждения">
+                            [required]="true"
+                            [status]="rewardFormStatusCtrl('reward_type')"
+                            [error]="rewardFormMessageCtrl('reward_type')">
+                <el-select [(model)]="rewardData.type" formControlName="reward_type" placeholder="Тип вознаграждения">
                   <el-option *ngFor="let rewardType of rewardsService.getRewardTypes()"
                              [label]="rewardType.title"
                              [value]="rewardType.code">
@@ -155,6 +156,109 @@
 </el-dialog>
 <!-- End: Add reward dialog -->
 
+
+<!-- Start: Edit reward dialog -->
+<el-dialog [(visible)]="isInEditRewardMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение вознаграждения</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="rewardForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Наименование"
+                        [required]="true"
+                        [status]="rewardFormStatusCtrl('name')"
+                        [error]="rewardFormMessageCtrl('name')">
+            <el-input formControlName="name" [(model)]="rewardData.name"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+          <!-- Start: Description -->
+          <el-form-item label="Описание"
+                        [status]="rewardFormStatusCtrl('description')"
+                        [error]="rewardFormMessageCtrl('description')">
+            <el-input formControlName="description" [(model)]="rewardData.description"></el-input>
+          </el-form-item>
+          <!-- End: Description -->
+
+          <!-- Start: Type -->
+          <el-form-item label="Тип вознаграждения"
+                        [required]="true"
+                        [status]="rewardFormStatusCtrl('reward_type')"
+                        [error]="rewardFormMessageCtrl('reward_type')">
+            <el-select [(model)]="rewardData.type" formControlName="reward_type" placeholder="Тип вознаграждения">
+              <el-option *ngFor="let rewardType of rewardsService.getRewardTypes()"
+                         [label]="rewardType.title"
+                         [value]="rewardType.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Type -->
+
+          <!-- Start: Start date -->
+          <el-form-item label="Дата начала"
+                        [required]="true"
+                        [status]="rewardFormStatusCtrl('from')"
+                        [error]="rewardFormMessageCtrl('from')">
+            <el-input formControlName="from" [(model)]="rewardData.from"></el-input>
+            <!--<el-date-picker [(model)]="rewardData.from" placeholder="Дата начала"></el-date-picker>-->
+          </el-form-item>
+          <!-- End: Start date -->
+
+          <!-- Start: End date -->
+          <el-form-item label="Дата окончания"
+                        [required]="false"
+                        [status]="rewardFormStatusCtrl('to')"
+                        [error]="rewardFormMessageCtrl('to')">
+            <el-input formControlName="to" [(model)]="rewardData.to"></el-input>
+          </el-form-item>
+          <!-- End: End date -->
+
+          <!-- Start: Value -->
+          <el-form-item label="Величина"
+                        [required]="true"
+                        [status]="rewardFormStatusCtrl('value')"
+                        [error]="rewardFormMessageCtrl('value')">
+            <el-input formControlName="value" [(model)]="rewardData.value"></el-input>
+          </el-form-item>
+          <!-- End: Value -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="rewardForm.invalid || rewardForm.pristine"
+                       [loading]="rewardsService.editingRewardInProgress()"
+                       (click)="editReward()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditRewardDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Edit reward dialog -->
 
 
 <!-- Start: Delete reward confirmation dialog -->

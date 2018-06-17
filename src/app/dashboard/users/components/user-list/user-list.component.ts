@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/fo
 import { IUserDTO } from '../../dto/user.dto';
 import { User } from '../../models/user.model';
 import { ElMessageService } from 'element-angular/release/message/message.service';
+import {Role} from "../../models/role.model";
 
 @Component({
   selector: 'app-user-list',
@@ -176,10 +177,19 @@ export class UserListComponent implements OnInit {
 
 
   async addUser() {
+    const rolesIds = [];
+    this.usersService.getRoleList().forEach((item: Role) => {
+      if (item.isEnabled) {
+        rolesIds.push(item.id);
+      }
+    });
+    if (rolesIds.length > 0) {
+      this.userData.roles_ids = rolesIds;
+    }
     await this.usersService.addUser(this.userData, this.authenticationService.getCurrentUser().companyId)
       .then((user: User) => {
         this.closeAddUserDialog();
-        this.message['success']('Роль пользователя удалена');
+        this.message['success']('Пользователь добавлен');
       });
   }
 

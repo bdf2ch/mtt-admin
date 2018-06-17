@@ -64,6 +64,17 @@ export class RewardsResource extends Resource {
 
   /**
    * Path: company/{!companyId}/reward/{!rewardId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: 'company/{!companyId}/reward/{!rewardId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editReward: IResourceMethodStrict<IRewardDTO, void, {companyId: number, rewardId: number}, IServerResponse<IRewardDTO>>;
+
+  /**
+   * Path: company/{!companyId}/reward/{!rewardId}
    * Method: DELETE
    */
   @ResourceAction({

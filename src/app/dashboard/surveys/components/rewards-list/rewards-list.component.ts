@@ -41,13 +41,14 @@ export class RewardsListComponent implements OnInit {
   }
 
   ngOnInit() {
+    const dateRegExp = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
     this.rewardForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: [''],
-      type: ['', Validators.required],
-      from: ['', Validators.required],
-      to: [''],
-      value: ['', Validators.required]
+      name: [this.rewardData.name, Validators.required],
+      description: [this.rewardData.description],
+      reward_type: [this.rewardData.type, Validators.required],
+      from: [this.rewardData.from, [Validators.required, Validators.pattern(dateRegExp)]],
+      to: [this.rewardData.to, Validators.pattern(dateRegExp)],
+      value: [this.rewardData.value, Validators.required]
     });
   }
 
@@ -69,13 +70,14 @@ export class RewardsListComponent implements OnInit {
     this.rewardForm.reset({
       name: this.rewardData.name,
       description: this.rewardData.description,
-      type: this.rewardData.type,
+      reward_type: this.rewardsService.getRewardTypes().length > 0 ? this.rewardsService.getRewardTypes()[0].code : '',
       from: this.rewardData.from,
       to: this.rewardData.to,
       value: this.rewardData.value
     });
     this.isInAddRewardMode = true;
     console.log(this.rewardData);
+    console.log(this.rewardForm);
   }
 
   /**
@@ -91,6 +93,21 @@ export class RewardsListComponent implements OnInit {
    */
   openEditRewardDialog(reward: Reward) {
     this.selectedReward = reward;
+    this.rewardData.id = reward.id;
+    this.rewardData.name = reward.title;
+    this.rewardData.description = reward.description;
+    this.rewardData.type = reward.type;
+    this.rewardData.from = `${reward.start.getFullYear()}-${reward.start.getMonth() < 10 ? '0' + (reward.start.getMonth() + 1).toString() : reward.start.getMonth()}-${reward.start.getDate()}`;
+    this.rewardData.to = reward.end ? `${reward.end.getFullYear()}-${reward.end.getMonth() < 10 ? '0' + (reward.end.getMonth() + 1).toString() : reward.end.getMonth()}-${reward.end.getDate()}` : null;
+    this.rewardData.value = reward.value;
+    this.rewardForm.reset({
+      name: this.rewardData.name,
+      description: this.rewardData.description,
+      reward_type: this.rewardData.type,
+      from: this.rewardData.from,
+      to: this.rewardData.to,
+      value: this.rewardData.value
+    });
     this.isInEditRewardMode = true;
   }
 
@@ -141,16 +158,16 @@ export class RewardsListComponent implements OnInit {
     switch (item) {
       case 'name':
         return control.dirty && control.hasError('required') ? 'Вы не указали наименование' : '';
-      case 'type':
-        return control.dirty && control.hasError('pattern') ? 'Вы не выбрали тип вознаграждения' : '';
+      case 'reward_type':
+        return control.dirty && control.hasError('required') ? 'Вы не выбрали тип вознаграждения' : '';
       case 'from':
         return control.dirty && control.hasError('required')
           ? 'Вы не указали дату начала действия' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+            ? 'Дата начала должна быть в формате ГГГГ-М-ДД' : '';
       case 'to':
         return control.dirty && control.hasError('required') ?
           'Вы не указали дату окончания действия' : control.hasError('pattern')
-            ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
+            ? 'Дата окончания должна быть в формате ГГГГ-ММ-ДД' : '';
       case 'value':
         return control.dirty && control.hasError('required') ? 'Вы не указали величину вознаграждения' : '';
     }
@@ -171,6 +188,24 @@ export class RewardsListComponent implements OnInit {
       .then(() => {
         this.closeAddRewardDialog();
         this.message['success']('Вознаграждение добавлено');
+      });
+  }
+
+  /**
+   * Изменение вознаграждения
+   * @returns {Promise<void>}
+   */
+  async editReward() {
+    if (this.rewardData.description === '') {
+      delete this.rewardData.description;
+    }
+    if (this.rewardData.to === '') {
+      delete this.rewardData.to;
+    }
+    await this.rewardsService.editReward(this.rewardData, this.authenticationService.getCurrentUser().companyId)
+      .then(() => {
+        this.closeEditRewardDialog();
+        this.message['success']('Вознаграждение изменено');
       });
   }
 

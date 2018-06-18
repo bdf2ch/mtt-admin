@@ -20,6 +20,7 @@ export class Restaurant implements IRestaurant {
   address: IAddress;          // Адрес
   timeTable: ITimeTable;      // Расписание работы
   social: ISocialNetwork[];   // Набор социальных сетей
+  isSelected: boolean;        // Выбран ли ресторан ()при создании опроса
 
   /**
    * Конструктор
@@ -34,6 +35,7 @@ export class Restaurant implements IRestaurant {
     this.address = config && config.address ? new Address(config.address['data']) : new Address();
     this.timeTable = config && config.work_intervals ? new TimeTable(config.work_intervals[0]) : new TimeTable();
     this.social = [];
+    this.isSelected = false;
 
     if (config && config.social_networks) {
       config.social_networks.forEach((item: ISocialNetworkDTO) => {

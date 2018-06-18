@@ -10,4 +10,5 @@ export interface IReward {
   end?: Date | null;              // Дата окончания действия
   type: string;                   // Тип вознаграждения
   value: any;                     // Величина вознаграждения
+  isAvailable: boolean;           // Доступно ли вознаграждение
 }

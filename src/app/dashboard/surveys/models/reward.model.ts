@@ -13,6 +13,7 @@ export class Reward implements IReward {
   start: Date;                     // Дата начала
   end?: Date | null;               // Дата окончания
   value: any;                      // Величиниа вознаграждения
+  isAvailable: boolean;            // Доступно ли вознаграждение
 
   /**
    * Конструктор
@@ -27,5 +28,6 @@ export class Reward implements IReward {
     this.start = config ? new Date(config.from) : new Date();
     this.end = config && config.to ? new Date(config.to) : null;
     this.value = config ? config.value : null;
+    this.isAvailable = config ? config.is_available : false;
   }
 }

@@ -130,6 +130,15 @@
               </el-form-item>
               <!-- End: Value -->
 
+              <!-- Start: Is available -->
+              <el-form-item label="Доступно">
+                <el-checkbox formControlname="is_available"
+                             [(model)]="rewardData.is_available"
+                             (modelChange)="changeRewardAvailable($event)">
+                </el-checkbox>
+              </el-form-item>
+              <!-- End: Is available -->
+
         </el-form>
 
         <!-- Start: Form controls -->

@@ -48,7 +48,8 @@ export class RewardsListComponent implements OnInit {
       reward_type: [this.rewardData.type, Validators.required],
       from: [this.rewardData.from, [Validators.required, Validators.pattern(dateRegExp)]],
       to: [this.rewardData.to, Validators.pattern(dateRegExp)],
-      value: [this.rewardData.value, Validators.required]
+      value: [this.rewardData.value, Validators.required],
+      is_available: [this.rewardData.is_available]
     });
   }
 
@@ -171,6 +172,14 @@ export class RewardsListComponent implements OnInit {
       case 'value':
         return control.dirty && control.hasError('required') ? 'Вы не указали величину вознаграждения' : '';
     }
+  }
+
+  /**
+   * Изменение доступности вознаграждения
+   * @param {boolean} value - Значение
+   */
+  changeRewardAvailable(value: boolean) {
+    this.rewardForm.markAsDirty();
   }
 
   /**

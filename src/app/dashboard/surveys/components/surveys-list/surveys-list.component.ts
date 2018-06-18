@@ -6,7 +6,8 @@ import { RestaurantsService } from '../../../restaurants/services/restaurants.se
 import { ISurveyDTO } from '../../dto/survey.dto';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { RewardsService } from '../../services/rewards.service';
-import {Restaurant} from '../../../restaurants/models/restaurant.model';
+import { Restaurant } from '../../../restaurants/models/restaurant.model';
+import { ElMessageService } from 'element-angular/release/message/message.service';
 
 @Component({
   selector: 'app-surveys-list',
@@ -26,7 +27,8 @@ export class SurveysListComponent implements OnInit {
               private readonly formBuilder: FormBuilder,
               public readonly surveysService: SurveysService,
               public readonly rewardsService: RewardsService,
-              public readonly restaurantsService: RestaurantsService) {
+              public readonly restaurantsService: RestaurantsService,
+              private readonly message: ElMessageService) {
     this.isInAddSurveyMode = false;
     this.isInEditSurveyDialog = false;
     this.isInDeleteSurveyDialog = false;
@@ -51,7 +53,7 @@ export class SurveysListComponent implements OnInit {
     this.surveyForm = this.formBuilder.group({
       name: [this.surveyData.name, Validators.required],
       description: [this.surveyData.description],
-      reward_id: [this.surveyData.reward_id, Validators.required]
+      reward_id: [this.rewardsService.getAvailableRewards().length > 0 ? this.rewardsService.getAvailableRewards()[0].id : null, Validators.required]
     });
   }
 
@@ -64,7 +66,7 @@ export class SurveysListComponent implements OnInit {
       name: '',
       description: '',
       company_id: 0,
-      reward_id: 0,
+      reward_id: this.rewardsService.getAvailableRewards().length > 0 ? this.rewardsService.getAvailableRewards()[0].id : null,
       from: '',
       to: null,
       available_passing_count: 100,
@@ -73,9 +75,14 @@ export class SurveysListComponent implements OnInit {
     };
     this.surveyForm.reset({
       name: this.surveyData.name,
-      description: this.surveyData.description
+      description: this.surveyData.description,
+      reward_id: this.surveyData.reward_id
     });
     this.restaurantIds = [];
+    this.restaurantsService.getRestaurants().forEach((item: Restaurant) => {
+      item.isSelected = false;
+    });
+    console.log(this.surveyData);
     this.isInAddSurveyMode = true;
   }
 
@@ -83,7 +90,6 @@ export class SurveysListComponent implements OnInit {
    * Закрытие диалогового окна добавления опроса
    */
   closeAddSurveyDialog() {
-
     this.isInAddSurveyMode = false;
   }
 
@@ -156,14 +162,6 @@ export class SurveysListComponent implements OnInit {
   }
 
   /**
-   * Добавление ресторана в список ресторанов, которые участвуют в опросе
-   * @param {Restaurant} restaurant - Ресторан
-   */
-  appendRestaurant(restaurant: Restaurant) {
-    //this.restaurants.push(restaurant);
-  }
-
-  /**
    * Удаление ресторана из списка ресторанов, которые участвуют в опросе
    * @param {Restaurant} restaurant - Ресторан
    */
@@ -175,9 +173,13 @@ export class SurveysListComponent implements OnInit {
     });
   }
 
-
+  /**
+   * Изменение статуса выбора ресторана, участвующего в опросе
+   * @param {boolean} value
+   * @param {Restaurant} restaurant
+   */
   changeRestaurantsStatus(value: boolean, restaurant: Restaurant) {
-    console.log(value, restaurant);
+    restaurant.isSelected = value;
     if (value === true) {
       this.restaurantIds.push(restaurant.id);
     } else {
@@ -187,11 +189,23 @@ export class SurveysListComponent implements OnInit {
         }
       });
     }
-    console.log(this.restaurantIds);
     this.surveyForm.updateValueAndValidity();
   }
 
+  /**
+   * Добавлени опроса
+   * @returns {Promise<void>}
+   */
   async addSurvey() {
+    delete this.surveyData.id;
+    delete this.surveyData.company_id;
+    delete this.surveyData.from;
+    delete this.surveyData.to;
+    delete this.surveyData.is_template;
+    delete this.surveyData.is_active;
+    delete this.surveyData.available_passing_count;
+
+    console.log(this.surveyData);
     await this.surveysService.addSurvey(this.surveyData)
       .then(() => {
         this.closeAddSurveyDialog();

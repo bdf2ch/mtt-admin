@@ -60,6 +60,7 @@ export class RewardsService {
           const reward = new Reward(item);
           this.rewards.push(reward);
         });
+        console.log(this.rewards);
         return this.rewards;
       }
     } catch (error) {
@@ -164,6 +165,20 @@ export class RewardsService {
    */
   getRewardsList(): Reward[] {
     return this.rewards;
+  }
+
+  /**
+   * Возвращает список доступных вознаграждений
+   * @returns {Reward[]}
+   */
+  getAvailableRewards(): Reward[] {
+    const result = [];
+    this.rewards.forEach((item: Reward) => {
+      if (item.isAvailable) {
+        result.push(item);
+      }
+    });
+    return result;
   }
 
   /**

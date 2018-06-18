@@ -21,8 +21,8 @@
         <tbody>
         <tr *ngFor="let survey of surveysService.getSurveysList(); let i = index;">
           <td class="p-3">{{ i + 1 }}.</td>
-          <td class="p-3">{{ survey.isActive ? 'Активен' : 'Неактивен' }}</td>
           <td class="p-3">{{ survey.title }}</td>
+          <td class="p-3">{{ survey.isActive ? 'Активен' : 'Неактивен' }}</td>
           <td class="p-3">{{ survey.start | date: 'dd.MM.yyyy' }}</td>
           <td class="p-3">
             <span class="text-muted" *ngIf="!survey.end">Не задана</span>
@@ -32,7 +32,7 @@
             <div class="container-fluid">
               <div class="row">
                 <div class="col-12 d-flex justify-content-between">
-                  <el-button type="success" size="small" icon="edit" (click)="openEditSurveyDialog(survey)">&nbsp; Изменить</el-button>
+                  <el-button type="success" size="small" icon="edit" [routerLink]="['/surveys', survey.id]"  (click)="openEditSurveyDialog(survey)">&nbsp; Изменить</el-button>
                   <el-button type="danger" size="small" icon="delete" (click)="openDeleteSurveyDialog(survey)">&nbsp; Удалить</el-button>
                 </div>
               </div>
@@ -114,13 +114,11 @@
 
           <!-- Start: Reward -->
           <h4 class="text-muted mb-3">Вознаграждение</h4>
-          <el-form-item *ngIf="rewardsService.getRewardsList().length !== 0"
+          <el-form-item *ngIf="rewardsService.getAvailableRewards().length !== 0"
                         label="Вознаграждение"
-                        [required]="true"
-                        [status]="surveyFormStatusCtrl('reward_id')"
-                        [error]="surveyFormMessageCtrl('reward_id')">
+                        [required]="true">
             <el-select [(model)]="surveyData.reward_id" formControlName="reward_id" placeholder="Вознаграждение" *ngIf="rewardsService.getRewardsList().length > 0">
-              <el-option *ngFor="let reward of rewardsService.getRewardsList()"
+              <el-option *ngFor="let reward of rewardsService.getAvailableRewards()"
                          [label]="reward.title"
                          [value]="reward.id">
               </el-option>
@@ -128,6 +126,10 @@
           </el-form-item>
           <div *ngIf="rewardsService.getRewardsList().length === 0" class="text-center mb-3">
             <div class="text-center mb-2">Вознаграждения отсутствуют, добавьте вознаграждение</div>
+            <el-button type="primary" routerLink="/surveys/rewards">Перейти к вознаграждениям</el-button>
+          </div>
+          <div *ngIf="rewardsService.getRewardsList().length !== 0 && rewardsService.getAvailableRewards().length === 0" class="text-center mb-3">
+            <div class="text-center mb-2">Доступные вознаграждения отсутствуют</div>
             <el-button type="primary" routerLink="/surveys/rewards">Перейти к вознаграждениям</el-button>
           </div>
           <!-- End: Reward -->

@@ -14,4 +14,5 @@ export interface IRestaurant {
   address: IAddress;          // Адрес
   timeTable: ITimeTable;      // Расписание работы
   social: ISocialNetwork[];   // Набор социальных сетей
+  isSelected: boolean;        // Выбран ли ресторан (при создании опроса)
 }

@@ -1,0 +1,28 @@
+.surveys-table {
+  thead tr {
+    font-size: 14px;
+    color: #607D8B;
+
+    .index {
+      width: 50px;
+    }
+    .controls {
+      width: 200px;
+    }
+  }
+  tbody tr {
+    background: white;
+    border-bottom: 1px solid #ECEFF1;
+  }
+  .survey-description {
+    font-size: 13px;
+    line-height: 13px;
+  }
+}
+
+.restaurants-table {
+  tbody tr td {
+    border-top: none !important;
+    border-bottom: none !important;
+  }
+}

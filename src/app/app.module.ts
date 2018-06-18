@@ -28,6 +28,9 @@ import { SurveysListComponent } from './dashboard/surveys/components/surveys-lis
 import { RoleListGuard } from './dashboard/users/guards/role-list.guard';
 import { RewardsListComponent } from './dashboard/surveys/components/rewards-list/rewards-list.component';
 import { RewardsResolveGuard } from './dashboard/surveys/guards/rewards-resolve.guard';
+import { SurveysResolveGuard } from './dashboard/surveys/guards/surveys-resolve.guard';
+import { SurveyComponent } from './dashboard/surveys/components/survey/survey.component';
+import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.guard';
 
 const routes: Routes = [
   {
@@ -41,12 +44,18 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            component: SurveysListComponent
+            component: SurveysListComponent,
+            resolve: [SurveysResolveGuard]
           },
           {
             path: 'rewards',
             component: RewardsListComponent,
             resolve: [RewardsResolveGuard]
+          },
+          {
+            path: ':id',
+            component: SurveyComponent,
+            resolve: [SurveyResolveGuard]
           }
         ]
       },
@@ -113,4 +122,4 @@ const routes: Routes = [
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

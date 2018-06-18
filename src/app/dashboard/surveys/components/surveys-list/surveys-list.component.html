@@ -1,3 +1,205 @@
-<p>
-  surveys-list works!
-</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <el-button type="primary" icon="plus" (click)="openAddSurveyDialog()">&nbsp; Добавить опрос</el-button>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <div class="col-12">
+      <table class="surveys-table table-hover w-100" *ngIf="surveysService.getSurveysList().length > 0">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">Наименование</th>
+          <th class="p-3">Статус</th>
+          <th class="p-3">Дата начала</th>
+          <th class="p-3">Дата окончания</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let survey of surveysService.getSurveysList(); let i = index;">
+          <td class="p-3">{{ i + 1 }}.</td>
+          <td class="p-3">{{ survey.isActive ? 'Активен' : 'Неактивен' }}</td>
+          <td class="p-3">{{ survey.title }}</td>
+          <td class="p-3">{{ survey.start | date: 'dd.MM.yyyy' }}</td>
+          <td class="p-3">
+            <span class="text-muted" *ngIf="!survey.end">Не задана</span>
+            <span *ngIf="survey.end">{{ survey.end | date: 'dd.MM.yyyy' }}</span>
+          </td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success" size="small" icon="edit" (click)="openEditSurveyDialog(survey)">&nbsp; Изменить</el-button>
+                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteSurveyDialog(survey)">&nbsp; Удалить</el-button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- Start: No surveys placeholder -->
+      <div *ngIf="surveysService.getSurveysList().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Опросы отсутствуют</p>
+      </div>
+      <!-- End: No surveys placeholder -->
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Start: Add survey dialog -->
+<el-dialog [(visible)]="isInAddSurveyMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление опроса</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-muted mb-3">Информация об опросе</h4>
+
+        <el-form [formGroup]="surveyForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Наименование"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('name')"
+                        [error]="surveyFormMessageCtrl('name')">
+            <el-input formControlName="name" [(model)]="surveyData.name"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+          <!-- Start: Description -->
+          <el-form-item label="Описание"
+                        [required]="false"
+                        [status]="surveyFormStatusCtrl('description')"
+                        [error]="surveyFormMessageCtrl('description')">
+            <el-input formControlName="description" [(model)]="surveyData.description"></el-input>
+          </el-form-item>
+          <!-- End: Description -->
+
+          <!-- Start: Start date -->
+          <!--
+          <el-form-item label="Дата начала"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('from')"
+                        [error]="surveyFormMessageCtrl('from')">
+            <el-input formControlName="from" [(model)]="surveyData.from"></el-input>
+          </el-form-item>
+          -->
+          <!-- End: Start date -->
+
+          <!-- Start: End date -->
+          <!--
+          <el-form-item label="Дата окончания"
+                        [required]="false"
+                        [status]="surveyFormStatusCtrl('to')"
+                        [error]="surveyFormMessageCtrl('to')">
+            <el-input formControlName="to" [(model)]="surveyData.to"></el-input>
+          </el-form-item>
+          -->
+          <!-- End: End date -->
+
+          <!-- Start: Reward -->
+          <h4 class="text-muted mb-3">Вознаграждение</h4>
+          <el-form-item *ngIf="rewardsService.getRewardsList().length !== 0"
+                        label="Вознаграждение"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('reward_id')"
+                        [error]="surveyFormMessageCtrl('reward_id')">
+            <el-select [(model)]="surveyData.reward_id" formControlName="reward_id" placeholder="Вознаграждение" *ngIf="rewardsService.getRewardsList().length > 0">
+              <el-option *ngFor="let reward of rewardsService.getRewardsList()"
+                         [label]="reward.title"
+                         [value]="reward.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div *ngIf="rewardsService.getRewardsList().length === 0" class="text-center mb-3">
+            <div class="text-center mb-2">Вознаграждения отсутствуют, добавьте вознаграждение</div>
+            <el-button type="primary" routerLink="/surveys/rewards">Перейти к вознаграждениям</el-button>
+          </div>
+          <!-- End: Reward -->
+
+          <!-- Start: Pass count -->
+          <!--
+          <el-form-item label="Кол-во прохождений"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('available_passing_count')"
+                        [error]="surveyFormMessageCtrl('available_passing_count')">
+            <el-input formControlName="available_passing_count" [(model)]="surveyData.available_passing_count"></el-input>
+          </el-form-item>
+          -->
+          <!-- End: Pass count -->
+
+          <!-- Start: Pass count -->
+          <!--
+          <el-form-item label="Когда спрашивать контакты"
+                        [required]="true">
+            <el-radio [(model)]="surveyData.is_active" label="В начале">В начале</el-radio>
+            <el-radio [(model)]="surveyData.is_active" label="В конце">В конце</el-radio>
+          </el-form-item>
+          -->
+          <!-- End: Pass count -->
+
+        </el-form>
+
+        <!-- Start: Restaurants -->
+        <div class="row pt-3">
+          <div class="col-12 border-bottom">
+            <h4 class="text-muted mb-3">Рестораны, участвующие в опросе</h4>
+
+            <table class="table table-sm table-striped restaurants-table">
+              <tbody>
+              <tr *ngFor="let restaurant of restaurantsService.getRestaurants()">
+                <td>{{ restaurant.title }}</td>
+                <td class="text-right">
+                  <el-checkbox [(model)]="restaurant.isSelected" (modelChange)="changeRestaurantsStatus($event, restaurant)"></el-checkbox>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+            <div class="text-center mb-4" *ngIf="restaurantsService.getRestaurants().length === 0">
+              <div class="text-muted mb-2">Рестораны отсутствуют, сначала добавьте хотя бы один ресторан</div>
+              <el-button type="primary" routerLink="/restaurants">Перейти к ресторанам</el-button>
+            </div>
+
+          </div>
+        </div>
+        <!-- End: Restaurants -->
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="surveyForm.invalid || restaurantIds.length === 0"
+                       [loading]="surveysService.addingSurveyInProgress()"
+                       (click)="addSurvey()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeAddSurveyDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Add survey dialog -->

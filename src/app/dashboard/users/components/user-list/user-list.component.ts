@@ -132,6 +132,9 @@ export class UserListComponent implements OnInit {
       password: this.userData.password,
       confirm_password: this.confirmPassword
     });
+    this.usersService.getRoleList().forEach((role: Role) => {
+      role.isEnabled = false;
+    });
   }
 
   /**
@@ -175,7 +178,10 @@ export class UserListComponent implements OnInit {
     this.isInDeleteUserMode = false;
   }
 
-
+  /**
+   * Добавление пользователя
+   * @returns {Promise<void>}
+   */
   async addUser() {
     const rolesIds = [];
     this.usersService.getRoleList().forEach((item: Role) => {
@@ -191,6 +197,15 @@ export class UserListComponent implements OnInit {
         this.closeAddUserDialog();
         this.message['success']('Пользователь добавлен');
       });
+  }
+
+
+  /**
+   * Изменение пользователя
+   * @returns {Promise<void>}
+   */
+  async editUser() {
+
   }
 
   /**

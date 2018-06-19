@@ -22,7 +22,7 @@
           <td class="p-3">{{ i + 1 }}.</td>
           <td class="p-3">
             <div>{{ user.fio }}</div>
-            <div class="role-description text-muted">Список ролей пользователя</div>
+            <div class="role-description text-muted">{{ user.rolesLabel }}</div>
           </td>
           <td>
             <div>{{ user.email }}</div>
@@ -53,6 +53,146 @@
   </div>
 </div>
 
+
+<!-- Start: Edit user dialog -->
+<el-dialog [(visible)]="isInEditUserMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение пользователя</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+
+        <el-form [formGroup]="userForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: User information -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Личные данные пользователя</h4>
+
+              <!-- Start: First name -->
+              <el-form-item label="Имя"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('first_name')"
+                            [error]="userFormMessageCtrl('first_name')">
+                <el-input formControlName="first_name" [(model)]="userData.first_name"></el-input>
+              </el-form-item>
+              <!-- End: Name -->
+
+              <!-- Start: Second name -->
+              <el-form-item label="Отчество"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('patronymic')"
+                            [error]="userFormMessageCtrl('patronymic')">
+                <el-input formControlName="patronymic" [(model)]="userData.patronymic"></el-input>
+              </el-form-item>
+              <!-- End: Second name -->
+
+              <!-- Start: Last name -->
+              <el-form-item label="Фамилия"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('last_name')"
+                            [error]="userFormMessageCtrl('last_name')">
+                <el-input formControlName="last_name" [(model)]="userData.last_name"></el-input>
+              </el-form-item>
+              <!-- End: last name -->
+
+              <!-- Start: E-mail -->
+              <el-form-item label="E-mail"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('email')"
+                            [error]="userFormMessageCtrl('email')">
+                <el-input formControlName="email" [(model)]="userData.email"></el-input>
+              </el-form-item>
+              <!-- End: E-mail -->
+
+              <!-- Start: Phone -->
+              <el-form-item label="Телефон"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('phone')"
+                            [error]="userFormMessageCtrl('phone')">
+                <el-input formControlName="phone" [(model)]="userData.phone"></el-input>
+              </el-form-item>
+              <!-- End: Phone -->
+
+              <!-- Start: Password -->
+              <!--
+              <el-form-item label="Пароль"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('password')"
+                            [error]="userFormMessageCtrl('password')">
+                <el-input native-type="password" formControlName="password" [(model)]="userData.password"></el-input>
+              </el-form-item>
+              -->
+              <!-- End: Password -->
+
+              <!-- Start: Confirm password -->
+              <!--
+              <el-form-item label="Пароль еще раз"
+                            [required]="true"
+                            [status]="userFormStatusCtrl('confirm_password')"
+                            [error]="userFormMessageCtrl('confirm_password')">
+                <el-input formControlName="confirm_password" [(model)]="confirmPassword"></el-input>
+              </el-form-item>
+              -->
+              <!-- End: Confirm password -->
+
+            </div>
+          </div>
+          <!-- End: User information -->
+
+          <!-- Start: Role permissions -->
+          <div class="row pt-3">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Роли пользователя</h4>
+
+              <table class="table table-sm table-striped roles-table">
+                <tbody>
+                <tr *ngFor="let role of usersService.getRoleList()">
+                  <td>{{ role.title }}</td>
+                  <td class="text-right">
+                    <el-checkbox [(model)]="role.isEnabled" (modelChange)="changeRoleStatus($event)"></el-checkbox>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <!-- End: Role permissions -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="userForm.invalid || userForm.pristine"
+                       [loading]="usersService.editingUserInProgress()"
+                       (click)="editUser()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditUserDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Edit user dialog -->
 
 
 <!-- Start: Add user dialog -->

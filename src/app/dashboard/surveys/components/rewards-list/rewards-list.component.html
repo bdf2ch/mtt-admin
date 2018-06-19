@@ -12,8 +12,10 @@
         <tr>
           <th class="index p-3">#</th>
           <th class="p-3">Наименование</th>
+          <th class="p-3">Тип</th>
           <th class="p-3">Дата начала</th>
           <th class="p-3">Дата окончания</th>
+          <th class="p-3">Величина</th>
           <th class="controls"></th>
         </tr>
         </thead>
@@ -24,11 +26,13 @@
             <div>{{ reward.title }}</div>
             <div class="reward-description text-muted" *ngIf="reward.description">{{ reward.description }}</div>
           </td>
+          <td class="p-3">{{ rewardsService.getRewardTypeByCode(reward.type).title }}</td>
           <td class="p-3">{{ reward.start | date: 'dd.MM.yyyy' }}</td>
           <td class="p-3">
             <span class="text-muted" *ngIf="!reward.end">Не задана</span>
             <span *ngIf="reward.end">{{ reward.end | date: 'dd.MM.yyyy' }}</span>
           </td>
+          <td class="p-3">{{ reward.value }}</td>
           <td>
             <div class="container-fluid">
               <div class="row">
@@ -131,12 +135,14 @@
               <!-- End: Value -->
 
               <!-- Start: Is available -->
+          <!--
               <el-form-item label="Доступно">
                 <el-checkbox formControlname="is_available"
                              [(model)]="rewardData.is_available"
                              (modelChange)="changeRewardAvailable($event)">
                 </el-checkbox>
               </el-form-item>
+              -->
               <!-- End: Is available -->
 
         </el-form>

@@ -1,3 +1,5 @@
+import { Restaurant } from '../../restaurants/models/restaurant.model';
+
 /**
  * Интерфейс, описывающий опрос
  */
@@ -13,4 +15,6 @@ export interface ISurvey {
   passedCount: number;            // Число завершенных прохождений
   isTemplate: boolean;            // Является ли шаблоном
   isActive: boolean;              // Является ли активным
+  restaurants?: Restaurant[];     // Массив ресторанов, в которых проводится опрос
+  needClientDataFirst?: boolean;  // Спрашивать контакты в начале
 }

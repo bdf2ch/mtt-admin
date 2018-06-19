@@ -22,13 +22,13 @@ export class SurveyResolveGuard implements Resolve<Promise<Survey[]>> {
     }
     if (this.surveysService.getSurveysList().length === 0) {
       await this.surveysService.fetchSurveyList();
-      const surveyId = route.params['id'] ? parseInt(route.params['id']) : null;
-      console.log('surveyId', surveyId);
-      if (surveyId) {
-        const survey = this.surveysService.getSurveyById(surveyId);
-        console.log(survey);
-        this.surveysService.selectedSurvey(survey);
-      }
+    }
+    const surveyId = route.params['id'] ? parseInt(route.params['id']) : null;
+    console.log('surveyId', surveyId);
+    if (surveyId) {
+      const survey = this.surveysService.getSurveyById(surveyId);
+      console.log(survey);
+      this.surveysService.selectedSurvey(survey);
     }
     if (this.restaurantsService.getRestaurants().length === 0) {
       await this.restaurantsService.fetchRestaurantsByCompanyId(this.authenticationService.getCurrentUser().companyId);

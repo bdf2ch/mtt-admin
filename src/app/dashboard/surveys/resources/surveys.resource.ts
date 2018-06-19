@@ -40,6 +40,17 @@ export class SurveysResource extends Resource {
   getSurveysList: IResourceMethod<void, IServerResponse<ISurveyDTO[]>>;
 
   /**
+   * Path:
+   * Method: GET
+   */
+  @ResourceAction({
+    path: '',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true
+  })
+  getQuestionTypes: IResourceMethod<void, IServerResponse<any>>;
+
+  /**
    * Path: questionnaire
    * Method: POST
    */
@@ -49,4 +60,15 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   addSurvey: IResourceMethodStrict<ISurveyDTO, void, void, IServerResponse<ISurveyDTO>>;
+
+  /**
+   * Path: questionnaire/{!surveyId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: 'questionnaire/{!surveyId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editSurvey: IResourceMethodStrict<ISurveyDTO, void, {surveyId: number}, IServerResponse<ISurveyDTO>>;
 }

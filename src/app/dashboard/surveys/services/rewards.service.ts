@@ -160,11 +160,41 @@ export class RewardsService {
   }
 
   /**
+   * Поиск типа вознаграждения по коду типа вознаграждения
+   * @param {string} code - Код типа вознаграждения
+   * @returns {RewardType | null}
+   */
+  getRewardTypeByCode(code: string): RewardType | null {
+    let result = null;
+    this.rewardTypes.forEach((item: RewardType) => {
+      if (item.code === code) {
+        result = item;
+      }
+    });
+    return result;
+  }
+
+  /**
    * Возвращает список вознаграждений
    * @returns {Reward[]}
    */
   getRewardsList(): Reward[] {
     return this.rewards;
+  }
+
+  /**
+   * Поиск вознаграждения по идентификатору
+   * @param {number} id - Идентфикатор вознаграждения
+   * @returns {Reward | null}
+   */
+  getRewardById(id: number): Reward | null {
+    let result = null;
+    this.rewards.forEach((item: Reward) => {
+      if (item.id === id) {
+        result = item;
+      }
+    });
+    return result;
   }
 
   /**

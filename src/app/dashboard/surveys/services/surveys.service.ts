@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Survey } from '../models/survey.model';
 import { SurveysResource } from '../resources/surveys.resource';
 import { ISurveyDTO } from '../dto/survey.dto';
+import {IRestaurantDTO} from '../../restaurants/dto/restaurant.dto';
+import {Restaurant} from '../../restaurants/models/restaurant.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ export class SurveysService {
 
   constructor(private readonly resource: SurveysResource) {
     this.surveys = [];
-    this.selectedSurvey = null;
+    this.selectedSurvey_ = null;
     this.isAddingSurveyInProgress = false;
     this.isEditingSurveyInProgress = false;
     this.isDeletingSurveyInProgress = false;
@@ -33,6 +35,7 @@ export class SurveysService {
           const survey = new Survey(item);
           this.surveys.push(survey);
         });
+        console.log(this.surveys);
         return this.surveys;
       }
     } catch (error) {
@@ -114,6 +117,45 @@ export class SurveysService {
     } catch (error) {
       console.error(error);
       this.isAddingSurveyInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Изменение опроса
+   * @param {ISurveyDTO} survey - Опрос
+   * @returns {Promise<Survey | null>}
+   */
+  async editSurvey(survey: ISurveyDTO): Promise<Survey | null> {
+    try {
+      this.isEditingSurveyInProgress = true;
+      const result = await this.resource.editSurvey(survey, null, {surveyId: survey.id});
+      if (result.data) {
+        this.isEditingSurveyInProgress = false;
+        this.surveys.forEach((item: Survey) => {
+          if (item.id === survey.id) {
+            item.title = survey.name;
+            item.description = survey.description;
+            item.start = new Date(survey.from);
+            item.end = survey.to !== '' ? new Date(survey.to) : null;
+            item.rewardId = survey.reward_id;
+            item.passingCount = survey.available_passing_count;
+            item.needClientDataFirst = survey.need_client_data_first;
+            item.isTemplate = survey.is_template;
+            item.restaurants = [];
+            if (result.data.restaurants) {
+              result.data.restaurants.data.forEach((rest: IRestaurantDTO) => {
+                const restaurant = new Restaurant(rest);
+                item.restaurants.push(restaurant);
+              });
+            }
+            return item;
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingSurveyInProgress = false;
       return null;
     }
   }

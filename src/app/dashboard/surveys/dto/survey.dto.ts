@@ -1,3 +1,5 @@
+import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
+
 /**
  * Survey DTO interface
  */
@@ -14,4 +16,8 @@ export interface ISurveyDTO {
   is_template?: boolean;              // Является ли шаблоном
   is_active?: boolean;                // Является ли активным
   restaurants_ids?: number[];         // Массив идентфиикаторов ресторанов
+  restaurants?: {                     // Массив ресторанов, в которых проводится опрос
+    data: IRestaurantDTO[]
+  };
+  need_client_data_first?: boolean;   // Спрашивать контакты в начале
 }

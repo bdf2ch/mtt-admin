@@ -22,6 +22,7 @@ export class SurveysListComponent implements OnInit {
   public surveyData: ISurveyDTO;
   public surveyForm: FormGroup;
   public restaurantIds: number[];
+  public templateId: number;
 
   constructor(private readonly router: Router,
               private readonly formBuilder: FormBuilder,
@@ -34,6 +35,7 @@ export class SurveysListComponent implements OnInit {
     this.isInDeleteSurveyDialog = false;
     this.selectedSurvey = null;
     this.restaurantIds = [];
+    this.templateId = 0;
     this.surveyData = {
       id: 0,
       name: '',
@@ -53,7 +55,8 @@ export class SurveysListComponent implements OnInit {
     this.surveyForm = this.formBuilder.group({
       name: [this.surveyData.name, Validators.required],
       description: [this.surveyData.description],
-      reward_id: [this.rewardsService.getAvailableRewards().length > 0 ? this.rewardsService.getAvailableRewards()[0].id : null, Validators.required]
+      reward_id: [this.rewardsService.getAvailableRewards().length > 0 ? this.rewardsService.getAvailableRewards()[0].id : null, Validators.required],
+      template_id: [this.templateId]
     });
   }
 
@@ -204,6 +207,7 @@ export class SurveysListComponent implements OnInit {
     delete this.surveyData.is_template;
     delete this.surveyData.is_active;
     delete this.surveyData.available_passing_count;
+    this.surveyData.restaurants_ids = this.restaurantIds;
 
     console.log(this.surveyData);
     await this.surveysService.addSurvey(this.surveyData)

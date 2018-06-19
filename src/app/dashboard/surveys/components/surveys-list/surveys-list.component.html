@@ -21,7 +21,10 @@
         <tbody>
         <tr *ngFor="let survey of surveysService.getSurveysList(); let i = index;">
           <td class="p-3">{{ i + 1 }}.</td>
-          <td class="p-3">{{ survey.title }}</td>
+          <td class="p-3">
+            <div>{{ survey.title }}</div>
+            <div class="survey-description text-muted" *ngIf="survey.description">{{ survey.description }}</div>
+          </td>
           <td class="p-3">{{ survey.isActive ? 'Активен' : 'Неактивен' }}</td>
           <td class="p-3">{{ survey.start | date: 'dd.MM.yyyy' }}</td>
           <td class="p-3">
@@ -63,8 +66,6 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <h4 class="text-muted mb-3">Информация об опросе</h4>
-
         <el-form [formGroup]="surveyForm"
                  label-width="170px"
                  [label-position]="'left'"
@@ -72,6 +73,21 @@
                  [show-icon]="true"
                  [show-message]="true">
 
+          <!-- Start: Template -->
+          <h4 class="text-muted mb-3">Шаблон опроса</h4>
+          <el-form-item *ngIf="rewardsService.getAvailableRewards().length !== 0"
+                        label="Шаблон"
+                        [required]="false">
+            <el-select [(model)]="templateId" formControlName="template_id" placeholder="Выберите шаблон" *ngIf="rewardsService.getRewardsList().length > 0">
+              <el-option *ngFor="let reward of rewardsService.getAvailableRewards()"
+                         [label]="reward.title"
+                         [value]="reward.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Template -->
+
+          <h4 class="text-muted mb-3">Информация об опросе</h4>
           <!-- Start: Name -->
           <el-form-item label="Наименование"
                         [required]="true"
@@ -90,28 +106,6 @@
           </el-form-item>
           <!-- End: Description -->
 
-          <!-- Start: Start date -->
-          <!--
-          <el-form-item label="Дата начала"
-                        [required]="true"
-                        [status]="surveyFormStatusCtrl('from')"
-                        [error]="surveyFormMessageCtrl('from')">
-            <el-input formControlName="from" [(model)]="surveyData.from"></el-input>
-          </el-form-item>
-          -->
-          <!-- End: Start date -->
-
-          <!-- Start: End date -->
-          <!--
-          <el-form-item label="Дата окончания"
-                        [required]="false"
-                        [status]="surveyFormStatusCtrl('to')"
-                        [error]="surveyFormMessageCtrl('to')">
-            <el-input formControlName="to" [(model)]="surveyData.to"></el-input>
-          </el-form-item>
-          -->
-          <!-- End: End date -->
-
           <!-- Start: Reward -->
           <h4 class="text-muted mb-3">Вознаграждение</h4>
           <el-form-item *ngIf="rewardsService.getAvailableRewards().length !== 0"
@@ -124,41 +118,20 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <div *ngIf="rewardsService.getRewardsList().length === 0" class="text-center mb-3">
-            <div class="text-center mb-2">Вознаграждения отсутствуют, добавьте вознаграждение</div>
+          <div *ngIf="rewardsService.getRewardsList().length === 0" class="empty-placeholder text-center mb-3 p-3">
+            <div class="text-center mb-3">Вознаграждения отсутствуют, добавьте хотя бы одно вознаграждение</div>
             <el-button type="primary" routerLink="/surveys/rewards">Перейти к вознаграждениям</el-button>
           </div>
-          <div *ngIf="rewardsService.getRewardsList().length !== 0 && rewardsService.getAvailableRewards().length === 0" class="text-center mb-3">
-            <div class="text-center mb-2">Доступные вознаграждения отсутствуют</div>
+          <div *ngIf="rewardsService.getRewardsList().length !== 0 && rewardsService.getAvailableRewards().length === 0" class="empty-placeholder text-center mb-3 p-3">
+            <div class="text-center mb-3">Доступные вознаграждения отсутствуют</div>
             <el-button type="primary" routerLink="/surveys/rewards">Перейти к вознаграждениям</el-button>
           </div>
           <!-- End: Reward -->
 
-          <!-- Start: Pass count -->
-          <!--
-          <el-form-item label="Кол-во прохождений"
-                        [required]="true"
-                        [status]="surveyFormStatusCtrl('available_passing_count')"
-                        [error]="surveyFormMessageCtrl('available_passing_count')">
-            <el-input formControlName="available_passing_count" [(model)]="surveyData.available_passing_count"></el-input>
-          </el-form-item>
-          -->
-          <!-- End: Pass count -->
-
-          <!-- Start: Pass count -->
-          <!--
-          <el-form-item label="Когда спрашивать контакты"
-                        [required]="true">
-            <el-radio [(model)]="surveyData.is_active" label="В начале">В начале</el-radio>
-            <el-radio [(model)]="surveyData.is_active" label="В конце">В конце</el-radio>
-          </el-form-item>
-          -->
-          <!-- End: Pass count -->
-
         </el-form>
 
         <!-- Start: Restaurants -->
-        <div class="row pt-3">
+        <div class="row">
           <div class="col-12 border-bottom">
             <h4 class="text-muted mb-3">Рестораны, участвующие в опросе</h4>
 
@@ -173,8 +146,8 @@
               </tbody>
             </table>
 
-            <div class="text-center mb-4" *ngIf="restaurantsService.getRestaurants().length === 0">
-              <div class="text-muted mb-2">Рестораны отсутствуют, сначала добавьте хотя бы один ресторан</div>
+            <div class="empty-placeholder text-center p-3 mb-4" *ngIf="restaurantsService.getRestaurants().length === 0">
+              <div class="text-muted mb-3">Рестораны отсутствуют, сначала добавьте хотя бы один ресторан</div>
               <el-button type="primary" routerLink="/restaurants">Перейти к ресторанам</el-button>
             </div>
 

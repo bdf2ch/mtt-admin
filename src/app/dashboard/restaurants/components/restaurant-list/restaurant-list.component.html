@@ -7,7 +7,7 @@
 
   <div class="row pt-3">
     <div class="col-12">
-      <table class="restaurants-table table-hover w-100">
+      <table class="restaurants-table table-hover w-100" *ngIf="restaurantsService.getRestaurants().length > 0">
         <thead>
         <tr>
           <th class="index p-3">#</th>

@@ -1,3 +1,334 @@
-<p>
-  survey works!
-</p>
+<div id="company" class="container-fluid h-100">
+  <div class="row h-100">
+    <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center">
+      <h3 class="mb-4 w-100 d-flex justify-content-between">
+        {{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}
+        <el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button>
+      </h3>
+
+      <table class="table table-sm mt-4">
+        <tbody>
+        <tr>
+          <th scope="row">Наименование</th>
+          <td>{{ surveysService.selectedSurvey().title }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Описание</th>
+          <td>
+            <span *ngIf="surveysService.selectedSurvey().description">{{ surveysService.selectedSurvey().description }}</span>
+            <span *ngIf="!surveysService.selectedSurvey().description" class="text-muted">Не указано</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Дата начала</th>
+          <td>{{ surveysService.selectedSurvey().start | date: 'dd.MM.yyyy' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Дата окончания</th>
+          <td>
+            <span *ngIf="surveysService.selectedSurvey().end">{{ surveysService.selectedSurvey().end | date: 'dd.MM.yyyy' }}</span>
+            <span *ngIf="!surveysService.selectedSurvey().end" class="text-muted">Не указана</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Вознаграждение</th>
+          <td>
+            {{ rewardsService.getRewardById(surveysService.selectedSurvey().rewardId).title }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Всего прохождений</th>
+          <td>
+            {{ surveysService.selectedSurvey().passingCount }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Доступно прохождений</th>
+          <td>
+            {{ surveysService.selectedSurvey().passingCount - surveysService.selectedSurvey().passedCount }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Когда спрашивать контакты</th>
+          <td>
+            <span *ngIf="surveysService.selectedSurvey().end">{{ surveysService.selectedSurvey().end | date: 'dd.MM.yyyy' }}</span>
+            <span *ngIf="!surveysService.selectedSurvey().end" class="text-muted">Не указана</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Рестораны</th>
+          <td>
+            <div *ngFor="let restaurant of surveysService.selectedSurvey().restaurants">
+              {{restaurant.title }}
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Является шаблоном</th>
+          <td>
+            {{ surveysService.selectedSurvey().isTemplate ? 'Да' : 'Нет' }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Состояние</th>
+          <td>
+            {{ surveysService.selectedSurvey().isActive ? 'Активен' : 'Неактивен' }}
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="pt-4">
+            <div el-row gutter="20">
+              <div el-col span="12" class="text-left">
+                <el-button type="warning" class="w-100">Сгенерировать коды</el-button>
+              </div>
+              <div el-col span="12" class="text-right">
+                <el-button type="success" class="w-100">Запустить опрос</el-button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Start: Payment requisites -->
+    <div class="col-12 col-lg-6 p-4 border-left">
+
+      <!-- Start: Header -->
+      <h3 class="mb-4 d-flex justify-content-between">
+        Вопросы
+        <el-button type="primary" icon="plus" (click)="openAddPaymentRequisitesDialog()">&nbsp; Добавить</el-button>
+      </h3>
+      <!-- End: Header -->
+
+      <!-- Start: No requisites placeholder -->
+      <!--
+      <div *ngIf="companyService.getCompany().paymentRequisites.length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Реквизиты отсутствуют</p>
+      </div>
+      -->
+      <!-- End: No requisites placeholder -->
+
+      <!-- Start: Requisites-->
+      <!--
+      <div class="container-fluid payment-requisites pl-0 pr-0">
+        <div class="row mt-4">
+          <div class="col-12 col-xl-6 mb-3" *ngFor="let item of companyService.getCompany().paymentRequisites">
+            <el-card>
+              <ng-template #header>
+                <div class="clearfix text-center">
+                  <span style="line-height: 36px;" class="text-muted">
+                    <strong>{{ item.businessTitle }}</strong>
+                  </span>
+                </div>
+              </ng-template>
+              <div class="text item">
+                <table class="table table-sm mb-0">
+                  <tbody>
+                  <tr>
+                    <td class="text-muted text-right border-top-0" style="width: 80px">ИНН</td>
+                    <td class="border-top-0">{{ item.INN }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">КПП</td>
+                    <td>{{ item.KPP }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">Юр. адрес</td>
+                    <td>{{ item.businessAddress }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">Физ. адрес</td>
+                    <td>{{ item.address }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">Расч. счет</td>
+                    <td>{{ item.account }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">Корр. счет</td>
+                    <td>{{ item.correspondingAccount }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted text-right">БИК</td>
+                    <td>{{ item.BIK }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="">
+
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+
+                <div class="footer">
+                  <div class="container-fluid p-0">
+                    <div class="row">
+                      <div class="col-6">
+                        <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
+                      </div>
+                      <div class="col-6">
+                        <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </el-card>
+          </div>
+        </div>
+      </div>
+      -->
+      <!-- End: Requisites -->
+    </div>
+    <!-- End: Payment requisites -->
+
+  </div>
+</div>
+
+
+<!-- Start: Edit survey dialog -->
+<el-dialog [(visible)]="isInEditSurveyMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Изменение опроса</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-muted mb-3">Информация об опросе</h4>
+
+        <el-form [formGroup]="surveyForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Name -->
+          <el-form-item label="Наименование"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('name')"
+                        [error]="surveyFormMessageCtrl('name')">
+            <el-input formControlName="name" [(model)]="surveyData.name"></el-input>
+          </el-form-item>
+          <!-- End: Name -->
+
+          <!-- Start: Description -->
+          <el-form-item label="Описание"
+                        [required]="false"
+                        [status]="surveyFormStatusCtrl('description')"
+                        [error]="surveyFormMessageCtrl('description')">
+            <el-input formControlName="description" [(model)]="surveyData.description"></el-input>
+          </el-form-item>
+          <!-- End: Description -->
+
+          <!-- Start: Start date -->
+          <el-form-item label="Дата начала"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('from')"
+                        [error]="surveyFormMessageCtrl('from')">
+            <el-input formControlName="from" [(model)]="surveyData.from"></el-input>
+          </el-form-item>
+          <!-- End: Start date -->
+
+          <!-- Start: End date -->
+          <el-form-item label="Дата окончания"
+                        [required]="false"
+                        [status]="surveyFormStatusCtrl('to')"
+                        [error]="surveyFormMessageCtrl('to')">
+            <el-input formControlName="to" [(model)]="surveyData.to"></el-input>
+          </el-form-item>
+          <!-- End: End date -->
+
+          <!-- Start: Reward -->
+          <el-form-item *ngIf="rewardsService.getAvailableRewards().length !== 0"
+                        label="Вознаграждение"
+                        [required]="true">
+            <el-select [(model)]="surveyData.reward_id" formControlName="reward_id" placeholder="Вознаграждение" *ngIf="rewardsService.getRewardsList().length > 0">
+              <el-option *ngFor="let reward of rewardsService.getAvailableRewards()"
+                         [label]="reward.title"
+                         [value]="reward.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Reward -->
+
+          <!-- Start: Pass count -->
+          <el-form-item label="Кол-во прохождений"
+                        [required]="true"
+                        [status]="surveyFormStatusCtrl('available_passing_count')"
+                        [error]="surveyFormMessageCtrl('available_passing_count')">
+            <el-input formControlName="available_passing_count"
+                      native-type="number"
+                      el-class="no-spinners"
+                      [(model)]="surveyData.available_passing_count">
+            </el-input>
+          </el-form-item>
+          <!-- End: Pass count -->
+
+          <!-- Start: Need client data first-->
+          <el-form-item label="Спрашивать контакты">
+            <el-radio-group [(model)]="surveyData.need_client_data_first" (modelChange)="changeNeedClientDataFirstStatus($event)">
+              <el-radio formControlName="need_client_data_first" [label]="true">В начале</el-radio>
+              <el-radio formControlName="need_client_data_first" [label]="false">В конце</el-radio>
+            </el-radio-group>
+
+          </el-form-item>
+          <!-- End: Need client data first -->
+
+          <!-- Start: Is template -->
+          <el-form-item label="Является шаблоном"
+                        [required]="false"
+                        [status]="surveyFormStatusCtrl('is_template')"
+                        [error]="surveyFormMessageCtrl('is_template')">
+            <el-checkbox formControlName="is_template" [(model)]="surveyData.is_template" (modelChange)="changeIsTemplateStatus($event)"></el-checkbox>
+          </el-form-item>
+          <!-- End: Is template -->
+        </el-form>
+
+        <!-- Start: Restaurants -->
+        <div class="row">
+          <div class="col-12 border-bottom">
+            <h4 class="text-muted mb-3">Рестораны, участвующие в опросе</h4>
+
+            <table class="table table-sm table-striped restaurants-table">
+              <tbody>
+              <tr *ngFor="let restaurant of restaurantsService.getRestaurants()">
+                <td>{{ restaurant.title }}</td>
+                <td class="text-right">
+                  <el-checkbox [(model)]="restaurant.isSelected" (modelChange)="changeRestaurantsStatus($event, restaurant)"></el-checkbox>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+        <!-- End: Restaurants -->
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="surveyForm.invalid || surveyForm.pristine || restaurantIds.length === 0"
+                       [loading]="surveysService.addingSurveyInProgress()"
+                       (click)="editSurvey()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditSurveyDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Edit survey dialog -->

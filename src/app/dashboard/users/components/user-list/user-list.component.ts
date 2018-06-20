@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
 import { AuthenticationService } from '../../../authentication/services/authentication.service';
-import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import {FormBuilder, FormGroup, AbstractControl, Validators, FormControl} from '@angular/forms';
 import { IUserDTO } from '../../dto/user.dto';
 import { User } from '../../models/user.model';
 import { ElMessageService } from 'element-angular/release/message/message.service';
-import {Role} from "../../models/role.model";
+import { Role } from '../../models/role.model';
 
 @Component({
   selector: 'app-user-list',
@@ -48,9 +48,9 @@ export class UserListComponent implements OnInit {
       patronymic: [this.userData.patronymic, Validators.required],
       last_name: [this.userData.last_name, Validators.required],
       email: [this.userData.email, [Validators.required, Validators.email]],
-      phone: [this.userData.email, Validators.required],
-      password: [this.userData.password, Validators.required],
-      confirm_password: [this.confirmPassword, Validators.required]
+      phone: [this.userData.email, Validators.required]
+      // password: [this.userData.password, Validators.required],
+      // confirm_password: [this.confirmPassword, Validators.required]
     });
   }
 
@@ -103,6 +103,10 @@ export class UserListComponent implements OnInit {
     }
   }
 
+  /**
+   * Изменение статуса роли пользователя
+   * @param {boolean} value
+   */
   changeRoleStatus(value: boolean) {
     this.userForm.markAsDirty();
   }
@@ -123,6 +127,8 @@ export class UserListComponent implements OnInit {
       password: ''
     };
     this.confirmPassword = '';
+    this.userForm.addControl('password', new FormControl(Validators.required));
+    this.userForm.addControl('confirm_password', new FormControl(Validators.required));
     this.userForm.reset({
       first_name: this.userData.first_name,
       patronymic: this.userData.patronymic,
@@ -150,6 +156,30 @@ export class UserListComponent implements OnInit {
    */
   openEditUserDialog(user: User) {
     this.selectedUser = user;
+    this.userData.id = user.id;
+    this.userData.company_id = user.companyId;
+    this.userData.first_name = user.firstName;
+    this.userData.patronymic = user.secondName;
+    this.userData.last_name = user.lastName;
+    this.userData.email = user.email;
+    this.userData.phone = user.phone;
+    this.userForm.removeControl('password');
+    this.userForm.removeControl('confirm_password');
+    this.userForm.reset({
+      first_name: this.userData.first_name,
+      patronymic: this.userData.patronymic,
+      last_name: this.userData.last_name,
+      email: this.userData.email,
+      phone: this.userData.phone
+    });
+    user.roles.forEach((role: Role) => {
+      this.usersService.getRoleList().forEach((item: Role) => {
+        if (item.id === role.id) {
+          console.log('role', item);
+          item.isEnabled = true;
+        }
+      });
+    });
     this.isInEditUserMode = true;
   }
 
@@ -159,6 +189,9 @@ export class UserListComponent implements OnInit {
   closeEditUserDialog() {
     this.selectedUser = null;
     this.isInEditUserMode = false;
+    this.usersService.getRoleList().forEach((role: Role) => {
+      role.isEnabled = false;
+    });
   }
 
   /**
@@ -199,13 +232,25 @@ export class UserListComponent implements OnInit {
       });
   }
 
-
   /**
    * Изменение пользователя
    * @returns {Promise<void>}
    */
   async editUser() {
-
+    const rolesIds = [];
+    this.usersService.getRoleList().forEach((item: Role) => {
+      if (item.isEnabled) {
+        rolesIds.push(item.id);
+      }
+    });
+    if (rolesIds.length > 0) {
+      this.userData.roles_ids = rolesIds;
+    }
+    await this.usersService.editUser(this.userData, this.authenticationService.getCurrentUser().companyId)
+      .then(() => {
+        this.closeEditUserDialog();
+        this.message['success']('Пользователь изменен');
+      });
   }
 
   /**

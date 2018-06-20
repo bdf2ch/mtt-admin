@@ -133,7 +133,7 @@
         <!-- Start: Restaurants -->
         <div class="row">
           <div class="col-12 border-bottom">
-            <h4 class="text-muted mb-3">Рестораны, участвующие в опросе</h4>
+            <h4 class="text-muted">Рестораны, участвующие в опросе</h4>
 
             <table class="table table-sm table-striped restaurants-table">
               <tbody>
@@ -146,7 +146,7 @@
               </tbody>
             </table>
 
-            <div class="empty-placeholder text-center p-3 mb-4" *ngIf="restaurantsService.getRestaurants().length === 0">
+            <div class="empty-placeholder text-center p-3 mb-3" *ngIf="restaurantsService.getRestaurants().length === 0">
               <div class="text-muted mb-3">Рестораны отсутствуют, сначала добавьте хотя бы один ресторан</div>
               <el-button type="primary" routerLink="/restaurants">Перейти к ресторанам</el-button>
             </div>

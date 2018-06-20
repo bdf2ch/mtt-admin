@@ -6,6 +6,7 @@ import { ISurveyDTO } from '../../dto/survey.dto';
 import { RestaurantsService } from '../../../restaurants/services/restaurants.service';
 import { Restaurant } from '../../../restaurants/models/restaurant.model';
 import { ElMessageService } from 'element-angular/release/message/message.service';
+import {IQuestionDTO} from '../../dto/question.dto';
 
 @Component({
   selector: 'app-survey',
@@ -14,8 +15,13 @@ import { ElMessageService } from 'element-angular/release/message/message.servic
 })
 export class SurveyComponent implements OnInit {
   public isInEditSurveyMode: boolean;
+  public isInAddQuestionMode: boolean;
+  public isInEditQuestionMode: boolean;
+  public isInDeleteQuestionMode: boolean;
   public surveyForm: FormGroup;
   public surveyData: ISurveyDTO;
+  public questionForm: FormGroup;
+  public questionData: IQuestionDTO;
   public restaurantIds: number[];
 
   constructor(private readonly formBuilder: FormBuilder,
@@ -24,6 +30,9 @@ export class SurveyComponent implements OnInit {
               public readonly rewardsService: RewardsService,
               private readonly message: ElMessageService) {
     this.isInEditSurveyMode = false;
+    this.isInAddQuestionMode = false;
+    this.isInEditQuestionMode = false;
+    this.isInDeleteQuestionMode = false;
     this.restaurantIds = [];
     const survey = this.surveysService.selectedSurvey();
     console.log('survey', survey);
@@ -40,6 +49,13 @@ export class SurveyComponent implements OnInit {
       need_client_data_first: survey.needClientDataFirst,
       is_template: survey.isTemplate
     };
+    this.questionData = {
+      id: 0,
+      company_id: 0,
+      title: '',
+      weight: 0,
+      type: this.surveysService.getQuestionTypeByCode('informative').code
+    };
   }
 
   ngOnInit() {
@@ -53,6 +69,11 @@ export class SurveyComponent implements OnInit {
       available_passing_count: ['', [Validators.required, Validators.min(1)]],
       need_client_data_first: [''],
       is_template: ['']
+    });
+    this.questionForm = this.formBuilder.group({
+      title: [this.questionData.title, Validators.required],
+      weight: [this.questionData.weight, Validators.required],
+      type: [this.questionData.type, Validators.required]
     });
   }
 
@@ -106,6 +127,20 @@ export class SurveyComponent implements OnInit {
   }
 
   /**
+   * Открытие диалогового окна добавлени вопроса
+   */
+  openAddQuestionDialog() {
+    this.isInAddQuestionMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна добавления вопрсоа
+   */
+  closeAddQuestionDialog() {
+    this.isInAddQuestionMode = false;
+  }
+
+  /**
    * Получение статуса элемента формы опроса
    * @param {string} item - Имя элемента формы
    * @returns {string}
@@ -141,6 +176,35 @@ export class SurveyComponent implements OnInit {
         return control.dirty && control.hasError('required')
           ? 'Вы не указали количество прохождений' : control.hasError('min')
             ? 'Количество прохождений не может быть меньше 1' : '';
+    }
+  }
+
+  /**
+   * Получение статуса элемента формы вопроса
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  questionFormStatusCtrl(item: string): string {
+    if (!this.surveyForm.controls[item]) { return; }
+    const control: AbstractControl = this.surveyForm.controls[item];
+    return control.dirty && control.hasError('required') || control.hasError('pattern') || control.hasError('min') ? 'error' : 'validating';
+  }
+
+  /**
+   * Получение сообщения об ошибке элемента формы вопроса
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  questionFormMessageCtrl(item: string): string {
+    if (!this.surveyForm.controls[item]) { return; }
+    const control: AbstractControl = this.surveyForm.controls[item];
+    switch (item) {
+      case 'title':
+        return control.dirty && control.hasError('required') ? 'Вы не указали текст вопроса' : '';
+      case 'weight':
+        return control.dirty && control.hasError('required') ? 'Вы не указали вес вопроса' : '';
+      case 'type':
+        return control.dirty && control.hasError('required') ? 'Вы не выбрали тип вопроса' : '';
     }
   }
 
@@ -192,4 +256,6 @@ export class SurveyComponent implements OnInit {
         this.message['success']('Опрос добавлен');
       });
   }
+
+  async addQuestion() {}
 }

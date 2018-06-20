@@ -61,7 +61,7 @@
     <span>Изменение пользователя</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="isInEditUserMode">
     <div class="row">
       <div class="col-12">
 
@@ -202,7 +202,7 @@
     <span>Добавление пользователя</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="isInAddUserMode">
     <div class="row">
       <div class="col-12">
 

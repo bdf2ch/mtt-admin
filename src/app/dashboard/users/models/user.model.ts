@@ -34,13 +34,25 @@ export class User implements IUser {
     //this.password = config ? config.password : '';
     this.phone = config && config.phone ? config.phone : null;
     this.fio = `${this.firstName} ${this.secondName} ${this.lastName}`;
+    this.roles = [];
+    this.rolesLabel = '';
 
     if (config && config.roles) {
       config.roles.data.forEach((item: IRoleDTO, index: number, array: IRoleDTO[]) => {
         const role = new Role(item);
         this.roles.push(role);
-        this.rolesLabel = `role.title ${index !== array.length ? ' ,' : ''}`;
       });
+      this.generateRolesLabel();
     }
+  }
+
+  /**
+   * Возвращает список ролей пользователя однйо строкой
+   */
+  generateRolesLabel() {
+    this.rolesLabel = 'Роли: ';
+    this.roles.forEach((role: Role, index: number, array: Role[]) => {
+      this.rolesLabel += `${role.title} ${index < array.length - 1 ? ', ' : ''}`;
+    });
   }
 }

@@ -2,25 +2,31 @@ import { Injectable } from '@angular/core';
 import { Survey } from '../models/survey.model';
 import { SurveysResource } from '../resources/surveys.resource';
 import { ISurveyDTO } from '../dto/survey.dto';
-import {IRestaurantDTO} from '../../restaurants/dto/restaurant.dto';
-import {Restaurant} from '../../restaurants/models/restaurant.model';
+import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
+import { Restaurant } from '../../restaurants/models/restaurant.model';
+import { QuestionType } from '../models/question-type.model';
+import { QuestionFormType } from '../models/question-form-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SurveysService {
+  private questionTypes: QuestionType[];
   private surveys: Survey[];
   private selectedSurvey_: Survey | null;
   private isAddingSurveyInProgress: boolean;
   private isEditingSurveyInProgress: boolean;
   private isDeletingSurveyInProgress: boolean;
+  private isAddingQuestionInProgress: boolean;
 
   constructor(private readonly resource: SurveysResource) {
+    this.questionTypes = [];
     this.surveys = [];
     this.selectedSurvey_ = null;
     this.isAddingSurveyInProgress = false;
     this.isEditingSurveyInProgress = false;
     this.isDeletingSurveyInProgress = false;
+    this.isAddingQuestionInProgress = false;
   }
 
   /**
@@ -37,6 +43,31 @@ export class SurveysService {
         });
         console.log(this.surveys);
         return this.surveys;
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+  /**
+   * Получение списка типов вопроса и типов форм вопросов
+   * @returns {Promise<QuestionType[]>}
+   */
+  async fetchQuestionTypes(): Promise<QuestionType[]> {
+    try {
+      const result = await this.resource.getQuestionTypes();
+      if (result.data) {
+        for (const question_type in result.data) {
+          const questionType = new QuestionType({code: question_type, title: result.data[question_type]['display_name']});
+          for (const form in result.data[question_type]['available_forms']) {
+            const questionFormType = new QuestionFormType({code: form, title: result.data[question_type]['available_forms'][form]});
+            questionType.forms.push(questionFormType);
+          }
+          this.questionTypes.push(questionType);
+        }
+        console.log(this.questionTypes);
+        return this.questionTypes;
       }
     } catch (error) {
       console.error(error);
@@ -76,6 +107,25 @@ export class SurveysService {
   }
 
   /**
+   * Воз вращает список типов вопросов
+   * @returns {QuestionType[]}
+   */
+  getQuestionTypesList(): QuestionType[] {
+    return this.questionTypes;
+  }
+
+  /**
+   * Поиск типа вопроса по коду
+   * @param {string} code - Код типа вопроса
+   * @returns {QuestionType | null}
+   */
+  getQuestionTypeByCode(code: string): QuestionType | null {
+    const findQuestionTypeByCode = (type: QuestionType) => type.code === code;
+    const questionType = this.questionTypes.find(findQuestionTypeByCode);
+    return questionType ? questionType : null;
+  }
+
+  /**
    * Выполняетлся ли добавлени опроса
    * @returns {boolean}
    */
@@ -97,6 +147,14 @@ export class SurveysService {
    */
   deletingSurveyInProgress(): boolean {
     return this.isDeletingSurveyInProgress;
+  }
+
+  /**
+   * Выполняется ли добавление вопроса
+   * @returns {boolean}
+   */
+  addingQuestionInProgress(): boolean {
+    return this.isAddingQuestionInProgress;
   }
 
   /**

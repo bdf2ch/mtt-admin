@@ -1,5 +1,6 @@
 <div id="company" class="container-fluid h-100">
   <div class="row h-100">
+    <!-- Start: Surveys list -->
     <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center">
       <h3 class="mb-4 w-100 d-flex justify-content-between">
         {{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}
@@ -91,14 +92,15 @@
         </tbody>
       </table>
     </div>
+    <!-- End: Surveys list -->
 
-    <!-- Start: Payment requisites -->
+    <!-- Start: Questions -->
     <div class="col-12 col-lg-6 p-4 border-left">
 
       <!-- Start: Header -->
       <h3 class="mb-4 d-flex justify-content-between">
         Вопросы
-        <el-button type="primary" icon="plus" (click)="openAddPaymentRequisitesDialog()">&nbsp; Добавить</el-button>
+        <el-button type="primary" icon="plus" (click)="openAddQuestionDialog()">&nbsp; Добавить</el-button>
       </h3>
       <!-- End: Header -->
 
@@ -191,7 +193,7 @@
 <!-- Start: Edit survey dialog -->
 <el-dialog [(visible)]="isInEditSurveyMode" [width]="'580px'">
   <ng-template #title>
-    <span class="el-icon-plus"></span>&nbsp;
+    <span class="el-icon-edit"></span>&nbsp;
     <span>Изменение опроса</span>
   </ng-template>
 
@@ -332,3 +334,105 @@
   </div>
 </el-dialog>
 <!-- End: Edit survey dialog -->
+
+
+<!-- Start: Add question dialog -->
+<el-dialog [(visible)]="isInAddQuestionMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление вопроса</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-muted mb-3">Информация о вопросе</h4>
+
+        <el-form [formGroup]="questionForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Title -->
+          <el-form-item label="Текст вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('title')"
+                        [error]="questionFormMessageCtrl('title')">
+            <el-input formControlName="title" [(model)]="questionData.title"></el-input>
+          </el-form-item>
+          <!-- End: Title -->
+
+          <!-- Start: Question type -->
+          <el-form-item label="Тип вопроса"
+                        [required]="true">
+            <el-select [(model)]="questionData.type" formControlName="type" placeholder="Тип вопроса">
+              <el-option *ngFor="let questionType of surveysService.getQuestionTypesList()"
+                         [label]="questionType.title"
+                         [value]="questionType.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Question type -->
+
+          <!-- Start: Weight -->
+          <el-form-item label="Вес вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('weight')"
+                        [error]="questionFormMessageCtrl('weight')">
+            <el-input formControlName="weight"
+                      native-type="number"
+                      el-class="no-spinners"
+                      [(model)]="questionData.weight">
+            </el-input>
+          </el-form-item>
+          <!-- End: Weight -->
+        </el-form>
+
+        <!-- Start: Restaurants -->
+        <div class="row">
+          <div class="col-12 border-bottom">
+            <h4 class="text-muted mb-3">Ответы</h4>
+
+            <table class="table table-sm table-striped restaurants-table">
+              <tbody>
+              <!--
+              <tr *ngFor="let restaurant of restaurantsService.getRestaurants()">
+                <td>{{ restaurant.title }}</td>
+                <td class="text-right">
+                  <el-checkbox [(model)]="restaurant.isSelected" (modelChange)="changeRestaurantsStatus($event, restaurant)"></el-checkbox>
+                </td>
+              </tr>
+              -->
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+        <!-- End: Restaurants -->
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="questionForm.invalid || questionForm.pristine"
+                       [loading]="surveysService.addingQuestionInProgress()"
+                       (click)="addQuestion()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeAddQuestionDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Add question dialog -->
+

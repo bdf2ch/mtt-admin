@@ -82,17 +82,30 @@ export class UsersService {
     return this.isDeletingUserRoleInProgress;
   }
 
+  /**
+   * Выполняетс ли добавление польтзователя
+   * @returns {boolean}
+   */
   addingUserInProgress(): boolean {
     return this.isAddingUserInProgress;
   }
 
+  /**
+   * Выполняется ли изменение пользователя
+   * @returns {boolean}
+   */
   editingUserInProgress(): boolean {
     return this.isEditingUserInProgress;
   }
 
+  /**
+   * Выполняется ли удаление поьзователя
+   * @returns {boolean}
+   */
   deletingUserInProgress(): boolean {
     return this.isDeletingUserInProgress;
   }
+
   /**
    * Получение списка пользователей по идентификатору компании
    * @param {number} companyId - Идентификатор компании
@@ -327,6 +340,45 @@ export class UsersService {
     }
   }
 
+  /**
+   * изменение пользователя
+   * @param {IUserDTO} user - Пользователь
+   * @param {number} companyId - Идентификатор компании
+   * @returns {Promise<User | null>}
+   */
+  async editUser(user: IUserDTO, companyId: number): Promise<User | null> {
+    try {
+      this.isEditingUserInProgress = true;
+      const result = await this.resource.editUser(user, null, {companyId: companyId, userId: user.id});
+      if (result.data) {
+        this.isEditingUserInProgress = false;
+        const editedUser = new User(result.data);
+        const findUserById = (usr: User) => usr.id === user.id;
+        const user_ = this.users.find(findUserById);
+        if (user_) {
+          user_.firstName = user.first_name;
+          user_.secondName = user.patronymic;
+          user_.lastName = user.last_name;
+          user_.email = user.email;
+          user_.phone = user.phone;
+          user_.roles = editedUser.roles;
+          user_.generateRolesLabel();
+          return user_;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingUserInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Удаление пользователя
+   * @param {number} companyId - Идентификатор компании
+   * @param {number} userId - Идентификатор пользователя
+   * @returns {Promise<boolean>}
+   */
   async deleteUser(companyId: number, userId: number): Promise<boolean> {
     try {
       const result = await this.resource.deleteUser({companyId: companyId, userId: userId});

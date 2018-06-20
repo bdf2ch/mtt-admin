@@ -16,6 +16,9 @@ export class SurveysResolveGuard implements Resolve<Promise<Survey[]>> {
               private readonly restaurantsService: RestaurantsService) {}
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Survey[]> {
+    if (this.surveysService.getQuestionTypesList().length === 0) {
+      await this.surveysService.fetchQuestionTypes();
+    }
     if (this.rewardsSevice.getRewardsList().length === 0) {
       await this.rewardsSevice.fetchRewards(this.authenticationService.getCurrentUser().companyId);
     }

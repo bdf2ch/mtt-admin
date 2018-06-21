@@ -6,8 +6,8 @@ import { IRangeDTO } from './range.dto';
  * Question DTO interface
  */
 export interface IQuestionDTO {
-  id: number;                         // Идентификатор
-  company_id: number;                 // Идентификатор компании
+  id?: number;                        // Идентификатор
+  company_id?: number;                // Идентификатор компании
   type: string;                       // Тип вопроса
   title: string;                      // Текст вопроса
   weight: number;                     // Вес вопроса

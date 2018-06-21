@@ -1,7 +1,8 @@
 import { ISurvey } from '../interfaces/survey.interface';
 import { ISurveyDTO } from '../dto/survey.dto';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
-import {IRestaurantDTO} from '../../restaurants/dto/restaurant.dto';
+import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
+import { Question } from './question.model';
 
 /**
  * Класс, реализующий интерфейс опроса
@@ -20,6 +21,7 @@ export class Survey implements ISurvey {
   isActive: boolean;                // Является ли активным
   restaurants?: Restaurant[];       // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;    // Спрашивать контакты в начале
+  questions: Question[];            // Вопросы
 
   /**
    * Конструктор
@@ -39,6 +41,7 @@ export class Survey implements ISurvey {
     this.isActive = config ? config.is_active : false;
     this.needClientDataFirst = config && config.need_client_data_first ? config.need_client_data_first : true;
     this.restaurants = [];
+    this.questions = [];
 
     if (config && config.restaurants) {
       config.restaurants.data.forEach((item: IRestaurantDTO) => {

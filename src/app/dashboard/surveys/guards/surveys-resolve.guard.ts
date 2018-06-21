@@ -12,15 +12,18 @@ import {RewardsService} from '../services/rewards.service';
 export class SurveysResolveGuard implements Resolve<Promise<Survey[]>> {
   constructor(private readonly authenticationService: AuthenticationService,
               private readonly surveysService: SurveysService,
-              private readonly rewardsSevice: RewardsService,
+              private readonly rewardsService: RewardsService,
               private readonly restaurantsService: RestaurantsService) {}
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Survey[]> {
     if (this.surveysService.getQuestionTypesList().length === 0) {
       await this.surveysService.fetchQuestionTypes();
     }
-    if (this.rewardsSevice.getRewardsList().length === 0) {
-      await this.rewardsSevice.fetchRewards(this.authenticationService.getCurrentUser().companyId);
+    if (this.rewardsService.getRewardTypes().length === 0) {
+      await this.rewardsService.fetchRewardTypes();
+    }
+    if (this.rewardsService.getRewardsList().length === 0) {
+      await this.rewardsService.fetchRewards(this.authenticationService.getCurrentUser().companyId);
     }
     if (this.surveysService.getSurveysList().length === 0) {
       await this.surveysService.fetchSurveyList();

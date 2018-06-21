@@ -41,16 +41,15 @@ const routes: Routes = [
       {
         path: 'surveys',
         component: SurveysComponent,
+        resolve: [SurveysResolveGuard],
         children: [
           {
             path: '',
-            component: SurveysListComponent,
-            resolve: [SurveysResolveGuard]
+            component: SurveysListComponent
           },
           {
             path: 'rewards',
-            component: RewardsListComponent,
-            resolve: [RewardsResolveGuard]
+            component: RewardsListComponent
           },
           {
             path: ':id',

@@ -105,11 +105,9 @@
       <!-- End: Header -->
 
       <!-- Start: No requisites placeholder -->
-      <!--
-      <div *ngIf="companyService.getCompany().paymentRequisites.length === 0">
-        <p class="text-muted text-center mt-4 pt-4">Реквизиты отсутствуют</p>
+      <div *ngIf="surveysService.selectedSurvey().questions.length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Вопросы отсутствуют</p>
       </div>
-      -->
       <!-- End: No requisites placeholder -->
 
       <!-- Start: Requisites-->
@@ -343,7 +341,7 @@
     <span>Добавление вопроса</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="isInAddQuestionMode">
     <div class="row">
       <div class="col-12">
         <h4 class="text-muted mb-3">Информация о вопросе</h4>
@@ -366,8 +364,10 @@
 
           <!-- Start: Question type -->
           <el-form-item label="Тип вопроса"
-                        [required]="true">
-            <el-select [(model)]="questionData.type" formControlName="type" placeholder="Тип вопроса">
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('type')"
+                        [error]="questionFormMessageCtrl('type')">
+            <el-select [(model)]="questionData.type" (modelChange)="questionTypeChange($event)" formControlName="type" placeholder="Тип вопроса">
               <el-option *ngFor="let questionType of surveysService.getQuestionTypesList()"
                          [label]="questionType.title"
                          [value]="questionType.code">
@@ -375,6 +375,20 @@
             </el-select>
           </el-form-item>
           <!-- End: Question type -->
+
+          <!-- Start: Form type -->
+          <el-form-item label="Форма вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('form_type')"
+                        [error]="questionFormMessageCtrl('form_type')">
+            <el-select [(model)]="questionFormData.type" (modelChange)="questionFormChange($event)" formControlName="form_type" placeholder="Тип формы вопроса">
+              <el-option *ngFor="let formType of surveysService.getQuestionTypeByCode(questionData.type).forms"
+                         [label]="formType.title"
+                         [value]="formType.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Form type -->
 
           <!-- Start: Weight -->
           <el-form-item label="Вес вопроса"
@@ -388,36 +402,80 @@
             </el-input>
           </el-form-item>
           <!-- End: Weight -->
+
         </el-form>
 
-        <!-- Start: Restaurants -->
+        <!-- Start: Answers -->
         <div class="row">
           <div class="col-12 border-bottom">
-            <h4 class="text-muted mb-3">Ответы</h4>
+            <h4 class="text-muted mb-3 d-flex justify-content-between" *ngIf="answers.length > 0">
+              Ответы
+              <el-button type="text" size="mini" icon="plus" (click)="appendAnswer()" [size]="'small'">&nbsp; Добавить</el-button>
+            </h4>
 
-            <table class="table table-sm table-striped restaurants-table">
-              <tbody>
-              <!--
-              <tr *ngFor="let restaurant of restaurantsService.getRestaurants()">
-                <td>{{ restaurant.title }}</td>
-                <td class="text-right">
-                  <el-checkbox [(model)]="restaurant.isSelected" (modelChange)="changeRestaurantsStatus($event, restaurant)"></el-checkbox>
-                </td>
-              </tr>
-              -->
-              </tbody>
-            </table>
+              <el-form [formGroup]="answerForm"
+                       label-width="170px"
+                       [label-position]="'left'"
+                       size="small"
+                       [show-icon]="true"
+                       [show-message]="true">
+
+                <!-- Start: Text content -->
+                <el-form-item *ngFor="let answer of answers"
+                              label-width="0"
+                              [required]="true"
+                              [status]="answerFormStatusCtrl('answer' + answer.dateCreated.toString())"
+                              [error]="answerFormMessageCtrl('answer' + answer.dateCreated.toString())">
+                  <div el-row gutter="20">
+                    <div el-col span="20">
+                      <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}" [(model)]="answer.text_content"></el-input>
+                    </div>
+                    <div el-col span="4">
+                        <el-button type="danger" icon="delete" (click)="removeAnswer(answer)"></el-button>
+                    </div>
+                  </div>
+                </el-form-item>
+                <!-- End: Text content -->
+
+                <!-- Start: Range min -->
+                <el-form-item *ngIf="questionFormData.type === 'mark'"
+                              label="Мин. значение"
+                              [required]="true"
+                              [status]="answerFormStatusCtrl('range_min')"
+                              [error]="answerFormMessageCtrl('range_min')">
+                  <el-input formControlName="range_min"
+                            native-type="number"
+                            el-class="no-spinners"
+                            [(model)]="rangeData.min">
+                  </el-input>
+                </el-form-item>
+                <!-- End: Range min -->
+
+                <!-- Start: Range max -->
+                <el-form-item *ngIf="questionFormData.type === 'mark'"
+                              label="Макс. значение"
+                              [required]="true"
+                              [status]="answerFormStatusCtrl('range_max')"
+                              [error]="answerFormMessageCtrl('range_max')">
+                  <el-input formControlName="range_max"
+                            native-type="number"
+                            el-class="no-spinners"
+                            [(model)]="rangeData.max">
+                  </el-input>
+                </el-form-item>
+                <!-- End: Range max -->
+              </el-form>
 
           </div>
         </div>
-        <!-- End: Restaurants -->
+        <!-- End: Answers -->
 
         <!-- Start: Form controls -->
         <div class="row">
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="questionForm.invalid || questionForm.pristine"
+                       [elDisabled]="questionForm.invalid || answerForm.invalid || answers.length < minAnswers"
                        [loading]="surveysService.addingQuestionInProgress()"
                        (click)="addQuestion()">
               &nbsp; Сохранить

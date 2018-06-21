@@ -11,6 +11,10 @@ import {
 import { environment } from '../../../../environments/environment';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { ISurveyDTO } from '../dto/survey.dto';
+import {IQuestionDTO} from '../dto/question.dto';
+import {IQuestionFormDTO} from '../dto/question-form.dto';
+import {IAnswerDTO} from '../dto/answer.dto';
+import {IRangeDTO} from '../dto/range.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -61,9 +65,57 @@ export class SurveysResource extends Resource {
   })
   editSurvey: IResourceMethodStrict<ISurveyDTO, void, {surveyId: number}, IServerResponse<ISurveyDTO>>;
 
+  /**
+   * Path: questions/types
+   * Method: GET
+   */
   @ResourceAction({
     path: '/question/types',
     method: ResourceRequestMethod.Get
   })
   getQuestionTypes: IResourceMethod<void, IServerResponse<any>>;
+
+  /**
+   * Path: question
+   * Method: POST
+   */
+  @ResourceAction({
+    path: '/question',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addQuestion: IResourceMethodStrict<IQuestionDTO, void, void, IServerResponse<IQuestionDTO>>;
+
+  /**
+   * Path: question-form
+   * Method: POST
+   */
+  @ResourceAction({
+    path: '/question-form',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addQuestionForm: IResourceMethodStrict<IQuestionFormDTO, void, void, IServerResponse<IQuestionFormDTO>>;
+
+  /**
+   * Path: question-form/{!questionFormId}/form-answer
+   * Method: POST
+   */
+  @ResourceAction({
+    path: '/question-form/{!questionFormId}/form-answer',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addAnswer: IResourceMethodStrict<IAnswerDTO, void, {questionFormId: number}, IServerResponse<IAnswerDTO>>;
+
+  /**
+   * Path: question-form/{!questionFormId}/question-form-range
+   * Method: POST
+   */
+  @ResourceAction({
+    path: '/question-form/{!questionFormId}/question-form-range',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addRange: IResourceMethodStrict<IRangeDTO, void, {questionFormId: number}, IServerResponse<IRangeDTO>>;
 }

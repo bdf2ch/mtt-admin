@@ -6,6 +6,14 @@ import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { QuestionType } from '../models/question-type.model';
 import { QuestionFormType } from '../models/question-form-type.model';
+import { Question } from '../models/question.model';
+import { IQuestionDTO } from '../dto/question.dto';
+import {IQuestionFormDTO} from '../dto/question-form.dto';
+import {QuestionForm} from '../models/question-form.model';
+import {Answer} from '../models/answer.model';
+import {IAnswerDTO} from '../dto/answer.dto';
+import {IRangeDTO} from '../dto/range.dto';
+import {QuestionRange} from '../models/question-range.model';
 
 @Injectable({
   providedIn: 'root'
@@ -214,6 +222,116 @@ export class SurveysService {
     } catch (error) {
       console.error(error);
       this.isEditingSurveyInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Добавление информации о вопросе
+   * @param {IQuestionDTO} question - Вопрос
+   * @returns {Promise<Question | null>}
+   */
+  async addQuestionInfo(question: IQuestionDTO): Promise<Question | null> {
+    try {
+      const result = await this.resource.addQuestion(question);
+      if (result.data) {
+        const question_ = new Question(result.data);
+        return question_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Добавление формы вопроса
+   * @param {IQuestionFormDTO} form - Форма вопроса
+   * @returns {Promise<QuestionForm | null>}
+   */
+  async addQuestionForm(form: IQuestionFormDTO): Promise<QuestionForm | null> {
+    try {
+      const result = await this.resource.addQuestionForm(form);
+      if (result.data) {
+        const form_ = new QuestionForm(result.data);
+        return form_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Добавление ответа
+   * @param {IAnswerDTO} answer - Ответ
+   * @param {number} questionFormId - Идентификатор формы вопроса
+   * @returns {Promise<Answer | null>}
+   */
+  async addAnswer(answer: IAnswerDTO, questionFormId: number): Promise<Answer | null> {
+    try {
+      const result = await this.resource.addAnswer(answer, null, {questionFormId: questionFormId});
+      if (result.data) {
+        const answer_ = new Answer(result.data);
+        return answer_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Добавление диапазона
+   * @param {IRangeDTO} range - Диапазон
+   * @param {number} questionFormId - Идентификато рформы вопроса
+   * @returns {Promise<QuestionRange | null>}
+   */
+  async addRange(range: IRangeDTO, questionFormId: number): Promise<QuestionRange | null> {
+    try {
+      const result = await this.resource.addRange(range, null, {questionFormId: questionFormId});
+      if (result.data) {
+        const range_  = new QuestionRange(result.data);
+        return range_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async addQuestion(question: IQuestionDTO, form: IQuestionFormDTO, answers: IAnswerDTO[], range: IRangeDTO | null): Promise<Question | null> {
+    try {
+      this.isAddingQuestionInProgress = true;
+      const question_ = await this.addQuestionInfo(question);
+      if (question_) {
+        form.question_id = question_.id;
+        const form_ = await this.addQuestionForm(form);
+        if (form_) {
+          question_.form = form_;
+          if (answers.length > 0) {
+            answers.forEach(async (item: IAnswerDTO) => {
+              const answer_ = await this.addAnswer(item, form_.id);
+              if (answer_) {
+                question_.answers.push(answer_);
+              }
+            });
+          } else if (range) {
+            const range_ = await this.addRange(range, form_.id);
+            if (range_) {
+              question_.range = range_;
+            }
+          }
+        }
+      }
+      this.isAddingQuestionInProgress = false;
+      if (this.selectedSurvey_) {
+        this.selectedSurvey_.questions.push(question_);
+      }
+      return question_;
+    } catch (error) {
+      console.error(error);
+      this.isAddingQuestionInProgress = false;
       return null;
     }
   }

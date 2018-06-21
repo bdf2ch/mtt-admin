@@ -455,5 +455,13 @@ export class SurveyComponent implements OnInit {
   async addQuestion() {
     console.log(this.questionForm);
     console.log(this.answerForm);
+    await this.surveysService.addQuestion(
+      this.questionData, this.questionFormData,
+      this.answers,
+      this.questionFormData.type === 'mark' ? this.rangeData : null
+    ).then(() => {
+        this.closeAddQuestionDialog();
+        this.message['success']('Вопрос добавлен');
+      });
   }
 }

@@ -118,4 +118,26 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   addRange: IResourceMethodStrict<IRangeDTO, void, {questionFormId: number}, IServerResponse<IRangeDTO>>;
+
+  /**
+   * Path: question/{!questionId}/attach-to-questionnaire/{!surveyId}
+   * Method: POST
+   */
+  @ResourceAction({
+    path: 'question/{!questionId}/attach-to-questionnaire/{!surveyId}',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addQuestionToSurvey: IResourceMethodStrict<{prev_question_id?: number}, void, {questionId: number, surveyId: number}, IServerResponse<ISurveyDTO>>;
+
+  /**
+   * Path: question/{!questionId}
+   * Method: DELETE
+   */
+  @ResourceAction({
+    path: 'question/{!questionId}',
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
+  })
+  deleteQuestion: IResourceMethod<{questionId: number}, IServerResponse<any>>;
 }

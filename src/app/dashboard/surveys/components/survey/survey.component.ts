@@ -208,6 +208,20 @@ export class SurveyComponent implements OnInit {
   }
 
   /**
+   * Открытие диалогового окна подтверждения удаления вопроса
+   */
+  openDeleteQuestionDialog() {
+    this.isInDeleteQuestionMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна подтверждения удаления вопроса
+   */
+  closeDeleteQuestionDialog() {
+    this.isInDeleteQuestionMode = false;
+  }
+
+  /**
    * Получение статуса элемента формы опроса
    * @param {string} item - Имя элемента формы
    * @returns {string}
@@ -462,6 +476,14 @@ export class SurveyComponent implements OnInit {
     ).then(() => {
         this.closeAddQuestionDialog();
         this.message['success']('Вопрос добавлен');
+      });
+  }
+
+  async deleteQuestion() {
+    await this.surveysService.deleteQuestion(this.surveysService.selectedSurvey().id)
+      .then(() => {
+        this.closeDeleteQuestionDialog();
+        this.message['success']('Вопрос удален');
       });
   }
 }

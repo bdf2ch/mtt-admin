@@ -14,6 +14,7 @@ import {Answer} from '../models/answer.model';
 import {IAnswerDTO} from '../dto/answer.dto';
 import {IRangeDTO} from '../dto/range.dto';
 import {QuestionRange} from '../models/question-range.model';
+import {IQuestionFormType} from '../interfaces/question-form-type.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,8 @@ export class SurveysService {
   private isEditingSurveyInProgress: boolean;
   private isDeletingSurveyInProgress: boolean;
   private isAddingQuestionInProgress: boolean;
+  private isEditingQuestionInProgress: boolean;
+  private isDeletingQuestionInProgress: boolean;
 
   constructor(private readonly resource: SurveysResource) {
     this.questionTypes = [];
@@ -35,6 +38,8 @@ export class SurveysService {
     this.isEditingSurveyInProgress = false;
     this.isDeletingSurveyInProgress = false;
     this.isAddingQuestionInProgress = false;
+    this.isEditingQuestionInProgress = false;
+    this.isDeletingQuestionInProgress = false;
   }
 
   /**
@@ -134,6 +139,23 @@ export class SurveysService {
   }
 
   /**
+   * Поиск типа формы вопроса коду
+   * @param {string} code - Код формы вопроса
+   * @returns {IQuestionFormType | null}
+   */
+  getFormTypeByCode(code: string): IQuestionFormType | null {
+    let result = null;
+    const findQuestionFormTypeByCode = (type: QuestionType) => type.code === code;
+    this.questionTypes.forEach((questionType: QuestionType) => {
+      const formType = questionType.forms.find(findQuestionFormTypeByCode);
+      if (formType) {
+        result = formType;
+      }
+    });
+    return result;
+  }
+
+  /**
    * Выполняетлся ли добавлени опроса
    * @returns {boolean}
    */
@@ -163,6 +185,22 @@ export class SurveysService {
    */
   addingQuestionInProgress(): boolean {
     return this.isAddingQuestionInProgress;
+  }
+
+  /**
+   * Выполняется ли изменение вопроса
+   * @returns {boolean}
+   */
+  editingQuestionInProgress(): boolean {
+    return this.isEditingQuestionInProgress;
+  }
+
+  /**
+   * Выполняется ли удаление вопроса
+   * @returns {boolean}
+   */
+  deletingQuestionInProgress(): boolean {
+    return this.isDeletingQuestionInProgress;
   }
 
   /**
@@ -300,6 +338,33 @@ export class SurveysService {
     }
   }
 
+  /**
+   * Добавление вопроса к опросу
+   * @param {number} questionId - Идентификатор вопроса
+   * @param {number} surveyId - Идентификатор опроса
+   * @param {number} index - Порядковый номер вопроса
+   * @returns {Promise<boolean>}
+   */
+  async addQuestionToSurvey(questionId: number, surveyId: number, index?: number): Promise<boolean> {
+    try {
+      const result = await this.resource.addQuestionToSurvey({prev_question_id: index ? index : undefined}, null, {questionId: questionId, surveyId: surveyId});
+      if (result.data) {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  /**
+   * Добавление вопроса
+   * @param {IQuestionDTO} question - Вопрос
+   * @param {IQuestionFormDTO} form - Форма вопроса
+   * @param {IAnswerDTO[]} answers - Массив ответов
+   * @param {IRangeDTO | null} range - Диапозон
+   * @returns {Promise<Question | null>}
+   */
   async addQuestion(question: IQuestionDTO, form: IQuestionFormDTO, answers: IAnswerDTO[], range: IRangeDTO | null): Promise<Question | null> {
     try {
       this.isAddingQuestionInProgress = true;
@@ -322,17 +387,46 @@ export class SurveysService {
               question_.range = range_;
             }
           }
+          const attach = await this.addQuestionToSurvey(question_.id, this.selectedSurvey_.id);
+          if (attach) {
+            this.isAddingQuestionInProgress = false;
+            if (this.selectedSurvey_) {
+              this.selectedSurvey_.questions.push(question_);
+            }
+          }
+          return question_;
         }
       }
-      this.isAddingQuestionInProgress = false;
-      if (this.selectedSurvey_) {
-        this.selectedSurvey_.questions.push(question_);
-      }
-      return question_;
+      return null;
     } catch (error) {
       console.error(error);
       this.isAddingQuestionInProgress = false;
       return null;
+    }
+  }
+
+  /**
+   * Удаление вопроса
+   * @param {number} questionId - Идентификатор вопроса
+   * @returns {Promise<boolean>}
+   */
+  async deleteQuestion(questionId: number): Promise<boolean> {
+    try {
+      this.isDeletingQuestionInProgress = true;
+      const result = await this.resource.deleteQuestion({questionId: questionId});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.isDeletingQuestionInProgress = false;
+        this.selectedSurvey_.questions.forEach((question: Question, index: number, array: Question[]) => {
+          if (question.id === questionId) {
+            array.splice(index, 1);
+            return true;
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      this.isDeletingQuestionInProgress = false;
+      return false;
     }
   }
 }

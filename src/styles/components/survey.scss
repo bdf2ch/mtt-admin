@@ -1,0 +1,18 @@
+.questions {
+  overflow: auto;
+  font-size: 14px;
+  background: #ECEFF1;
+
+  .el-card__header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: -20px;
+    padding: 10px 20px;
+    //background: #ECEFF1;
+  }
+}

@@ -1,4 +1,5 @@
 import { Restaurant } from '../../restaurants/models/restaurant.model';
+import { Question } from '../models/question.model';
 
 /**
  * Интерфейс, описывающий опрос
@@ -17,4 +18,5 @@ export interface ISurvey {
   isActive: boolean;              // Является ли активным
   restaurants?: Restaurant[];     // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;  // Спрашивать контакты в начале
+  questions: Question[];          // Массив вопросов
 }

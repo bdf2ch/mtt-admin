@@ -3,6 +3,7 @@ import { ISurveyDTO } from '../dto/survey.dto';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 import { Question } from './question.model';
+import {IQuestionDTO} from '../dto/question.dto';
 
 /**
  * Класс, реализующий интерфейс опроса
@@ -47,6 +48,13 @@ export class Survey implements ISurvey {
       config.restaurants.data.forEach((item: IRestaurantDTO) => {
         const restaurant = new Restaurant(item);
         this.restaurants.push(restaurant);
+      });
+    }
+
+    if (config && config.questions) {
+      config.questions.data.forEach((item: IQuestionDTO) => {
+        const question = new Question(item);
+        this.questions.push(question);
       });
     }
   }

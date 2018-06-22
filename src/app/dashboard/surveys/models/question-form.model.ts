@@ -8,12 +8,12 @@ export class QuestionForm {
   id: number;                   // Идентификатор
   questionId: number;           // Идентификатор вопроса
   companyId: number;            // Идентфиикатор компании
-  type: QuestionFormType;       // Тип формы вопроса
+  type: string;                 // Тип формы вопроса
 
   constructor(config?: IQuestionFormDTO) {
     this.id = config ? config.id : 0;
     this.questionId = config ? config.question_id : 0;
     this.companyId = config ? config.company_id : 0;
-    this.type = new QuestionFormType();
+    this.type = config ? config.type : '';
   }
 }

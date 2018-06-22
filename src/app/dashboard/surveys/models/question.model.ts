@@ -8,7 +8,7 @@ import { QuestionRange } from './question-range.model';
 export class Question {
   id: number;                       // Идентфиикатор
   companyId: number;                // Идентфиикатор компании
-  type: QuestionType;               // Тип вопроса
+  type: string;                     // Тип вопроса
   title: string;                    // Текст вопроса
   weight: number;                   // Вес вопроса
   form: QuestionForm;               // Форма
@@ -22,10 +22,10 @@ export class Question {
   constructor(config?: IQuestionDTO) {
     this.id = config ? config.id : 0;
     this.companyId = config ? config.company_id : 0;
-    this.type = new QuestionType();
+    this.type = config.type;
     this.title = config ? config.title : '';
     this.weight = config ? config.weight : 0;
-    this.form = config ? new QuestionForm(config.form.data) : new QuestionForm();
+    this.form = config ? new QuestionForm(config.form.data) : null;
     this.range = config && config.range ? new QuestionRange(config.range.data) : null;
     this.answers = [];
 

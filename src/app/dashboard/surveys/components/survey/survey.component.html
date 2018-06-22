@@ -1,7 +1,7 @@
-<div id="company" class="container-fluid h-100">
+<div id="survey" class="container-fluid h-100">
   <div class="row h-100">
     <!-- Start: Surveys list -->
-    <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center">
+    <div class="col-12 col-lg-8 p-4 d-flex flex-column align-items-center">
       <h3 class="mb-4 w-100 d-flex justify-content-between">
         {{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}
         <el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button>
@@ -95,7 +95,7 @@
     <!-- End: Surveys list -->
 
     <!-- Start: Questions -->
-    <div class="col-12 col-lg-6 p-4 border-left">
+    <div class="questions col-12 col-lg-4 p-4 border-left">
 
       <!-- Start: Header -->
       <h3 class="mb-4 d-flex justify-content-between">
@@ -110,76 +110,58 @@
       </div>
       <!-- End: No requisites placeholder -->
 
-      <!-- Start: Requisites-->
-      <!--
-      <div class="container-fluid payment-requisites pl-0 pr-0">
+      <!-- Start: Questions-->
+      <div class="container-fluid pl-0 pr-0">
         <div class="row mt-4">
-          <div class="col-12 col-xl-6 mb-3" *ngFor="let item of companyService.getCompany().paymentRequisites">
+          <div class="col-12 mb-3" *ngFor="let question of surveysService.selectedSurvey().questions; let i = index;">
             <el-card>
               <ng-template #header>
-                <div class="clearfix text-center">
+                <div class="clearfix">
                   <span style="line-height: 36px;" class="text-muted">
-                    <strong>{{ item.businessTitle }}</strong>
+                    <strong>{{(i + 1) + '. ' +  question.title }}</strong>
                   </span>
                 </div>
               </ng-template>
               <div class="text item">
-                <table class="table table-sm mb-0">
-                  <tbody>
-                  <tr>
-                    <td class="text-muted text-right border-top-0" style="width: 80px">ИНН</td>
-                    <td class="border-top-0">{{ item.INN }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">КПП</td>
-                    <td>{{ item.KPP }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Юр. адрес</td>
-                    <td>{{ item.businessAddress }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Физ. адрес</td>
-                    <td>{{ item.address }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Расч. счет</td>
-                    <td>{{ item.account }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Корр. счет</td>
-                    <td>{{ item.correspondingAccount }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">БИК</td>
-                    <td>{{ item.BIK }}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" class="">
 
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+                <div *ngIf="question.form.type === 'checkbox'">
+                  <div *ngFor="let answer of question.answers">
+                    <el-checkbox>{{ answer.content }}</el-checkbox>
+                  </div>
+                </div>
+
+                <div *ngIf="question.form.type === 'radio_button'">
+                  <el-radio-group [model]="'fdsfs'">
+                    <el-radio *ngFor="let answer of question.answers" [label]="answer.content">{{ answer.content }}</el-radio>
+                  </el-radio-group>
+                </div>
+
+                <div *ngIf="question.form.type === 'mark'">
+                  <el-slider [min]="question.range.min" [max]="question.range.max"></el-slider>
+                </div>
 
                 <div class="footer">
                   <div class="container-fluid p-0">
-                    <div class="row">
-                      <div class="col-6">
-                        <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
+                    <div class="row no-gutters">
+                      <div class="col-4">
+                        Вес вопроса: {{ question.weight }}
                       </div>
-                      <div class="col-6">
-                        <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
+                      <div class="col-4">
+                        <el-button type="success" size="small" icon="edit" class="w-100 mr-2" (click)="openEditPaymentsRequisitesDialog()">&nbsp; Изменить</el-button>
+                      </div>
+                      <div class="col-4">
+                        <el-button type="danger" size="small" icon="delete" class="w-100 ml-2" (click)="openDeleteQuestionDialog()">&nbsp; Удалить</el-button>
                       </div>
                     </div>
                   </div>
                 </div>
+
               </div>
             </el-card>
           </div>
         </div>
       </div>
-      -->
+
       <!-- End: Requisites -->
     </div>
     <!-- End: Payment requisites -->
@@ -332,7 +314,6 @@
   </div>
 </el-dialog>
 <!-- End: Edit survey dialog -->
-
 
 <!-- Start: Add question dialog -->
 <el-dialog [(visible)]="isInAddQuestionMode" [width]="'580px'">
@@ -494,3 +475,32 @@
 </el-dialog>
 <!-- End: Add question dialog -->
 
+<!-- Start: Delete question confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteQuestionMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление вопроса</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="surveysService.selectedSurvey()">
+    <div class="row">
+      <div class="col-12">
+        Удалить вопрос "{{ surveysService.selectedSurvey().title }}"?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="surveysService.deletingQuestionInProgress()"
+                   (click)="deleteQuestion()">
+          &nbsp; Удалить
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100" (click)="closeDeleteQuestionDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete question confirmation dialog -->

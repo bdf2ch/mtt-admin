@@ -80,11 +80,28 @@
           <td></td>
           <td class="pt-4">
             <div el-row gutter="20">
+              <!--
               <div el-col span="12" class="text-left">
                 <el-button type="warning" class="w-100">Сгенерировать коды</el-button>
               </div>
-              <div el-col span="12" class="text-right">
-                <el-button type="success" class="w-100">Запустить опрос</el-button>
+              -->
+              <div el-col span="24" class="text-right">
+                <div *ngIf="surveysService.selectedSurvey().isActive === false">
+                  <el-button type="success"
+                             class="w-100"
+                             (click)="setSurveyStatus(true)"
+                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
+                    Запустить опрос
+                  </el-button>
+                </div>
+                <div *ngIf="surveysService.selectedSurvey().isActive === true">
+                  <el-button type="danger"
+                             class="w-100"
+                             (click)="setSurveyStatus(false)"
+                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
+                    Остановить опрос
+                  </el-button>
+                </div>
               </div>
             </div>
           </td>
@@ -132,7 +149,12 @@
 
                 <div *ngIf="question.form.type === 'radio_button'">
                   <el-radio-group [model]="'fdsfs'">
-                    <el-radio *ngFor="let answer of question.answers" [label]="answer.content">{{ answer.content }}</el-radio>
+                    <div *ngFor="let answer of question.answers">
+                      <el-radio [label]="answer.content" class="d-block">
+                        {{ answer.content }}
+                        <span class="text-muted" *ngIf="answer.weight">&nbsp;Вес: {{answer.weight}}</span>
+                      </el-radio>
+                    </div>
                   </el-radio-group>
                 </div>
 
@@ -143,14 +165,14 @@
                 <div class="footer">
                   <div class="container-fluid p-0">
                     <div class="row no-gutters">
-                      <div class="col-4">
+                      <div class="col-4 text-muted">
                         Вес вопроса: {{ question.weight }}
                       </div>
                       <div class="col-4">
                         <el-button type="success" size="small" icon="edit" class="w-100 mr-2" (click)="openEditPaymentsRequisitesDialog()">&nbsp; Изменить</el-button>
                       </div>
                       <div class="col-4">
-                        <el-button type="danger" size="small" icon="delete" class="w-100 ml-2" (click)="openDeleteQuestionDialog()">&nbsp; Удалить</el-button>
+                        <el-button type="danger" size="small" icon="delete" class="w-100 ml-2" (click)="openDeleteQuestionDialog(question)">&nbsp; Удалить</el-button>
                       </div>
                     </div>
                   </div>
@@ -408,8 +430,18 @@
                               [status]="answerFormStatusCtrl('answer' + answer.dateCreated.toString())"
                               [error]="answerFormMessageCtrl('answer' + answer.dateCreated.toString())">
                   <div el-row gutter="20">
-                    <div el-col span="20">
-                      <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}" [(model)]="answer.text_content"></el-input>
+                    <div el-col span="16">
+                      <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}"
+                                [(model)]="answer.text_content"
+                                placeholder="Текст ответа"></el-input>
+                    </div>
+                    <div el-col span="4">
+                      <el-input  native-type="number"
+                                 el-class="no-spinners"
+                                 formControlName="{{'weight' + answer.dateCreated.toString()}}"
+                                 [(model)]="answer.weight"
+                                  placeholder="Вес">
+                      </el-input>
                     </div>
                     <div el-col span="4">
                         <el-button type="danger" icon="delete" (click)="removeAnswer(answer)"></el-button>
@@ -481,10 +513,10 @@
     <span class="el-icon-delete"></span>&nbsp;
     <span>Удаление вопроса</span>
   </ng-template>
-  <div class="container-fluid" *ngIf="surveysService.selectedSurvey()">
+  <div class="container-fluid" *ngIf="selectedQuestion">
     <div class="row">
       <div class="col-12">
-        Удалить вопрос "{{ surveysService.selectedSurvey().title }}"?
+        Удалить вопрос "{{ selectedQuestion.title }}"?
       </div>
     </div>
     <div class="row mt-4">

@@ -66,6 +66,17 @@ export class SurveysResource extends Resource {
   editSurvey: IResourceMethodStrict<ISurveyDTO, void, {surveyId: number}, IServerResponse<ISurveyDTO>>;
 
   /**
+   * Path: questionnaire/{!surveyId}/set-active-status
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/set-active-status',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  setSurveyStatus: IResourceMethodStrict<{is_active: number}, void,  {surveyId: number}, IServerResponse<any>>;
+
+  /**
    * Path: questions/types
    * Method: GET
    */
@@ -124,7 +135,7 @@ export class SurveysResource extends Resource {
    * Method: POST
    */
   @ResourceAction({
-    path: 'question/{!questionId}/attach-to-questionnaire/{!surveyId}',
+    path: '/question/{!questionId}/attach-to-questionnaire/{!surveyId}',
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
@@ -135,7 +146,7 @@ export class SurveysResource extends Resource {
    * Method: DELETE
    */
   @ResourceAction({
-    path: 'question/{!questionId}',
+    path: '/question/{!questionId}',
     method: ResourceRequestMethod.Delete,
     withCredentials: true
   })

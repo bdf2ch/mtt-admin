@@ -10,6 +10,7 @@ import { IQuestionDTO } from '../../dto/question.dto';
 import { IQuestionFormDTO } from '../../dto/question-form.dto';
 import { IAnswerDTO } from '../../dto/answer.dto';
 import {IRangeDTO} from '../../dto/range.dto';
+import {Question} from "../../models/question.model";
 
 @Component({
   selector: 'app-survey',
@@ -32,6 +33,7 @@ export class SurveyComponent implements OnInit {
   public answers: IAnswerDTO[];
   public minAnswers: number;
   public rangeData: IRangeDTO;
+  public selectedQuestion: Question | null;
 
   constructor(private readonly formBuilder: FormBuilder,
               public readonly restaurantsService: RestaurantsService,
@@ -43,6 +45,7 @@ export class SurveyComponent implements OnInit {
     this.isInEditQuestionMode = false;
     this.isInDeleteQuestionMode = false;
     this.restaurantIds = [];
+    this.selectedQuestion = null;
     const survey = this.surveysService.selectedSurvey();
     console.log('survey', survey);
     this.surveyData = {
@@ -210,7 +213,8 @@ export class SurveyComponent implements OnInit {
   /**
    * Открытие диалогового окна подтверждения удаления вопроса
    */
-  openDeleteQuestionDialog() {
+  openDeleteQuestionDialog(question: Question) {
+    this.selectedQuestion = question;
     this.isInDeleteQuestionMode = true;
   }
 
@@ -219,6 +223,7 @@ export class SurveyComponent implements OnInit {
    */
   closeDeleteQuestionDialog() {
     this.isInDeleteQuestionMode = false;
+    this.selectedQuestion = null;
   }
 
   /**
@@ -401,6 +406,7 @@ export class SurveyComponent implements OnInit {
         this.minAnswers = 2;
         this.answers.push(answer);
         this.answerForm.addControl(`answer${answer.dateCreated}`, new FormControl(answer.text_content, Validators.required));
+        this.answerForm.addControl(`weight${answer.dateCreated}`, new FormControl(answer.weight));
         break;
       case 'radio_button':
         this.minAnswers = 2;
@@ -409,6 +415,7 @@ export class SurveyComponent implements OnInit {
           `answer${answer.dateCreated}`,
           new FormControl(answer.text_content, Validators.required)
         );
+        this.answerForm.addControl(`weight${answer.dateCreated}`, new FormControl(answer.weight));
         break;
       case 'mark':
         this.minAnswers = 0;
@@ -439,6 +446,7 @@ export class SurveyComponent implements OnInit {
     };
     this.answers.push(answer);
     this.answerForm.addControl(`answer${answer.dateCreated}`, new FormControl(answer.text_content, Validators.required));
+    this.answerForm.addControl(`weight${answer.dateCreated}`, new FormControl(answer.weight));
   }
 
   /**
@@ -466,6 +474,17 @@ export class SurveyComponent implements OnInit {
       });
   }
 
+  async setSurveyStatus(isActive: boolean) {
+    await this.surveysService.setSurveyStatus(this.surveysService.selectedSurvey().id, isActive)
+      .then(() => {
+        this.message['success'](isActive === true ? 'Опрос запущен' : 'Опрос остановлен');
+      });
+  }
+
+  /**
+   * Добавление вопроса
+   * @returns {Promise<void>}
+   */
   async addQuestion() {
     console.log(this.questionForm);
     console.log(this.answerForm);
@@ -479,8 +498,20 @@ export class SurveyComponent implements OnInit {
       });
   }
 
+  /**
+   * Изменение вопроса
+   * @returns {Promise<void>}
+   */
+  async editQuestion() {
+
+  }
+
+  /**
+   * Удаление вопроса
+   * @returns {Promise<void>}
+   */
   async deleteQuestion() {
-    await this.surveysService.deleteQuestion(this.surveysService.selectedSurvey().id)
+    await this.surveysService.deleteQuestion(this.selectedQuestion.id)
       .then(() => {
         this.closeDeleteQuestionDialog();
         this.message['success']('Вопрос удален');

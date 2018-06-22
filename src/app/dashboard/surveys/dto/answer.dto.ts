@@ -7,6 +7,7 @@ export interface IAnswerDTO {
   company_id?: number;                    // Идентификатор компании
   text_content: string;                   // Текст ответа
   index?: number;                         // Прядковый номер
+  weight?: number;                        // Вес отаета
   next_questions_map_node?: any | null;   // ХЗ что это
   dateCreated?: number;                   // Дата создания
 }

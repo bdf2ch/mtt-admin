@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthenticationResource } from '../resources/authentication.resource';
 import { IUser } from '../../users/interfaces/user.interface';
 import { ILogIn } from '../interfaces/log-in.interface';
@@ -14,7 +15,8 @@ export class AuthenticationService {
   private token: string;
   private isAuthenticationInProgress: boolean;
 
-  constructor(private readonly resource: AuthenticationResource) {
+  constructor(private readonly router: Router,
+              private readonly resource: AuthenticationResource) {
     this.currentUser = null;
     this.isAuthenticationInProgress = false;
   }
@@ -82,14 +84,12 @@ export class AuthenticationService {
    * Завершение текущей сессии
    * @returns {Promise<void>}
    */
-  async logOut(): Promise<void> {
-    try {
-      if (window.localStorage && window.localStorage['api_token']) {
+  logOut() {
+    console.log('out', window.localStorage);
+      if (window.localStorage) {
         window.localStorage.removeItem('api_token');
         this.currentUser = null;
+        this.router.navigate(['auth']);
       }
-    } catch (error) {
-      console.error(error);
-    }
   }
 }

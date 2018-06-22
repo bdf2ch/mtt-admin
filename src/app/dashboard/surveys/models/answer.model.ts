@@ -7,6 +7,7 @@ export class Answer {
   content: string;              // Содержание
   index: number;                // Порядковый номер
   next?: any;                   // ???
+  weight: number;
 
   /**
    * Конструктор
@@ -19,5 +20,6 @@ export class Answer {
     this.content = config ? config.text_content : '';
     this.index = config ? config.index : 0;
     this.next = config ? config.next_questions_map_node : null;
+    this.weight = config ? config.weight : null;
   }
 }

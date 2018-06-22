@@ -26,6 +26,7 @@ export class SurveysService {
   private isAddingSurveyInProgress: boolean;
   private isEditingSurveyInProgress: boolean;
   private isDeletingSurveyInProgress: boolean;
+  private isSettingSurveyStatusInProgress: boolean;
   private isAddingQuestionInProgress: boolean;
   private isEditingQuestionInProgress: boolean;
   private isDeletingQuestionInProgress: boolean;
@@ -36,6 +37,7 @@ export class SurveysService {
     this.selectedSurvey_ = null;
     this.isAddingSurveyInProgress = false;
     this.isEditingSurveyInProgress = false;
+    this.isSettingSurveyStatusInProgress = false;
     this.isDeletingSurveyInProgress = false;
     this.isAddingQuestionInProgress = false;
     this.isEditingQuestionInProgress = false;
@@ -172,6 +174,14 @@ export class SurveysService {
   }
 
   /**
+   * Выполняется ли активация / деактивация опроса
+   * @returns {boolean}
+   */
+  settingSurveyStatusInProgress(): boolean {
+    return this.isSettingSurveyStatusInProgress;
+  }
+
+  /**
    * Выполняется ли удалени опроса
    * @returns {boolean}
    */
@@ -261,6 +271,34 @@ export class SurveysService {
       console.error(error);
       this.isEditingSurveyInProgress = false;
       return null;
+    }
+  }
+
+  /**
+   * Активация / деактивация опроса
+   * @param {number} surveyId - Идентификатор опроса
+   * @param {boolean} isActive - Статус опроса
+   * @returns {Promise<boolean>}
+   */
+  async setSurveyStatus(surveyId: number, isActive: boolean): Promise<boolean> {
+    try {
+      this.isSettingSurveyStatusInProgress = true;
+      const result = await this.resource.setSurveyStatus({is_active: isActive === true ? 1 : 0}, null, {surveyId: surveyId});
+      if (result.data) {
+        this.isSettingSurveyStatusInProgress = false;
+        const findSurveyById = (item: Survey) => item.id === surveyId;
+        const survey = this.surveys.find(findSurveyById);
+        if (survey) {
+          console.log(survey);
+          survey.isActive = isActive;
+          console.log(survey);
+        }
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isSettingSurveyStatusInProgress = false;
+      return false;
     }
   }
 

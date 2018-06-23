@@ -37,7 +37,7 @@ export class Survey implements ISurvey {
     this.start = config ? new Date(config.from) : new Date();
     this.end = config && config.to ? new Date(config.to) : null;
     this.passingCount = config ? config.available_passing_count : 0;
-    this.passedCount = config ? config.passed_count : 0;
+    this.passedCount = config && config.passed_count ? config.passed_count : 0;
     this.isTemplate = config ? config.is_template : false;
     this.isActive = config ? config.is_active : false;
     this.needClientDataFirst = config && config.need_client_data_first ? config.need_client_data_first : true;

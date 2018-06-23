@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SurveysService } from '../../services/surveys.service';
 import { RewardsService } from '../../services/rewards.service';
-import {FormGroup, AbstractControl, Validators, FormBuilder, FormControl} from '@angular/forms';
+import { FormGroup, AbstractControl, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { ISurveyDTO } from '../../dto/survey.dto';
 import { RestaurantsService } from '../../../restaurants/services/restaurants.service';
 import { Restaurant } from '../../../restaurants/models/restaurant.model';
@@ -9,8 +9,9 @@ import { ElMessageService } from 'element-angular/release/message/message.servic
 import { IQuestionDTO } from '../../dto/question.dto';
 import { IQuestionFormDTO } from '../../dto/question-form.dto';
 import { IAnswerDTO } from '../../dto/answer.dto';
-import {IRangeDTO} from '../../dto/range.dto';
-import {Question} from "../../models/question.model";
+import { IRangeDTO } from '../../dto/range.dto';
+import { Question } from '../../models/question.model';
+import { Answer } from '../../models/answer.model';
 
 @Component({
   selector: 'app-survey',
@@ -28,6 +29,7 @@ export class SurveyComponent implements OnInit {
   public questionData: IQuestionDTO;
   public questionFormData: IQuestionFormDTO;
   public answerForm: FormGroup;
+  public newAnswerForm: FormGroup;
   public answerData: IAnswerDTO;
   public restaurantIds: number[];
   public answers: IAnswerDTO[];
@@ -211,6 +213,94 @@ export class SurveyComponent implements OnInit {
   }
 
   /**
+   * Открытие диалогвого окна изменения вопроса
+   */
+  openEditQuestionDialog(question: Question) {
+    this.selectedQuestion = question;
+    this.answers = [];
+    this.questionData.id = question.id;
+    this.questionData.company_id = question.companyId;
+    this.questionData.type = question.type;
+    this.questionData.title = question.title;
+    this.questionData.weight = question.weight;
+    this.questionFormData.id = question.form.id;
+    this.questionFormData.type = question.form.type;
+    this.questionFormData.question_id = question.form.questionId;
+    this.questionFormData.company_id = question.form.companyId;
+    console.log(this.questionFormData);
+    if (question.range) {
+      this.rangeData.id = question.range.id;
+      this.rangeData.company_id = question.range.companyId;
+      this.rangeData.question_form_id = question.form.id;
+      this.rangeData.min = question.range.min;
+      this.rangeData.max = question.range.max;
+    }
+    this.questionForm.reset({
+      title: this.questionData.title,
+      type: this.questionData.type,
+      weight: this.questionData.weight,
+      form_type: this.questionFormData.type
+    });
+    question.answers.forEach((answer: Answer) => {
+      const answer_: IAnswerDTO = {
+        id: answer.id,
+        question_form_id: question.form.id,
+        index: answer.index,
+        weight: answer.weight,
+        text_content: answer.content
+      };
+      this.answers.push(answer_);
+    });
+    for (const item in this.answerForm.controls) {
+      this.answerForm.removeControl(item);
+    }
+    console.log('type', this.questionFormData.type);
+    switch (this.questionFormData.type) {
+      case 'text_input':
+        this.minAnswers = 0;
+        break;
+      case 'checkbox':
+        this.minAnswers = 2;
+        this.answers.forEach((item: IAnswerDTO) => {
+          this.answerForm.addControl(`answer${item.id}`, new FormControl(item.text_content, Validators.required));
+          this.answerForm.addControl(`weight${item.id}`, new FormControl(item.weight));
+          this.answerForm.get(`answer${item.id}`).reset(item.text_content);
+          this.answerForm.get(`weight${item.id}`).reset(item.weight);
+        });
+        break;
+      case 'radio_button':
+        this.minAnswers = 2;
+        this.answers.forEach((item: IAnswerDTO) => {
+          this.answerForm.addControl(`answer${item.id}`, new FormControl(item.text_content, Validators.required));
+          this.answerForm.addControl(`weight${item.id}`, new FormControl(item.weight));
+          this.answerForm.get(`answer${item.id}`).reset(item.text_content);
+          this.answerForm.get(`weight${item.id}`).reset(item.weight);
+        });
+        break;
+      case 'mark':
+        console.log('mark');
+        this.minAnswers = 0;
+        this.answerForm.addControl('range_min', new FormControl(this.rangeData.min, Validators.required));
+        this.answerForm.addControl('range_max', new FormControl(this.rangeData.max, Validators.required));
+        this.answerForm.get('range_min').reset(this.rangeData.min);
+        this.answerForm.get('range_max').reset(this.rangeData.max);
+        console.log(this.answerForm);
+        break;
+    }
+    this.answerForm.updateValueAndValidity();
+    this.isInEditQuestionMode = true;
+    console.log(this.answerForm);
+  }
+
+  /**
+   * Закрытие диалогового окна изменения вопроса
+   */
+  closeEditQuestionDialog() {
+    this.isInEditQuestionMode = false;
+    this.selectedQuestion = null;
+  }
+
+  /**
    * Открытие диалогового окна подтверждения удаления вопроса
    */
   openDeleteQuestionDialog(question: Question) {
@@ -377,6 +467,7 @@ export class SurveyComponent implements OnInit {
   questionTypeChange(value: any) {
     const questionType = this.surveysService.getQuestionTypeByCode(value);
     this.questionFormData.type = null;
+    this.questionForm.markAsDirty();
     /**
     if (questionType.forms.length > 0) {
       this.questionFormData.type = questionType.forms[0].code;
@@ -395,6 +486,7 @@ export class SurveyComponent implements OnInit {
       this.answerForm.removeControl(control);
     }
     const answer: IAnswerDTO = {
+      id: 0,
       text_content: '',
       dateCreated: new Date().getTime()
     };
@@ -411,27 +503,21 @@ export class SurveyComponent implements OnInit {
       case 'radio_button':
         this.minAnswers = 2;
         this.answers.push(answer);
-        this.answerForm.addControl(
-          `answer${answer.dateCreated}`,
-          new FormControl(answer.text_content, Validators.required)
-        );
+        this.answerForm.addControl(`answer${answer.dateCreated}`, new FormControl(answer.text_content, Validators.required));
         this.answerForm.addControl(`weight${answer.dateCreated}`, new FormControl(answer.weight));
         break;
       case 'mark':
+        console.log('mark');
         this.minAnswers = 0;
-        this.answerForm.addControl(
-          'range_min',
-          new FormControl(this.rangeData.min, Validators.required)
-        );
-        this.answerForm.addControl(
-          'range_max',
-          new FormControl(this.rangeData.max, Validators.required)
-        );
+        this.answerForm.addControl('range_min', new FormControl(this.rangeData.min, Validators.required));
+        this.answerForm.addControl('range_max', new FormControl(this.rangeData.max, Validators.required));
         this.answerForm.get('range_min').reset(this.rangeData.min);
         this.answerForm.get('range_max').reset(this.rangeData.max);
+        console.log(this.answerForm);
         break;
     }
-    this.answerForm.updateValueAndValidity();
+    this.questionForm.markAsDirty();
+    //this.answerForm.updateValueAndValidity();
     console.log(this.answerForm);
   }
 
@@ -441,6 +527,7 @@ export class SurveyComponent implements OnInit {
    */
   appendAnswer() {
     const answer: IAnswerDTO = {
+      id: 0,
       text_content: '',
       dateCreated: new Date().getTime()
     };
@@ -455,8 +542,11 @@ export class SurveyComponent implements OnInit {
    */
   removeAnswer(answer: IAnswerDTO) {
     this.answers.forEach((item: IAnswerDTO, index: number, array: IAnswerDTO[]) => {
-      if (item.dateCreated === answer.dateCreated) {
+      if ((item.id !== 0 && item.id === answer.id) || (item.id === 0 && item.dateCreated && item.dateCreated === answer.dateCreated)) {
+        this.answerForm.removeControl(`answer${answer.id !== 0 ? answer.id : answer.dateCreated}`);
+        this.answerForm.removeControl(`weight${answer.id !== 0 ? answer.id : answer.dateCreated}`);
         array.splice(index, 1);
+        this.answerForm.markAsDirty();
       }
     });
   }
@@ -474,6 +564,7 @@ export class SurveyComponent implements OnInit {
       });
   }
 
+
   async setSurveyStatus(isActive: boolean) {
     await this.surveysService.setSurveyStatus(this.surveysService.selectedSurvey().id, isActive)
       .then(() => {
@@ -489,7 +580,8 @@ export class SurveyComponent implements OnInit {
     console.log(this.questionForm);
     console.log(this.answerForm);
     await this.surveysService.addQuestion(
-      this.questionData, this.questionFormData,
+      this.questionData,
+      this.questionFormData,
       this.answers,
       this.questionFormData.type === 'mark' ? this.rangeData : null
     ).then(() => {
@@ -503,7 +595,15 @@ export class SurveyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editQuestion() {
-
+    await this.surveysService.editQuestion(
+      this.questionData,
+      this.questionFormData,
+      this.answers,
+      this.questionFormData.type === 'mark' ? this.rangeData : null)
+      .then(() => {
+        this.closeEditQuestionDialog();
+        this.message['success']('Вопрос изменен');
+      });
   }
 
   /**

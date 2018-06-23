@@ -7,7 +7,8 @@ import {IQuestionDTO} from './question.dto';
 export interface ISurveyDTO {
   id?: number;                        // Идентификатор
   company_id?: number;                // Идентификатор компании
-  reward_id?: number;                 // Идентификатор вознаграждения
+  reward_id?: number;                 // Идентификатор вознаграждения\
+  template_id?: number;               // Идентификатор шаблона
   name: string;                       // Наименование
   description?: string;               // Описание
   from?: string;                      // Дата начала

@@ -22,6 +22,7 @@ import {IQuestionFormType} from '../interfaces/question-form-type.interface';
 export class SurveysService {
   private questionTypes: QuestionType[];
   private surveys: Survey[];
+  private templates: Survey[];
   private selectedSurvey_: Survey | null;
   private isAddingSurveyInProgress: boolean;
   private isEditingSurveyInProgress: boolean;
@@ -34,6 +35,7 @@ export class SurveysService {
   constructor(private readonly resource: SurveysResource) {
     this.questionTypes = [];
     this.surveys = [];
+    this.templates = [];
     this.selectedSurvey_ = null;
     this.isAddingSurveyInProgress = false;
     this.isEditingSurveyInProgress = false;
@@ -58,6 +60,27 @@ export class SurveysService {
         });
         console.log(this.surveys);
         return this.surveys;
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+  /**
+   * Получение списка опросов, являющихся шаблонами
+   * @returns {Promise<Survey[]>}
+   */
+  async fetchSurveyTemplatesList(): Promise<Survey[]> {
+    try {
+      const result = await this.resource.getSurveyTemplates();
+      if (result.data) {
+        result.data.forEach((item: ISurveyDTO) => {
+          const survey = new Survey(item);
+          this.templates.push(survey);
+        });
+        console.log('templates', this.templates);
+        return this.templates;
       }
     } catch (error) {
       console.error(error);
@@ -96,6 +119,14 @@ export class SurveysService {
    */
   getSurveysList(): Survey[] {
     return this.surveys;
+  }
+
+  /**
+   * Получение списка опроов, являющихся шаблонами
+   * @returns {Survey[]}
+   */
+  getSurveysTemplatesList(): Survey[] {
+    return this.templates;
   }
 
   /**
@@ -321,6 +352,36 @@ export class SurveysService {
   }
 
   /**
+   * Изменение информации о вопросе
+   * @param {IQuestionDTO} question - Вопрос
+   * @returns {Promise<Question | null>}
+   */
+  async editQuestionInfo(question: IQuestionDTO): Promise<Question | null> {
+    try {
+      this.isEditingQuestionInProgress = true;
+      const result = await this.resource.editQuestion(question, null, {questionId: question.id});
+      if (result.data) {
+        this.isEditingQuestionInProgress = false;
+        let res = null;
+        this.selectedSurvey_.questions.forEach((question_: Question) => {
+          if (question_.id === question.id) {
+            console.log('question found');
+            question_.title = question.title;
+            question_.type = question.type;
+            question_.weight = question.weight;
+            res = question_;
+          }
+        });
+        return res;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingQuestionInProgress = false;
+      return null;
+    }
+  }
+
+  /**
    * Добавление формы вопроса
    * @param {IQuestionFormDTO} form - Форма вопроса
    * @returns {Promise<QuestionForm | null>}
@@ -328,6 +389,24 @@ export class SurveysService {
   async addQuestionForm(form: IQuestionFormDTO): Promise<QuestionForm | null> {
     try {
       const result = await this.resource.addQuestionForm(form);
+      if (result.data) {
+        const form_ = new QuestionForm(result.data);
+        return form_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Изменение формы вопроса
+   * @param {IQuestionFormDTO} form - Форма вопроса
+   * @returns {Promise<QuestionForm | null>}
+   */
+  async editQuestionForm(form: IQuestionFormDTO): Promise<QuestionForm | null> {
+    try {
+      const result = await this.resource.editQuestionForm(form, null, {questionFormId: form.id});
       if (result.data) {
         const form_ = new QuestionForm(result.data);
         return form_;
@@ -358,6 +437,63 @@ export class SurveysService {
   }
 
   /**
+   * Изменение ответа
+   * @param {IAnswerDTO} answer - Ответ
+   * @param {number} questionId - Идентификатор вопроса
+   * @returns {Promise<Answer | null>}
+   */
+  async editAnswer(answer: IAnswerDTO, questionId: number): Promise<Answer | null> {
+    try {
+      const result = await this.resource.editAnswer(answer, null, {answerId: answer.id});
+      if (result.data) {
+        const findQuestionById = (item: Question) => question.id === questionId;
+        const question = this.selectedSurvey_.questions.find(findQuestionById);
+        if (question) {
+          question.answers.forEach((answer_: Answer) => {
+            if (answer_.id === answer.id) {
+              answer_.content = answer.text_content;
+              answer_.weight = answer.weight;
+              answer_.index = answer.index;
+              return answer;
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Удаление ответа
+   * @param {number} answerId - Идентфиикатор ответа
+   * @param {number} questionId - Идентфиикатор вопроса
+   * @returns {Promise<boolean>}
+   */
+  async deleteAnswer(answerId: number, questionId: number): Promise<boolean> {
+    try {
+      const result = await this.resource.deleteAnswer({answerId: answerId});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        const findQuestionById = (question: Question) => question.id === questionId;
+        const question_ = this.selectedSurvey_.questions.find(findQuestionById);
+        if (question_) {
+          question_.answers.forEach((answer: Answer, index: number, array: Answer[]) => {
+            if (answer.id === answerId) {
+              array.splice(index, 1);
+              return true;
+            }
+          });
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  /**
    * Добавление диапазона
    * @param {IRangeDTO} range - Диапазон
    * @param {number} questionFormId - Идентификато рформы вопроса
@@ -368,6 +504,24 @@ export class SurveysService {
       const result = await this.resource.addRange(range, null, {questionFormId: questionFormId});
       if (result.data) {
         const range_  = new QuestionRange(result.data);
+        return range_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Изменение диапазона
+   * @param {IRangeDTO} range - Диапазон
+   * @returns {Promise<QuestionRange | null>}
+   */
+  async editRange(range: IRangeDTO): Promise<QuestionRange | null> {
+    try {
+      const result = await this.resource.editRange(range, null, {rangeId: range.id});
+      if (result.data) {
+        const range_ = new QuestionRange(result.data);
         return range_;
       }
     } catch (error) {
@@ -439,6 +593,81 @@ export class SurveysService {
     } catch (error) {
       console.error(error);
       this.isAddingQuestionInProgress = false;
+      return null;
+    }
+  }
+
+  /**
+   * Измененение вопроса
+   * @param {IQuestionDTO} question - Вопрос
+   * @param {IQuestionFormDTO} form - Форма вопроса
+   * @param {IAnswerDTO[]} answers - Массив ответов
+   * @param {IRangeDTO | null} range - Диапазон
+   * @returns {Promise<Question | null>}
+   */
+  async editQuestion(question: IQuestionDTO, form: IQuestionFormDTO, answers: IAnswerDTO[], range: IRangeDTO | null): Promise<Question | null> {
+    try {
+      this.isEditingQuestionInProgress = true;
+      const question_ = await this.editQuestionInfo(question);
+      console.log('question', question_);
+      if (question_) {
+       if (question_.form.type !== form.type) {
+         const form_ = await this.editQuestionForm(form);
+         if (form_) {
+           question_.form = form_;
+           question_.answers = [];
+           if (range) {
+             const range_ = await this.addRange(range, form_.id);
+             if (range_) {
+               question_.range = range_;
+               return question_;
+             }
+           }
+           answers.forEach(async (item: IAnswerDTO) => {
+             const answer_ = await this.addAnswer(item, form_.id);
+             if (answer_) {
+               question_.answers.push(answer_);
+             }
+           });
+         }
+       } else {
+         if (range) {
+           const range_ = await this.editRange(range);
+           if (range_) {
+             question_.range = range_;
+             return question_;
+           }
+         }
+
+         answers.forEach(async (item: IAnswerDTO) => {
+           const findAnswerById = (answer: Answer) => answer.id === item.id;
+           const answer_ = question_.answers.find(findAnswerById);
+           if (answer_) {
+             if (answer_.index !== item.index || answer_.content !== item.text_content || answer_.weight !== item.weight) {
+               const editedAnswer = await this.editAnswer(item, question_.id);
+             }
+           } else {
+             const newAnswer = await this.addAnswer(item, form.id);
+             if (newAnswer) {
+               question_.answers.push(newAnswer);
+             }
+           }
+         });
+
+         question_.answers.forEach(async (item: Answer) => {
+           const findAnswerById = (answer: IAnswerDTO) => answer.id === item.id;
+           const answer_ = answers.find(findAnswerById);
+           if (!answer_) {
+              const deleteResult = await this.deleteAnswer(answer_.id, question_.id);
+           }
+         });
+       }
+       this.isEditingQuestionInProgress = false;
+       return question_;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isEditingQuestionInProgress = false;
       return null;
     }
   }

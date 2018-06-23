@@ -44,6 +44,17 @@ export class SurveysResource extends Resource {
   getSurveysList: IResourceMethod<void, IServerResponse<ISurveyDTO[]>>;
 
   /**
+   * Path: questionnaire/templates
+   * Method: GET
+   */
+  @ResourceAction({
+    path: '/questionnaire/templates',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true
+  })
+  getSurveyTemplates: IResourceMethod<void, IServerResponse<ISurveyDTO[]>>;
+
+  /**
    * Path: questionnaire
    * Method: POST
    */
@@ -98,6 +109,17 @@ export class SurveysResource extends Resource {
   addQuestion: IResourceMethodStrict<IQuestionDTO, void, void, IServerResponse<IQuestionDTO>>;
 
   /**
+   * Path: question/{!questionId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: '/question/{!questionId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editQuestion: IResourceMethodStrict<IQuestionDTO, void, {questionId: number}, IServerResponse<IQuestionDTO>>;
+
+  /**
    * Path: question-form
    * Method: POST
    */
@@ -107,6 +129,17 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   addQuestionForm: IResourceMethodStrict<IQuestionFormDTO, void, void, IServerResponse<IQuestionFormDTO>>;
+
+  /**
+   * Path: question-form/1{!questionFormId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: 'question-form/{!questionFormId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editQuestionForm: IResourceMethodStrict<IQuestionFormDTO, void, {questionFormId: number}, IServerResponse<IQuestionFormDTO>>;
 
   /**
    * Path: question-form/{!questionFormId}/form-answer
@@ -120,6 +153,28 @@ export class SurveysResource extends Resource {
   addAnswer: IResourceMethodStrict<IAnswerDTO, void, {questionFormId: number}, IServerResponse<IAnswerDTO>>;
 
   /**
+   * Path: form-answer/{!answerId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: '/form-answer/{!answerId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editAnswer: IResourceMethodStrict<IAnswerDTO, void, {answerId: number}, IServerResponse<IAnswerDTO>>;
+
+  /**
+   * Path: form-answer/{!answerId}
+   * Method: DELETE
+   */
+  @ResourceAction({
+    path: '/form-answer/{!answerId}',
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
+  })
+  deleteAnswer: IResourceMethod<{answerId: number}, IServerResponse<boolean>>;
+
+  /**
    * Path: question-form/{!questionFormId}/question-form-range
    * Method: POST
    */
@@ -129,6 +184,17 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   addRange: IResourceMethodStrict<IRangeDTO, void, {questionFormId: number}, IServerResponse<IRangeDTO>>;
+
+  /**
+   * Path: question-form-range/{!rangeId}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: 'question-form-range/{!rangeId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editRange: IResourceMethodStrict<IRangeDTO, void, {rangeId: number}, IServerResponse<IRangeDTO>>;
 
   /**
    * Path: question/{!questionId}/attach-to-questionnaire/{!surveyId}

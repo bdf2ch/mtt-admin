@@ -169,10 +169,22 @@
                         Вес вопроса: {{ question.weight }}
                       </div>
                       <div class="col-4">
-                        <el-button type="success" size="small" icon="edit" class="w-100 mr-2" (click)="openEditPaymentsRequisitesDialog()">&nbsp; Изменить</el-button>
+                        <el-button type="success"
+                                   size="small"
+                                   icon="edit"
+                                   class="w-100 mr-2"
+                                   (click)="openEditQuestionDialog(question)">
+                          &nbsp; Изменить
+                        </el-button>
                       </div>
                       <div class="col-4">
-                        <el-button type="danger" size="small" icon="delete" class="w-100 ml-2" (click)="openDeleteQuestionDialog(question)">&nbsp; Удалить</el-button>
+                        <el-button type="danger"
+                                   size="small"
+                                   icon="delete"
+                                   class="w-100 ml-2"
+                                   (click)="openDeleteQuestionDialog(question)">
+                          &nbsp; Удалить
+                        </el-button>
                       </div>
                     </div>
                   </div>
@@ -284,12 +296,14 @@
           <!-- End: Need client data first -->
 
           <!-- Start: Is template -->
+          <!--
           <el-form-item label="Является шаблоном"
                         [required]="false"
                         [status]="surveyFormStatusCtrl('is_template')"
                         [error]="surveyFormMessageCtrl('is_template')">
             <el-checkbox formControlName="is_template" [(model)]="surveyData.is_template" (modelChange)="changeIsTemplateStatus($event)"></el-checkbox>
           </el-form-item>
+          -->
           <!-- End: Is template -->
         </el-form>
 
@@ -337,14 +351,14 @@
 </el-dialog>
 <!-- End: Edit survey dialog -->
 
-<!-- Start: Add question dialog -->
-<el-dialog [(visible)]="isInAddQuestionMode" [width]="'580px'">
+<!-- Start: Edit question dialog -->
+<el-dialog [(visible)]="isInEditQuestionMode" [width]="'580px'">
   <ng-template #title>
     <span class="el-icon-plus"></span>&nbsp;
-    <span>Добавление вопроса</span>
+    <span>Изменение вопроса</span>
   </ng-template>
 
-  <div class="container-fluid" *ngIf="isInAddQuestionMode">
+  <div class="container-fluid" *ngIf="isInEditQuestionMode">
     <div class="row">
       <div class="col-12">
         <h4 class="text-muted mb-3">Информация о вопросе</h4>
@@ -427,18 +441,18 @@
                 <el-form-item *ngFor="let answer of answers"
                               label-width="0"
                               [required]="true"
-                              [status]="answerFormStatusCtrl('answer' + answer.dateCreated.toString())"
-                              [error]="answerFormMessageCtrl('answer' + answer.dateCreated.toString())">
+                              [status]="answerFormStatusCtrl('answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString()))"
+                              [error]="answerFormMessageCtrl('answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString()))">
                   <div el-row gutter="20">
                     <div el-col span="16">
-                      <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}"
+                      <el-input formControlName="{{'answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString())}}"
                                 [(model)]="answer.text_content"
                                 placeholder="Текст ответа"></el-input>
                     </div>
                     <div el-col span="4">
                       <el-input  native-type="number"
                                  el-class="no-spinners"
-                                 formControlName="{{'weight' + answer.dateCreated.toString()}}"
+                                 formControlName="{{'weight' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString())}}"
                                  [(model)]="answer.weight"
                                   placeholder="Вес">
                       </el-input>
@@ -478,6 +492,176 @@
                 </el-form-item>
                 <!-- End: Range max -->
               </el-form>
+
+          </div>
+        </div>
+        <!-- End: Answers -->
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="(questionForm.pristine && answerForm.pristine) || (questionForm.dirty && questionForm.invalid) || (answerForm.dirty && answerForm.invalid) || answers.length < minAnswers"
+                       [loading]="surveysService.editingQuestionInProgress()"
+                       (click)="editQuestion()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditQuestionDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Edit question dialog -->
+
+<!-- Start: Add question dialog -->
+<el-dialog [(visible)]="isInAddQuestionMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-plus"></span>&nbsp;
+    <span>Добавление вопроса</span>
+  </ng-template>
+
+  <div class="container-fluid" *ngIf="isInAddQuestionMode">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-muted mb-3">Информация о вопросе</h4>
+
+        <el-form [formGroup]="questionForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <!-- Start: Title -->
+          <el-form-item label="Текст вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('title')"
+                        [error]="questionFormMessageCtrl('title')">
+            <el-input formControlName="title" [(model)]="questionData.title"></el-input>
+          </el-form-item>
+          <!-- End: Title -->
+
+          <!-- Start: Question type -->
+          <el-form-item label="Тип вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('type')"
+                        [error]="questionFormMessageCtrl('type')">
+            <el-select [(model)]="questionData.type" (modelChange)="questionTypeChange($event)" formControlName="type" placeholder="Тип вопроса">
+              <el-option *ngFor="let questionType of surveysService.getQuestionTypesList()"
+                         [label]="questionType.title"
+                         [value]="questionType.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Question type -->
+
+          <!-- Start: Form type -->
+          <el-form-item label="Форма вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('form_type')"
+                        [error]="questionFormMessageCtrl('form_type')">
+            <el-select [(model)]="questionFormData.type" (modelChange)="questionFormChange($event)" formControlName="form_type" placeholder="Тип формы вопроса">
+              <el-option *ngFor="let formType of surveysService.getQuestionTypeByCode(questionData.type).forms"
+                         [label]="formType.title"
+                         [value]="formType.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- End: Form type -->
+
+          <!-- Start: Weight -->
+          <el-form-item label="Вес вопроса"
+                        [required]="true"
+                        [status]="questionFormStatusCtrl('weight')"
+                        [error]="questionFormMessageCtrl('weight')">
+            <el-input formControlName="weight"
+                      native-type="number"
+                      el-class="no-spinners"
+                      [(model)]="questionData.weight">
+            </el-input>
+          </el-form-item>
+          <!-- End: Weight -->
+
+        </el-form>
+
+        <!-- Start: Answers -->
+        <div class="row">
+          <div class="col-12 border-bottom">
+            <h4 class="text-muted mb-3 d-flex justify-content-between" *ngIf="answers.length > 0">
+              Ответы
+              <el-button type="text" size="mini" icon="plus" (click)="appendAnswer()" [size]="'small'">&nbsp; Добавить</el-button>
+            </h4>
+
+            <el-form [formGroup]="answerForm"
+                     label-width="170px"
+                     [label-position]="'left'"
+                     size="small"
+                     [show-icon]="true"
+                     [show-message]="true">
+
+              <!-- Start: Text content -->
+              <el-form-item *ngFor="let answer of answers"
+                            label-width="0"
+                            [required]="true"
+                            [status]="answerFormStatusCtrl('answer' + answer.dateCreated.toString())"
+                            [error]="answerFormMessageCtrl('answer' + answer.dateCreated.toString())">
+                <div el-row gutter="20">
+                  <div el-col span="16">
+                    <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}"
+                              [(model)]="answer.text_content"
+                              placeholder="Текст ответа"></el-input>
+                  </div>
+                  <div el-col span="4">
+                    <el-input  native-type="number"
+                               el-class="no-spinners"
+                               formControlName="{{'weight' + answer.dateCreated.toString()}}"
+                               [(model)]="answer.weight"
+                               placeholder="Вес">
+                    </el-input>
+                  </div>
+                  <div el-col span="4">
+                    <el-button type="danger" icon="delete" (click)="removeAnswer(answer)"></el-button>
+                  </div>
+                </div>
+              </el-form-item>
+              <!-- End: Text content -->
+
+              <!-- Start: Range min -->
+              <el-form-item *ngIf="questionFormData.type === 'mark'"
+                            label="Мин. значение"
+                            [required]="true"
+                            [status]="answerFormStatusCtrl('range_min')"
+                            [error]="answerFormMessageCtrl('range_min')">
+                <el-input formControlName="range_min"
+                          native-type="number"
+                          el-class="no-spinners"
+                          [(model)]="rangeData.min">
+                </el-input>
+              </el-form-item>
+              <!-- End: Range min -->
+
+              <!-- Start: Range max -->
+              <el-form-item *ngIf="questionFormData.type === 'mark'"
+                            label="Макс. значение"
+                            [required]="true"
+                            [status]="answerFormStatusCtrl('range_max')"
+                            [error]="answerFormMessageCtrl('range_max')">
+                <el-input formControlName="range_max"
+                          native-type="number"
+                          el-class="no-spinners"
+                          [(model)]="rangeData.max">
+                </el-input>
+              </el-form-item>
+              <!-- End: Range max -->
+            </el-form>
 
           </div>
         </div>

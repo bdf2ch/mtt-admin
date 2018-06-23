@@ -28,33 +28,61 @@ export class CompanyResource extends Resource {
     super(handler);
   }
 
+  /**
+   * Path: company/{!id}
+   * Method: GET
+   */
   @ResourceAction({
     path: '/{!id}',
-    method: ResourceRequestMethod.Get
+    method: ResourceRequestMethod.Get,
+    withCredentials: true,
+    headers: {
+      'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : ''
+    }
   })
   getCompanyById: IResourceMethodStrict<void, {with_payment_requisites: any}, {id: number}, IServerResponse<ICompanyDTO>>;
 
+  /**
+   * Path: company/{!id}
+   * Method: PATCH
+   */
   @ResourceAction({
     path: '/{!id}',
-    method: ResourceRequestMethod.Patch
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
   })
   editCompanyById: IResourceMethodStrict<ICompanyDTO, void, {id: number}, IServerResponse<ICompanyDTO>>;
 
+  /**
+   * Path: company/{!id}/payment-requisites
+   * Method: POST
+   */
   @ResourceAction({
     path: '/{!id}/payment-requisites',
-    method: ResourceRequestMethod.Post
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
   })
   addPaymentRequisites: IResourceMethodStrict<IPaymentRequisitesDTO, void, {id: number}, IServerResponse<IPaymentRequisitesDTO>>;
 
+  /**
+   * Path: company/{!id}/payment-requisites/{!requisitesId}
+   * Method: PATCH
+   */
   @ResourceAction({
     path: '/{!id}/payment-requisites/{!requisitesId}',
-    method: ResourceRequestMethod.Patch
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
   })
   editPaymentRequisites: IResourceMethodStrict<IPaymentRequisitesDTO, void, {id: number, requisitesId: number}, IServerResponse<IPaymentRequisitesDTO>>;
 
+  /**
+   * Path: company/{!id}/payment-requisites/{!requisitesId}
+   * Method: DELETE
+   */
   @ResourceAction({
     path: '/{!id}/payment-requisites/{!requisitesId}',
-    method: ResourceRequestMethod.Delete
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
   })
   deletePaymentRequisites: IResourceMethodStrict<void, void, {id: number, requisitesId: number}, IServerResponse<boolean>>;
 }

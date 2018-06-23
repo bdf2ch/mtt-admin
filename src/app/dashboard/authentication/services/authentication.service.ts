@@ -86,7 +86,7 @@ export class AuthenticationService {
    */
   logOut() {
     console.log('out', window.localStorage);
-      if (window.localStorage) {
+      if (window.localStorage && window.localStorage['api_token']) {
         window.localStorage.removeItem('api_token');
         this.currentUser = null;
         this.router.navigate(['auth']);

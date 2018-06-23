@@ -10,6 +10,8 @@ import { CompanyService } from '../../../company/services/company.service';
 import { Restaurant } from '../../models/restaurant.model';
 import { ElMessageService } from 'element-angular/release/message/message.service';
 import { SocialNetwork } from '../../models/social-network.model';
+import {YandexService} from "../../services/yandex.service";
+import {IGeoPosition} from "../../interfaces/geo-position.interface";
 
 @Component({
   selector: 'app-restaurant-list',
@@ -27,11 +29,13 @@ export class RestaurantListComponent implements OnInit {
   timeTableData: ITimeTableDTO;
   socialNetworksData: ISocialNetworkDTO[];
   rKeeperData: string;
+  geo: IGeoPosition;
 
   constructor(private readonly builder: FormBuilder,
               public authenticationService: AuthenticationService,
               public readonly companyService: CompanyService,
               public readonly restaurantsService: RestaurantsService,
+              private readonly yandexService: YandexService,
               private readonly message: ElMessageService) {
     this.isInAddRestaurantMode = false;
     this.isInDeleteRestaurantMode = false;
@@ -158,6 +162,18 @@ export class RestaurantListComponent implements OnInit {
     );
     this.closeAddRestaurantDialog();
     this.message['success']('Ресторан добавлен');
+  }
+
+  /**
+   * Получение геопозиции ресторана
+   * @returns {Promise<void>}
+   */
+  async onBlur() {
+    console.log('blur');
+    this.geo = await this.yandexService.getGeoPosition(
+      `${this.addressData.city}, ${this.addressData.street}, ${this.addressData.building_number}`
+    );
+    console.log(this.geo);
   }
 
   /**

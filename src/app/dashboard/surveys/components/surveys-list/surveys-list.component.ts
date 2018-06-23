@@ -207,6 +207,9 @@ export class SurveysListComponent implements OnInit {
     delete this.surveyData.is_template;
     delete this.surveyData.is_active;
     delete this.surveyData.available_passing_count;
+    if (this.templateId !== 0) {
+      this.surveyData.template_id = this.templateId;
+    }
     this.surveyData.restaurants_ids = this.restaurantIds;
 
     console.log(this.surveyData);

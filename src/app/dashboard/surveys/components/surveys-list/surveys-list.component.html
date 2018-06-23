@@ -79,9 +79,9 @@
                         label="Шаблон"
                         [required]="false">
             <el-select [(model)]="templateId" formControlName="template_id" placeholder="Выберите шаблон" *ngIf="rewardsService.getRewardsList().length > 0">
-              <el-option *ngFor="let reward of rewardsService.getAvailableRewards()"
-                         [label]="reward.title"
-                         [value]="reward.id">
+              <el-option *ngFor="let template of surveysService.getSurveysTemplatesList()"
+                         [label]="template.title"
+                         [value]="template.id">
               </el-option>
             </el-select>
           </el-form-item>

@@ -28,6 +28,9 @@ export class SurveysResolveGuard implements Resolve<Promise<Survey[]>> {
     if (this.surveysService.getSurveysList().length === 0) {
       await this.surveysService.fetchSurveyList();
     }
+    if (this.surveysService.getSurveysTemplatesList().length === 0) {
+      await this.surveysService.fetchSurveyTemplatesList();
+    }
     if (this.restaurantsService.getRestaurants().length === 0) {
       await this.restaurantsService.fetchRestaurantsByCompanyId(this.authenticationService.getCurrentUser().companyId);
     }

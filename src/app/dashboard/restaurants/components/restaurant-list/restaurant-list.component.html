@@ -126,7 +126,7 @@
                             [required]="true"
                             [status]="restaurantFormStatusCtrl('building_number')"
                             [error]="restaurantFormMessageCtrl('building_number')">
-                <el-input formControlName="building_number" [(model)]="addressData.building_number"></el-input>
+                <el-input formControlName="building_number" [(model)]="addressData.building_number" (blur)="onBlur()"></el-input>
               </el-form-item>
               <!-- End: Building -->
             </div>

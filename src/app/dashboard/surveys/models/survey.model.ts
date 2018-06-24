@@ -20,6 +20,7 @@ export class Survey implements ISurvey {
   passedCount: number;              // Число завершенных прохождений
   isTemplate: boolean;              // Является ли шаблоном
   isActive: boolean;                // Является ли активным
+  isDeletable: boolean;             // Является ли опрос удаляемым
   restaurants?: Restaurant[];       // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;    // Спрашивать контакты в начале
   questions: Question[];            // Вопросы
@@ -40,6 +41,7 @@ export class Survey implements ISurvey {
     this.passedCount = config && config.passed_count ? config.passed_count : 0;
     this.isTemplate = config ? config.is_template : false;
     this.isActive = config ? config.is_active : false;
+    this.isDeletable = config ? config.is_deletable : false;
     this.needClientDataFirst = config && config.need_client_data_first ? config.need_client_data_first : true;
     this.restaurants = [];
     this.questions = [];

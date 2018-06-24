@@ -14,6 +14,8 @@ export class Question {
   form: QuestionForm;               // Форма
   answers: Answer[];                // Ответы
   range: QuestionRange | null;      // Диапазон
+  isEditable: boolean;              // Изменяем ли вопрос
+  isDeletable: boolean;            // Удаляем ли вопрос
 
   /**
    * Конструктор
@@ -27,6 +29,8 @@ export class Question {
     this.weight = config ? config.weight : 0;
     this.form = config ? new QuestionForm(config.form.data) : null;
     this.range = config && config.range ? new QuestionRange(config.range.data) : null;
+    this.isEditable = config ? config.is_editable : true;
+    this.isDeletable = config ? config.is_deletable : false;
     this.answers = [];
 
     if (config && config.answers) {

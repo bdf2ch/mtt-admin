@@ -77,6 +77,17 @@ export class SurveysResource extends Resource {
   editSurvey: IResourceMethodStrict<ISurveyDTO, void, {surveyId: number}, IServerResponse<ISurveyDTO>>;
 
   /**
+   * Path: questionnaire/{!surveyId}
+   * Method: DELETE
+   */
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}',
+    method: ResourceRequestMethod.Delete,
+    withCredentials: true
+  })
+  deleteSurvey: IResourceMethod<{surveyId: number}, IServerResponse<boolean>>;
+
+  /**
    * Path: questionnaire/{!surveyId}/set-active-status
    * Method: PATCH
    */

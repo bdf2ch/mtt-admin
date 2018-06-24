@@ -564,7 +564,6 @@ export class SurveyComponent implements OnInit {
       });
   }
 
-
   async setSurveyStatus(isActive: boolean) {
     await this.surveysService.setSurveyStatus(this.surveysService.selectedSurvey().id, isActive)
       .then(() => {

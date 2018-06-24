@@ -17,6 +17,7 @@ export interface ISurveyDTO {
   passed_count?: number;              // Число завершенных прохождений
   is_template?: boolean;              // Является ли шаблоном
   is_active?: boolean;                // Является ли активным
+  is_deletable?: boolean;             // Можно ли удалять опрос
   restaurants_ids?: number[];         // Массив идентфиикаторов ресторанов
   need_client_data_first?: boolean;   // Спрашивать контакты в начале
   restaurants?: {                     // Массив ресторанов, в которых проводится опрос

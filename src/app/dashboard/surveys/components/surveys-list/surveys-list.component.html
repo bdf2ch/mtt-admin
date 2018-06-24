@@ -36,7 +36,7 @@
               <div class="row">
                 <div class="col-12 d-flex justify-content-between">
                   <el-button type="success" size="small" icon="edit" [routerLink]="['/surveys', survey.id]"  (click)="openEditSurveyDialog(survey)">&nbsp; Изменить</el-button>
-                  <el-button type="danger" size="small" icon="delete" (click)="openDeleteSurveyDialog(survey)">&nbsp; Удалить</el-button>
+                  <el-button type="danger" size="small" icon="delete" *ngIf="survey.isDeletable" (click)="openDeleteSurveyDialog(survey)">&nbsp; Удалить</el-button>
                 </div>
               </div>
             </div>
@@ -178,3 +178,33 @@
   </div>
 </el-dialog>
 <!-- End: Add survey dialog -->
+
+<!-- Start: Delete survey confirmation dialog -->
+<el-dialog [(visible)]="isInDeleteSurveyMode" [width]="'400px'">
+  <ng-template #title>
+    <span class="el-icon-delete"></span>&nbsp;
+    <span>Удаление опроса</span>
+  </ng-template>
+  <div class="container-fluid" *ngIf="selectedSurvey">
+    <div class="row">
+      <div class="col-12">
+        Удалить опрос "{{ selectedSurvey.title }}"?
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="surveysService.deletingSurveyInProgress()"
+                   (click)="deleteSurvey()">
+          &nbsp; Удалить
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100" (click)="closeDeleteQuestionDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Delete survey confirmation dialog -->

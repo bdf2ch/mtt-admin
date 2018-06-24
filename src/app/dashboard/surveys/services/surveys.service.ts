@@ -306,6 +306,31 @@ export class SurveysService {
   }
 
   /**
+   * Удаление опроса
+   * @param {number} surveyId - Идентификатор опроса
+   * @returns {Promise<boolean>}
+   */
+  async deleteSurvey(surveyId: number): Promise<boolean> {
+    try {
+      this.isDeletingSurveyInProgress = true;
+      const result = await this.resource.deleteSurvey({surveyId: surveyId});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.isDeletingSurveyInProgress = false;
+        let answer = false;
+        this.surveys.forEach((survey: Survey, index: number, array: Survey[]) => {
+          array.splice(index, 1);
+          answer = true;
+        });
+        return answer;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isDeletingSurveyInProgress = false;
+      return false;
+    }
+  }
+
+  /**
    * Активация / деактивация опроса
    * @param {number} surveyId - Идентификатор опроса
    * @param {boolean} isActive - Статус опроса
@@ -446,7 +471,7 @@ export class SurveysService {
     try {
       const result = await this.resource.editAnswer(answer, null, {answerId: answer.id});
       if (result.data) {
-        const findQuestionById = (item: Question) => question.id === questionId;
+        const findQuestionById = (item: Question) => item.id === questionId;
         const question = this.selectedSurvey_.questions.find(findQuestionById);
         if (question) {
           question.answers.forEach((answer_: Answer) => {
@@ -657,8 +682,9 @@ export class SurveysService {
          question_.answers.forEach(async (item: Answer) => {
            const findAnswerById = (answer: IAnswerDTO) => answer.id === item.id;
            const answer_ = answers.find(findAnswerById);
+           console.log('founded answer', answer_);
            if (!answer_) {
-              const deleteResult = await this.deleteAnswer(answer_.id, question_.id);
+              const deleteResult = await this.deleteAnswer(item.id, question_.id);
            }
          });
        }

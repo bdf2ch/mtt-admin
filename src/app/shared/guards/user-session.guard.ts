@@ -16,6 +16,7 @@ export class UserSessionGuard implements CanActivate {
       console.log('auth check');
       const result: User | null = await this.authenticationService.check();
       if (result) {
+        this.router.navigate(['/surveys']);
         return true;
       } else {
         this.router.navigate(['/auth']);

@@ -12,6 +12,10 @@ export interface IRestaurantDTO {
   site: string | null;                            // Сайт
   r_keeper_config?: any;                          // Конфигурация R-Keeper
   address?: IAddressDTO;                          // Адрес
-  work_intervals?: ITimeTableDTO[] | null;        // Расписание работы
-  social_networks?: ISocialNetworkDTO[] | null;   // Список социальных сетей
+  workIntervals?: {                               // Расписание работы
+    data: ITimeTableDTO
+  };
+  socialNetworks?: {                              // Список социальных сетей
+    data: ISocialNetworkDTO[];
+  };
 }

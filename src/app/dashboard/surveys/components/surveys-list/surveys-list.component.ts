@@ -16,8 +16,8 @@ import { ElMessageService } from 'element-angular/release/message/message.servic
 })
 export class SurveysListComponent implements OnInit {
   public isInAddSurveyMode: boolean;
-  public isInEditSurveyDialog: boolean;
-  public isInDeleteSurveyDialog: boolean;
+  public isInEditSurveyMode: boolean;
+  public isInDeleteSurveyMode: boolean;
   public selectedSurvey: Survey | null;
   public surveyData: ISurveyDTO;
   public surveyForm: FormGroup;
@@ -31,8 +31,8 @@ export class SurveysListComponent implements OnInit {
               public readonly restaurantsService: RestaurantsService,
               private readonly message: ElMessageService) {
     this.isInAddSurveyMode = false;
-    this.isInEditSurveyDialog = false;
-    this.isInDeleteSurveyDialog = false;
+    this.isInEditSurveyMode = false;
+    this.isInDeleteSurveyMode = false;
     this.selectedSurvey = null;
     this.restaurantIds = [];
     this.templateId = 0;
@@ -100,14 +100,14 @@ export class SurveysListComponent implements OnInit {
    * Открытите диалогового окна изменения опроса
    */
   openEditSurveyDialog() {
-    this.isInEditSurveyDialog = true;
+    this.isInEditSurveyMode = true;
   }
 
   /**
    * Закрытие диалогового окна изменения опроса
    */
   closeEditSurveyDialog() {
-    this.isInEditSurveyDialog = false;
+    this.isInEditSurveyMode = false;
   }
 
   /**
@@ -116,14 +116,14 @@ export class SurveysListComponent implements OnInit {
    */
   openDeleteSurveyDialog(survey: Survey) {
     this.selectedSurvey = survey;
-    this.isInDeleteSurveyDialog = true;
+    this.isInDeleteSurveyMode = true;
   }
 
   /**
    * Закрытие диалогового окна подтверждения удаления опроса
    */
   closeDeleteSurveyDialog() {
-    this.isInDeleteSurveyDialog = false;
+    this.isInDeleteSurveyMode = false;
     this.selectedSurvey = null;
   }
 
@@ -217,6 +217,18 @@ export class SurveysListComponent implements OnInit {
       .then(() => {
         this.closeAddSurveyDialog();
         this.message['success']('Опрос добавлен');
+      });
+  }
+
+  /**
+   * Удаление опроса
+   * @returns {Promise<void>}
+   */
+  async deleteSurvey() {
+    await this.surveysService.deleteSurvey(this.selectedSurvey.id)
+      .then(() => {
+        this.closeDeleteSurveyDialog();
+        this.message['success']('Опрос удален');
       });
   }
 

@@ -16,6 +16,7 @@ export interface ISurvey {
   passedCount: number;            // Число завершенных прохождений
   isTemplate: boolean;            // Является ли шаблоном
   isActive: boolean;              // Является ли активным
+  isDeletable: boolean;           // Является ли опрос удаляемым
   restaurants?: Restaurant[];     // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;  // Спрашивать контакты в начале
   questions: Question[];          // Массив вопросов

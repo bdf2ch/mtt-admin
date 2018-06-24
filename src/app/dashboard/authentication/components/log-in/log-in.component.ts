@@ -58,7 +58,9 @@ export class LogInComponent implements OnInit {
     console.log(this.loginForm);
     const result: User | null = await this.authenticationService.logIn(this.loginData);
     if (result) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/']).then(() => {
+        window.location.reload();
+      });
     } else {
       this.message.setOptions({ showClose: true })
       this.message['warning']('Пользователь не найден');

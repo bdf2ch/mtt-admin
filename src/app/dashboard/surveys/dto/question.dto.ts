@@ -11,6 +11,8 @@ export interface IQuestionDTO {
   type: string;                       // Тип вопроса
   title: string;                      // Текст вопроса
   weight: number;                     // Вес вопроса
+  is_deletable?: boolean;             // Удаляем ли вопрос
+  is_editable?: boolean;              // Редактируем ли вопрос
   form?: {                            // Форма вопроса
     data: IQuestionFormDTO
   };

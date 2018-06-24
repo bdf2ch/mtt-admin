@@ -33,12 +33,12 @@ export class Restaurant implements IRestaurant {
     this.www = config ? config.site : '';
     this.rKeeperConfig = config ? config.r_keeper_config : {};
     this.address = config && config.address ? new Address(config.address['data']) : new Address();
-    this.timeTable = config && config.work_intervals ? new TimeTable(config.work_intervals[0]) : new TimeTable();
+    this.timeTable = config && config.workIntervals ? new TimeTable(config.workIntervals.data) : new TimeTable();
     this.social = [];
     this.isSelected = false;
 
-    if (config && config.social_networks) {
-      config.social_networks.forEach((item: ISocialNetworkDTO) => {
+    if (config && config.socialNetworks) {
+      config.socialNetworks.data.forEach((item: ISocialNetworkDTO) => {
         const social = new SocialNetwork(item);
         this.social.push(social);
       });

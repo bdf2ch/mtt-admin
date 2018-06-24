@@ -143,7 +143,10 @@
 
                 <div *ngIf="question.form.type === 'checkbox'">
                   <div *ngFor="let answer of question.answers">
-                    <el-checkbox>{{ answer.content }}</el-checkbox>
+                    <el-checkbox>
+                      {{ answer.content }}
+                      <span class="text-muted" *ngIf="answer.weight"> - Вес: {{answer.weight}}</span>
+                    </el-checkbox>
                   </div>
                 </div>
 
@@ -152,7 +155,7 @@
                     <div *ngFor="let answer of question.answers">
                       <el-radio [label]="answer.content" class="d-block">
                         {{ answer.content }}
-                        <span class="text-muted" *ngIf="answer.weight">&nbsp;Вес: {{answer.weight}}</span>
+                        <span class="text-muted" *ngIf="answer.weight"> - Вес: {{answer.weight}}</span>
                       </el-radio>
                     </div>
                   </el-radio-group>
@@ -173,7 +176,8 @@
                                    size="small"
                                    icon="edit"
                                    class="w-100 mr-2"
-                                   (click)="openEditQuestionDialog(question)">
+                                   (click)="openEditQuestionDialog(question)"
+                                   *ngIf="question.isEditable">
                           &nbsp; Изменить
                         </el-button>
                       </div>
@@ -182,7 +186,8 @@
                                    size="small"
                                    icon="delete"
                                    class="w-100 ml-2"
-                                   (click)="openDeleteQuestionDialog(question)">
+                                   (click)="openDeleteQuestionDialog(question)"
+                                   *ngIf="question.isDeletable">
                           &nbsp; Удалить
                         </el-button>
                       </div>
@@ -384,7 +389,7 @@
                         [required]="true"
                         [status]="questionFormStatusCtrl('type')"
                         [error]="questionFormMessageCtrl('type')">
-            <el-select [(model)]="questionData.type" (modelChange)="questionTypeChange($event)" formControlName="type" placeholder="Тип вопроса">
+            <el-select [(model)]="questionData.type" (modelChange)="questionTypeChange($event)" formControlName="type" [elDisabled]="true" placeholder="Тип вопроса">
               <el-option *ngFor="let questionType of surveysService.getQuestionTypesList()"
                          [label]="questionType.title"
                          [value]="questionType.code">

@@ -39,6 +39,11 @@ const routes: Routes = [
     canActivate: [UserSessionGuard],
     children: [
       {
+        path: '',
+        redirectTo: 'surveys',
+        pathMatch: 'full'
+      },
+      {
         path: 'surveys',
         component: SurveysComponent,
         resolve: [SurveysResolveGuard],

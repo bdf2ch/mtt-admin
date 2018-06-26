@@ -12,6 +12,7 @@ import { IAnswerDTO } from '../../dto/answer.dto';
 import { IRangeDTO } from '../../dto/range.dto';
 import { Question } from '../../models/question.model';
 import { Answer } from '../../models/answer.model';
+import { IHeaderDTO } from '../../dto/header.dto';
 
 @Component({
   selector: 'app-survey',
@@ -23,6 +24,7 @@ export class SurveyComponent implements OnInit {
   public isInAddQuestionMode: boolean;
   public isInEditQuestionMode: boolean;
   public isInDeleteQuestionMode: boolean;
+  public isInGenerateCodesMode: boolean;
   public surveyForm: FormGroup;
   public surveyData: ISurveyDTO;
   public questionForm: FormGroup;
@@ -36,6 +38,12 @@ export class SurveyComponent implements OnInit {
   public minAnswers: number;
   public rangeData: IRangeDTO;
   public selectedQuestion: Question | null;
+  public codesAmount: number;
+  public codesForm: FormGroup;
+  public headerData: IHeaderDTO;
+  public headerImage: File | null;
+  public footerData: IHeaderDTO;
+  public footerImage: File | null;
 
   constructor(private readonly formBuilder: FormBuilder,
               public readonly restaurantsService: RestaurantsService,
@@ -46,8 +54,12 @@ export class SurveyComponent implements OnInit {
     this.isInAddQuestionMode = false;
     this.isInEditQuestionMode = false;
     this.isInDeleteQuestionMode = false;
+    this.isInGenerateCodesMode = false;
     this.restaurantIds = [];
     this.selectedQuestion = null;
+    this.codesAmount = 50;
+    this.headerImage = null;
+    this.footerImage = null;
     const survey = this.surveysService.selectedSurvey();
     console.log('survey', survey);
     this.surveyData = {
@@ -83,19 +95,40 @@ export class SurveyComponent implements OnInit {
       max: 1
     };
     this.answers = [];
+    this.headerData = {
+      type: 'header',
+      url: '',
+      text_content: '',
+      background_color: '',
+      image: null
+    };
+    this.footerData = {
+      type: 'footer',
+      url: '',
+      text_content: '',
+      background_color: '',
+      image: null
+    };
   }
 
   ngOnInit() {
     const dateRegExp = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
+    const siteRegExp = /^https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,}$/;
     this.surveyForm = this.formBuilder.group({
       name: ['', Validators.required],
       description: [''],
       from: ['', [Validators.required, Validators.pattern(dateRegExp)]],
       to: ['', Validators.pattern(dateRegExp)],
-      reward_id: ['', Validators.required],
+      reward_id: [this.surveyData.reward_id, Validators.required],
       available_passing_count: ['', [Validators.required, Validators.min(1)]],
       need_client_data_first: [''],
-      is_template: ['']
+      is_template: [''],
+      header_url: [this.headerData.url, [Validators.pattern(siteRegExp)]],
+      header_text_content: [this.headerData.text_content],
+      header_background_color: [this.headerData.background_color],
+      footer_url: [this.footerData.url, [Validators.pattern(siteRegExp)]],
+      footer_text_content: [this.footerData.text_content],
+      footer_background_color: [this.footerData.background_color]
     });
     this.questionForm = this.formBuilder.group({
       title: [this.questionData.title, Validators.required],
@@ -105,6 +138,9 @@ export class SurveyComponent implements OnInit {
     });
     this.answerForm = this.formBuilder.group({
       text: [this.answerData.text_content, Validators.required]
+    });
+    this.codesForm = this.formBuilder.group({
+      count: [this.codesAmount, [Validators.required, Validators.min(1)]]
     });
   }
 
@@ -126,6 +162,18 @@ export class SurveyComponent implements OnInit {
     this.surveyData.available_passing_count = survey.passingCount;
     this.surveyData.need_client_data_first = survey.needClientDataFirst;
     this.surveyData.is_template = survey.isTemplate;
+    this.headerData.id = survey.header.id;
+    this.headerData.type = survey.header.type;
+    this.headerData.url = survey.header.url;
+    this.headerData.background_color = survey.header.backgroundColor;
+    this.headerData.text_content = survey.header.content;
+    this.headerData.image_url = survey.header.imageUrl;
+    this.footerData.id = survey.footer.id;
+    this.footerData.type = survey.footer.type;
+    this.footerData.url = survey.footer.url;
+    this.footerData.background_color = survey.footer.backgroundColor;
+    this.footerData.text_content = survey.footer.content;
+    this.footerData.image_url = survey.footer.imageUrl;
     this.surveyForm.reset({
       name: this.surveyData.name,
       description: this.surveyData.description,
@@ -134,7 +182,13 @@ export class SurveyComponent implements OnInit {
       reward_id: this.surveyData.reward_id,
       available_passing_count: this.surveyData.available_passing_count,
       need_client_data_first: this.surveyData.need_client_data_first,
-      is_template: this.surveyData.is_template
+      is_template: this.surveyData.is_template,
+      header_url: this.headerData.url,
+      header_text_content: this.headerData.text_content,
+      header_background_color: this.headerData.background_color,
+      footer_url: this.footerData.url,
+      footer_text_content: this.footerData.text_content,
+      footer_background_color: this.footerData.background_color
     });
     this.restaurantsService.getRestaurants().forEach((item: Restaurant) => {
       item.isSelected = false;
@@ -317,6 +371,24 @@ export class SurveyComponent implements OnInit {
   }
 
   /**
+   * Открытие диалогового окна генерации кодов опроса
+   */
+  openGenerateCodesDialog() {
+    this.codesAmount = 50;
+    this.codesForm.reset({
+      count: this.codesAmount
+    });
+    this.isInGenerateCodesMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна генерации кодов опроса
+   */
+  closeGenerateCodesDialog() {
+    this.isInGenerateCodesMode = false;
+  }
+
+  /**
    * Получение статуса элемента формы опроса
    * @param {string} item - Имя элемента формы
    * @returns {string}
@@ -352,6 +424,22 @@ export class SurveyComponent implements OnInit {
         return control.dirty && control.hasError('required')
           ? 'Вы не указали количество прохождений' : control.hasError('min')
             ? 'Количество прохождений не может быть меньше 1' : '';
+      case 'header_url':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали ссылку шапки' : control.hasError('pattern')
+            ? 'Ссыллка шапки указана некорректно' : '';
+      case 'header_background_color':
+        return control.dirty && control.hasError('required') ? 'Вы не указали цвет фона шапки' : '';
+      case 'header_text_content':
+        return control.dirty && control.hasError('required') ? 'Вы не указали содержимое шапки' : '';
+      case 'footer_url':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали ссылку подвала' : control.hasError('pattern')
+            ? 'Ссыллка подвала указана некорректно' : '';
+      case 'footer_background_color':
+        return control.dirty && control.hasError('required') ? 'Вы не указали цвет фона подвала' : '';
+      case 'footer_text_content':
+        return control.dirty && control.hasError('required') ? 'Вы не указали содержимое подвала' : '';
     }
   }
 
@@ -421,6 +509,33 @@ export class SurveyComponent implements OnInit {
         return control.dirty && control.hasError('required')
           ? 'Вы не указали максимальное значение' : parseInt(control.value) <= this.rangeData.min
             ? 'Макс. значение не может быть меньше минимального' : '';
+    }
+  }
+
+  /**
+   * Получение статуса элемента формы опроса
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  codesFormStatusCtrl(item: string): string {
+    if (!this.codesForm.controls[item]) { return; }
+    const control: AbstractControl = this.codesForm.controls[item];
+    return control.dirty && control.hasError('required') || control.hasError('min') ? 'error' : 'validating';
+  }
+
+  /**
+   * Получение сообщения об ошибке элемента формы опроса
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  codesFormMessageCtrl(item: string): string {
+    if (!this.surveyForm.controls[item]) { return; }
+    const control: AbstractControl = this.surveyForm.controls[item];
+    switch (item) {
+      case 'count':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали количество прохождений' : control.hasError('min')
+            ? 'Количество прохождений не может быть меньше 1' : '';
     }
   }
 
@@ -556,11 +671,37 @@ export class SurveyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editSurvey() {
+    console.log(this.headerData);
+    if (!this.headerData.image) {
+      delete this.headerData.image;
+    }
+    if (this.headerData.background_color === '') {
+      delete this.headerData.background_color;
+    }
+    if (this.headerData.text_content === '') {
+      delete this.headerData.text_content;
+    }
+    if (!this.headerData.url || this.headerData.url === '') {
+      delete this.headerData.url;
+    }
+    if (!this.footerData.image) {
+      delete this.footerData.image;
+    }
+    if (this.footerData.background_color === '') {
+      delete this.footerData.background_color;
+    }
+    if (this.footerData.text_content === '') {
+      delete this.footerData.text_content;
+    }
+    if (!this.footerData.url || this.footerData.url === '') {
+      delete this.footerData.url;
+    }
+    console.log(this.headerData);
     this.surveyData.restaurants_ids = this.restaurantIds;
-    await this.surveysService.editSurvey(this.surveyData)
+    await this.surveysService.editSurvey(this.surveyData, this.headerData, this.footerData)
       .then(() => {
         this.closeEditSurveyDialog();
-        this.message['success']('Опрос добавлен');
+        this.message['success']('Опрос изменен');
       });
   }
 
@@ -615,5 +756,31 @@ export class SurveyComponent implements OnInit {
         this.closeDeleteQuestionDialog();
         this.message['success']('Вопрос удален');
       });
+  }
+
+  /**
+   * Генерация кодов опроса
+   * @returns {Promise<void>}
+   */
+  async  generateCodes() {
+    await this.surveysService.generateCodes(this.surveysService.selectedSurvey().id, this.codesAmount)
+      .then(() => {
+        this.closeGenerateCodesDialog();
+        this.message['success']('Коды сгенерированы');
+      });
+  }
+
+  appendHeaderImage(f: File) {
+    console.log(f);
+    this.headerImage = f;
+    this.headerData.image = f;
+    this.surveyForm.markAsDirty();
+  }
+
+  appendFooterImage(f: File) {
+    console.log(f);
+    this.footerImage = f;
+    this.footerData.image = f;
+    this.surveyForm.markAsDirty();
   }
 }

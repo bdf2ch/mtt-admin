@@ -10,7 +10,7 @@ export interface ICompany {
   title: string;                              // Наименование
   www: string;                                // Сайт
   phone: string;                              // Телефон
-  rKeeperConfig?: any | null;                 // Конфигурация R-Keeper
+  // rKeeperConfig?: any | null;                 // Конфигурация R-Keeper
   restaurants?: IRestaurant[];                // Набор ресторынов
   paymentRequisites?: IPaymentRequisites[];   // Набор платежных реквизитов
 }

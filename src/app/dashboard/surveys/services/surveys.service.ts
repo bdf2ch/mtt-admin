@@ -8,13 +8,15 @@ import { QuestionType } from '../models/question-type.model';
 import { QuestionFormType } from '../models/question-form-type.model';
 import { Question } from '../models/question.model';
 import { IQuestionDTO } from '../dto/question.dto';
-import {IQuestionFormDTO} from '../dto/question-form.dto';
-import {QuestionForm} from '../models/question-form.model';
-import {Answer} from '../models/answer.model';
-import {IAnswerDTO} from '../dto/answer.dto';
-import {IRangeDTO} from '../dto/range.dto';
-import {QuestionRange} from '../models/question-range.model';
-import {IQuestionFormType} from '../interfaces/question-form-type.interface';
+import { IQuestionFormDTO } from '../dto/question-form.dto';
+import { QuestionForm } from '../models/question-form.model';
+import { Answer } from '../models/answer.model';
+import { IAnswerDTO } from '../dto/answer.dto';
+import { IRangeDTO } from '../dto/range.dto';
+import { QuestionRange } from '../models/question-range.model';
+import { IQuestionFormType } from '../interfaces/question-form-type.interface';
+import { IHeaderDTO } from '../dto/header.dto';
+import { Header } from '../models/header.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +33,7 @@ export class SurveysService {
   private isAddingQuestionInProgress: boolean;
   private isEditingQuestionInProgress: boolean;
   private isDeletingQuestionInProgress: boolean;
+  private isGeneratingCodesInProgress: boolean;
 
   constructor(private readonly resource: SurveysResource) {
     this.questionTypes = [];
@@ -44,6 +47,7 @@ export class SurveysService {
     this.isAddingQuestionInProgress = false;
     this.isEditingQuestionInProgress = false;
     this.isDeletingQuestionInProgress = false;
+    this.isGeneratingCodesInProgress = false;
   }
 
   /**
@@ -245,6 +249,14 @@ export class SurveysService {
   }
 
   /**
+   * Выполняется ли генерация кодов опроса
+   * @returns {boolean}
+   */
+  generatingCodesInProgress(): boolean {
+    return this.isGeneratingCodesInProgress;
+  }
+
+  /**
    * Добавление опроса
    * @param {ISurveyDTO} survey - Опрос
    * @returns {Promise<Survey | null>}
@@ -271,13 +283,13 @@ export class SurveysService {
    * @param {ISurveyDTO} survey - Опрос
    * @returns {Promise<Survey | null>}
    */
-  async editSurvey(survey: ISurveyDTO): Promise<Survey | null> {
+  async editSurvey(survey: ISurveyDTO, header: IHeaderDTO, footer: IHeaderDTO): Promise<Survey | null> {
     try {
       this.isEditingSurveyInProgress = true;
       const result = await this.resource.editSurvey(survey, null, {surveyId: survey.id});
       if (result.data) {
         this.isEditingSurveyInProgress = false;
-        this.surveys.forEach((item: Survey) => {
+        this.surveys.forEach(async (item: Survey) => {
           if (item.id === survey.id) {
             item.title = survey.name;
             item.description = survey.description;
@@ -294,6 +306,8 @@ export class SurveysService {
                 item.restaurants.push(restaurant);
               });
             }
+            await this.editHeader(header, survey.id);
+            await this.editHeader(footer, survey.id);
             return item;
           }
         });
@@ -720,6 +734,84 @@ export class SurveysService {
       console.error(error);
       this.isDeletingQuestionInProgress = false;
       return false;
+    }
+  }
+
+  /**
+   * Генерация кодов опроса
+   * @param {number} surveyId - Идентификатор опроса
+   * @param {number} amount - Количество кодов
+   * @returns {Promise<boolean>}
+   */
+  async generateCodes(surveyId: number, amount: number): Promise<boolean> {
+    try {
+      this.isGeneratingCodesInProgress = true;
+      const result = await this.resource.generateCodes({count: amount}, null, {surveyId: surveyId});
+      if (result.data) {
+        this.isGeneratingCodesInProgress = false;
+        const findSurveyById = (survey: Survey) => survey.id === surveyId;
+        const survey_ = this.surveys.find(findSurveyById);
+        if (survey_) {
+          survey_.passingCount += amount;
+        }
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isGeneratingCodesInProgress = false;
+      return false;
+    }
+  }
+
+  /**
+   * Добавление шапки опроса
+   * @param {IHeaderDTO} header - Шапка
+   * @param {number} surveyId - Идентфикатор опроса
+   * @returns {Promise<IHeaderDTO | null>}
+   */
+  async addHeader(header: IHeaderDTO, surveyId: number): Promise<Header | null> {
+    try {
+      const result = await this.resource.addHeader(header, null, null);
+      if (result.data) {
+        const header_ = new Header(result.data);
+        const findSurveyById = (item: Survey) => item.id === surveyId;
+        const survey = this.surveys.find(findSurveyById);
+        if (survey) {
+          survey.header = header_;
+        }
+        return header_;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async editHeader(header: IHeaderDTO, surveyId: number): Promise<Header | null> {
+    try {
+      const result = await this.resource.editHeader(header, null, {templateId: header.id});
+      if (result.data) {
+        const findSurveyById = (item: Survey) => item.id === surveyId;
+        const survey = this.surveys.find(findSurveyById);
+        if (survey) {
+          if (header.type === 'header') {
+            survey.header.url = header.url;
+            survey.header.content = header.text_content;
+            survey.header.backgroundColor = header.background_color;
+            survey.header.imageUrl = result.data.image_url;
+          }
+          if (header.type === 'footer') {
+            survey.footer.url = header.url;
+            survey.footer.content = header.text_content;
+            survey.footer.backgroundColor = header.background_color;
+            survey.footer.imageUrl = result.data.image_url;
+          }
+          return header.type === 'header' ? survey.header : survey.footer;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
 }

@@ -3,7 +3,9 @@ import { ISurveyDTO } from '../dto/survey.dto';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 import { Question } from './question.model';
-import {IQuestionDTO} from '../dto/question.dto';
+import { IQuestionDTO } from '../dto/question.dto';
+import { Header } from './header.model';
+import { Footer } from './footer.model';
 
 /**
  * Класс, реализующий интерфейс опроса
@@ -24,6 +26,8 @@ export class Survey implements ISurvey {
   restaurants?: Restaurant[];       // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;    // Спрашивать контакты в начале
   questions: Question[];            // Вопросы
+  header: Header;
+  footer: Footer;
 
   /**
    * Конструктор
@@ -43,6 +47,8 @@ export class Survey implements ISurvey {
     this.isActive = config ? config.is_active : false;
     this.isDeletable = config ? config.is_deletable : false;
     this.needClientDataFirst = config && config.need_client_data_first ? config.need_client_data_first : true;
+    this.header = config && config.templates ? new Header(config.templates.data[0]) : new Header();
+    this.footer = config && config.templates ? new Footer(config.templates.data[1]) : new Footer();
     this.restaurants = [];
     this.questions = [];
 

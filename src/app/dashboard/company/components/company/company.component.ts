@@ -54,11 +54,12 @@ export class CompanyComponent implements OnInit {
   }
 
   ngOnInit() {
+    const siteRegExp = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]!\$&'\(\)\*\+,;=.]+$/;
     this.editCompanyForm = this.builder.group({
       title: [this.companyData.name, Validators.required],
       phone: [this.companyData.phone],
-      www: [this.companyData.site],
-      r_keeper_config: [this.companyData.r_keeper_config]
+      www: [this.companyData.site, Validators.pattern(siteRegExp)]
+      // r_keeper_config: [this.companyData.r_keeper_config]
     });
     const INNRegExp = /^[0-9]{10}$|^[0-9]{12}$/;
     const KPPRegExp = /^[0-9]{9}$/;
@@ -85,7 +86,7 @@ export class CompanyComponent implements OnInit {
     this.companyData.name = this.companyService.getCompany().title;
     this.companyData.phone = this.companyService.getCompany().phone;
     this.companyData.site = this.companyService.getCompany().www;
-    this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
+    // this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     this.isInEditCompanyMode = true;
   }
 
@@ -96,7 +97,7 @@ export class CompanyComponent implements OnInit {
     this.companyData.name = this.companyService.getCompany().title;
     this.companyData.phone = this.companyService.getCompany().phone;
     this.companyData.site = this.companyService.getCompany().www;
-    this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
+    // this.companyData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
     this.isInEditCompanyMode = false;
   }
 
@@ -108,7 +109,7 @@ export class CompanyComponent implements OnInit {
   editCompanyFormStatusCtrl(item: string): string {
     if (!this.editCompanyForm.controls[item]) { return; }
     const control: AbstractControl = this.editCompanyForm.controls[item];
-    return control.dirty && control.hasError('required') ? 'error' : 'validating';
+    return control.dirty && control.hasError('required') || control.hasError('pattern') ? 'error' : 'validating';
   }
 
   /**
@@ -122,6 +123,8 @@ export class CompanyComponent implements OnInit {
     switch (item) {
       case 'title':
         return control.dirty && control.hasError('message') ? 'Вы не указали наименование' : '';
+      case 'www':
+        return control.dirty && control.hasError('pattern') ? 'Адрес сайта указан некорректно' : '';
     }
   }
 
@@ -130,6 +133,9 @@ export class CompanyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editCompany() {
+    if (this.companyData.site.indexOf('http') === -1) {
+      this.companyData.site = 'http://' + this.companyData.site;
+    }
     await this.companyService.editCompanyById(this.companyData).then(() => {
       this.closeEditCompanyDialog();
       this.editCompanyForm.reset({
@@ -321,7 +327,9 @@ export class CompanyComponent implements OnInit {
   }
 
   async deletePaymentRequisites() {
-    await this.companyService.deletePaymentRequisites(this.authenticationService.getCurrentUser().companyId, this.selectedPaymentRequisites.id)
+    await this.companyService.deletePaymentRequisites(
+      this.authenticationService.getCurrentUser().companyId,
+      this.selectedPaymentRequisites.id)
       .then(() => {
         this.closeDeletePaymentRequisitesDialog();
         this.message['success']('Платежные реквизиты удалены');

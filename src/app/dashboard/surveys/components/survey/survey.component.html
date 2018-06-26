@@ -51,10 +51,7 @@
         </tr>
         <tr>
           <th scope="row">Когда спрашивать контакты</th>
-          <td>
-            <span *ngIf="surveysService.selectedSurvey().end">{{ surveysService.selectedSurvey().end | date: 'dd.MM.yyyy' }}</span>
-            <span *ngIf="!surveysService.selectedSurvey().end" class="text-muted">Не указана</span>
-          </td>
+          <td>{{ surveysService.selectedSurvey().needClientDataFirst  ? 'В начале' : 'В конце' }}</td>
         </tr>
         <tr>
           <th scope="row">Рестораны</th>
@@ -80,12 +77,12 @@
           <td></td>
           <td class="pt-4">
             <div el-row gutter="20">
-              <!--
+
               <div el-col span="12" class="text-left">
-                <el-button type="warning" class="w-100">Сгенерировать коды</el-button>
+                <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Сгенерировать коды</el-button>
               </div>
-              -->
-              <div el-col span="24" class="text-right">
+
+              <div el-col span="12" class="text-right">
                 <div *ngIf="surveysService.selectedSurvey().isActive === false">
                   <el-button type="success"
                              class="w-100"
@@ -310,7 +307,109 @@
           </el-form-item>
           -->
           <!-- End: Is template -->
+
+          <!-- Start: Header -->
+          <div class="row">
+            <div class="col-12">
+              <h4 class="text-muted mb-3">Шапка опроса</h4>
+
+              <!-- Start: Url -->
+              <el-form-item label="Ссылка"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('header_url')"
+                            [error]="surveyFormMessageCtrl('header_url')">
+                <el-input formControlName="header_url" [(model)]="headerData.url"></el-input>
+              </el-form-item>
+              <!-- End: Url -->
+
+              <!-- Start: Background color -->
+              <el-form-item label="Цвет фона"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('header_background_color')"
+                            [error]="surveyFormMessageCtrl('header_background_color')">
+                <el-input formControlName="header_background_color" [(model)]="headerData.background_color"></el-input>
+              </el-form-item>
+              <!-- End: Background color -->
+
+              <!-- Start: Content -->
+              <el-form-item label="Содержимое"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('header_text_content')"
+                            [error]="surveyFormMessageCtrl('header_text_content')">
+                <el-input formControlName="header_text_content" [(model)]="headerData.text_content"></el-input>
+              </el-form-item>
+              <!-- End: Content -->
+
+              <!-- Start: Image -->
+              <el-form-item label="Изображение"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('header_image')"
+                            [error]="surveyFormMessageCtrl('header_image')">
+                <el-upload [upload-filter]="appendHeaderImage.bind(this)" [show-file-list]="true">
+                  <ng-template #trigger>
+                    <el-button size="small" type="primary">Загрузить</el-button>
+                    <span class="text-muted ml-2">{{ headerImage ? headerImage.name : 'Изображение не выбрано' }}</span>
+                  </ng-template>
+                </el-upload>
+              </el-form-item>
+              <!-- End: Image -->
+
+            </div>
+          </div>
+          <!-- End: header -->
+
+
+          <!-- Start: Footer -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Подвал опроса</h4>
+
+              <!-- Start: Url -->
+              <el-form-item label="Ссылка"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('footer_url')"
+                            [error]="surveyFormMessageCtrl('footer_url')">
+                <el-input formControlName="footer_url" [(model)]="footerData.url"></el-input>
+              </el-form-item>
+              <!-- End: Url -->
+
+              <!-- Start: Background color -->
+              <el-form-item label="Цвет фона"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('footer_background_color')"
+                            [error]="surveyFormMessageCtrl('footer_background_color')">
+                <el-input formControlName="footer_background_color" [(model)]="footerData.background_color"></el-input>
+              </el-form-item>
+              <!-- End: Background color -->
+
+              <!-- Start: Content -->
+              <el-form-item label="Содержимое"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('footer_text_content')"
+                            [error]="surveyFormMessageCtrl('footer_text_content')">
+                <el-input formControlName="footer_text_content" [(model)]="footerData.text_content"></el-input>
+              </el-form-item>
+              <!-- End: Content -->
+
+              <!-- Start: Image -->
+              <el-form-item label="Изображение"
+                            [required]="true"
+                            [status]="surveyFormStatusCtrl('footer_image')"
+                            [error]="surveyFormMessageCtrl('footer_image')">
+                <el-upload [upload-filter]="appendFooterImage.bind(this)" [show-file-list]="true">
+                  <ng-template #trigger>
+                    <el-button size="small" type="primary">Загрузить</el-button>
+                    <span class="text-muted ml-2">{{ footerImage ? footerImage.name : 'Изображение не выбрано' }}</span>
+                  </ng-template>
+                </el-upload>
+              </el-form-item>
+              <!-- End: Image -->
+
+            </div>
+          </div>
+          <!-- End: Footer -->
         </el-form>
+
 
         <!-- Start: Restaurants -->
         <div class="row">
@@ -725,3 +824,54 @@
   </div>
 </el-dialog>
 <!-- End: Delete question confirmation dialog -->
+
+
+
+<!-- Start: Generate codes dialog -->
+<el-dialog [(visible)]="isInGenerateCodesMode" [width]="'450px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Генерация кодов опроса</span>
+  </ng-template>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <el-form [formGroup]="codesForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+          <!-- Start: Count -->
+          <el-form-item label="Кол-во прохождений"
+                        [required]="true"
+                        [status]="codesFormStatusCtrl('count')"
+                        [error]="codesFormMessageCtrl('count')">
+            <el-input formControlName="count"
+                      native-type="number"
+                      el-class="no-spinners"
+                      [(model)]="codesAmount">
+            </el-input>
+          </el-form-item>
+          <!-- End: Count -->
+        </el-form>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-6">
+        <el-button type="success"
+                   icon="check"
+                   class="w-100"
+                   [loading]="surveysService.generatingCodesInProgress()"
+                   [elDisabled]="codesForm.invalid"
+                   (click)="generateCodes()">
+          &nbsp; Сгенерировать
+        </el-button>
+      </div>
+      <div class="col-6">
+        <el-button type="danger" icon="close" class="w-100" (click)="closeGenerateCodesDialog()">&nbsp; Отмена</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Generate codes dialog -->

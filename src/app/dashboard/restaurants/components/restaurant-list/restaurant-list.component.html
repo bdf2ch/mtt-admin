@@ -221,10 +221,10 @@
 
               <!-- Start: Name -->
               <el-form-item label="Конфигурация"
-                            [required]="!companyService.getCompany().rKeeperConfig"
+                            [required]="true"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
-                <el-input formControlName="config" [(model)]="restaurantData.r_keeper_config"></el-input>
+                <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig"></el-input>
               </el-form-item>
               <!-- End: Name -->
             </div>
@@ -431,10 +431,10 @@
 
               <!-- Start: Name -->
               <el-form-item label="Конфигурация"
-                            [required]="!companyService.getCompany().rKeeperConfig"
+                            [required]="true"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
-                <el-input formControlName="config" [(model)]="restaurantData.r_keeper_config"></el-input>
+                <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig"></el-input>
               </el-form-item>
               <!-- End: Name -->
             </div>

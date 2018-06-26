@@ -15,6 +15,7 @@ import {IQuestionDTO} from '../dto/question.dto';
 import {IQuestionFormDTO} from '../dto/question-form.dto';
 import {IAnswerDTO} from '../dto/answer.dto';
 import {IRangeDTO} from '../dto/range.dto';
+import {IHeaderDTO} from '../dto/header.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -228,4 +229,31 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   deleteQuestion: IResourceMethod<{questionId: number}, IServerResponse<any>>;
+
+
+  /**
+   * Path: questionnare/{!surveyId}/questionnaire-code
+   * Method: POST
+   */
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/questionnaire-code',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  generateCodes: IResourceMethodStrict<{count: number}, void, {surveyId: number}, IServerResponse<any>>;
+
+
+  @ResourceAction({
+    path: '/questionnaire-template',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  addHeader: IResourceMethodStrict<IHeaderDTO, void, void, IServerResponse<IHeaderDTO>>;
+
+  @ResourceAction({
+    path: '/questionnaire-template/{!templateId}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  editHeader: IResourceMethodStrict<IHeaderDTO, void, {templateId: number}, IServerResponse<IHeaderDTO>>;
 }

@@ -10,7 +10,7 @@ export interface IRestaurantDTO {
   name: string;                                   // Наименование
   phone: string | null;                           // Телефон
   site: string | null;                            // Сайт
-  r_keeper_config?: any;                          // Конфигурация R-Keeper
+  rKeeperConfig?: any;                          // Конфигурация R-Keeper
   address?: IAddressDTO;                          // Адрес
   workIntervals?: {                               // Расписание работы
     data: ITimeTableDTO

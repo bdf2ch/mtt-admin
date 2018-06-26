@@ -31,7 +31,7 @@ export class Restaurant implements IRestaurant {
     this.title = config ? config.name : '';
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
-    this.rKeeperConfig = config ? config.r_keeper_config : {};
+    this.rKeeperConfig = config ? config.rKeeperConfig : {};
     this.address = config && config.address ? new Address(config.address['data']) : new Address();
     this.timeTable = config && config.workIntervals ? new TimeTable(config.workIntervals.data) : new TimeTable();
     this.social = [];

@@ -28,6 +28,7 @@
             <span *ngIf="!companyService.getCompany().www" class="text-muted">Не указан</span>
           </td>
         </tr>
+        <!--
         <tr>
           <th scope="row">Конфигурация R-Keeper</th>
           <td>
@@ -35,6 +36,7 @@
             <span *ngIf="!companyService.getCompany().rKeeperConfig" class="text-muted">Не указана</span>
           </td>
         </tr>
+        -->
         </tbody>
       </table>
     </div>
@@ -173,11 +175,13 @@
     <!-- End: WWW -->
 
     <!-- Start: R-Keeper Configuration -->
+    <!--
     <el-form-item label="Конф. R-Keeper"
                   [status]="editCompanyFormStatusCtrl('r_keeper_config')"
                   [error]="editCompanyFormMessageCtrl('r_keeper_config')">
       <el-input formControlName="r_keeper_config" [(model)]="companyData.r_keeper_config"></el-input>
     </el-form-item>
+    -->
     <!-- End: R-Keeper Configuration -->
 
     <!-- Start: Controls -->

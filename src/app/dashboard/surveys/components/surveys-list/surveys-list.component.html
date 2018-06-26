@@ -75,10 +75,9 @@
 
           <!-- Start: Template -->
           <h4 class="text-muted mb-3">Шаблон опроса</h4>
-          <el-form-item *ngIf="rewardsService.getAvailableRewards().length !== 0"
-                        label="Шаблон"
+          <el-form-item label="Шаблон"
                         [required]="false">
-            <el-select [(model)]="templateId" formControlName="template_id" placeholder="Выберите шаблон" *ngIf="rewardsService.getRewardsList().length > 0">
+            <el-select [(model)]="templateId" formControlName="template_id" placeholder="Выберите шаблон">
               <el-option *ngFor="let template of surveysService.getSurveysTemplatesList()"
                          [label]="template.title"
                          [value]="template.id">
@@ -86,6 +85,7 @@
             </el-select>
           </el-form-item>
           <!-- End: Template -->
+
 
           <h4 class="text-muted mb-3">Информация об опросе</h4>
           <!-- Start: Name -->

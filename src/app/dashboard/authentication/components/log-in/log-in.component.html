@@ -1,6 +1,6 @@
 <div class="log-in-wrapper container-fluid h-100">
   <div class="row h-100 justify-content-center align-items-center">
-    <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-4">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4 col-xl-3">
 
       <!-- Start: User authentication form -->
       <el-card class="log-in-container">
@@ -36,8 +36,9 @@
 
 
 
-          <el-form-item class="d-flex justify-content-end">
+          <el-form-item class="d-flex justify-content-end w-100">
             <el-button type="primary"
+                       native-type="submit"
                        (click)="submit()"
                        [elDisabled]="loginForm.invalid"
                        [loading]="authenticationService.isAuthenticating()">&nbsp;

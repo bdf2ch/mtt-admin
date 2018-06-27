@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormGroup, FormBuilder, AbstractControl, Validators} from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ILogIn } from '../../interfaces/log-in.interface';
 import { AuthenticationService } from '../../services/authentication.service';
@@ -58,11 +58,11 @@ export class LogInComponent implements OnInit {
     console.log(this.loginForm);
     const result: User | null = await this.authenticationService.logIn(this.loginData);
     if (result) {
-      this.router.navigate(['/']).then(() => {
+      // this.router.navigate(['/']).then(() => {
         window.location.reload();
-      });
+      // });
     } else {
-      this.message.setOptions({ showClose: true })
+      this.message.setOptions({ showClose: true });
       this.message['warning']('Пользователь не найден');
     }
   }

@@ -31,6 +31,7 @@ export class CompanyService {
    */
   async fetchCompanyById(companyId: number): Promise<Company | null> {
     try {
+      console.log(window.localStorage);
       const result = await this.resource.getCompanyById(null, {with_payment_requisites: true}, {id: companyId}, null);
       console.log(result);
       if (result.data) {

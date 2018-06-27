@@ -142,7 +142,9 @@
                   <div *ngFor="let answer of question.answers">
                     <el-checkbox>
                       {{ answer.content }}
+                      <!--
                       <span class="text-muted" *ngIf="answer.weight"> - Вес: {{answer.weight}}</span>
+                      -->
                     </el-checkbox>
                   </div>
                 </div>
@@ -152,7 +154,9 @@
                     <div *ngFor="let answer of question.answers">
                       <el-radio [label]="answer.content" class="d-block">
                         {{ answer.content }}
+                        <!--
                         <span class="text-muted" *ngIf="answer.weight"> - Вес: {{answer.weight}}</span>
+                        -->
                       </el-radio>
                     </div>
                   </el-radio-group>
@@ -165,10 +169,12 @@
                 <div class="footer">
                   <div class="container-fluid p-0">
                     <div class="row no-gutters">
+                      <!--
                       <div class="col-4 text-muted">
                         Вес вопроса: {{ question.weight }}
                       </div>
-                      <div class="col-4">
+                      -->
+                      <div class="col-6">
                         <el-button type="success"
                                    size="small"
                                    icon="edit"
@@ -178,7 +184,7 @@
                           &nbsp; Изменить
                         </el-button>
                       </div>
-                      <div class="col-4">
+                      <div class="col-6">
                         <el-button type="danger"
                                    size="small"
                                    icon="delete"
@@ -512,6 +518,7 @@
           <!-- End: Form type -->
 
           <!-- Start: Weight -->
+          <!--
           <el-form-item label="Вес вопроса"
                         [required]="true"
                         [status]="questionFormStatusCtrl('weight')"
@@ -522,6 +529,7 @@
                       [(model)]="questionData.weight">
             </el-input>
           </el-form-item>
+          -->
           <!-- End: Weight -->
 
         </el-form>
@@ -548,11 +556,12 @@
                             [status]="answerFormStatusCtrl('answer' + answer.dateCreated.toString())"
                             [error]="answerFormMessageCtrl('answer' + answer.dateCreated.toString())">
                 <div el-row gutter="20">
-                  <div el-col span="16">
+                  <div el-col span="20">
                     <el-input formControlName="{{'answer' + answer.dateCreated.toString()}}"
                               [(model)]="answer.text_content"
                               placeholder="Текст ответа"></el-input>
                   </div>
+                  <!--
                   <div el-col span="4">
                     <el-input  native-type="number"
                                el-class="no-spinners"
@@ -561,6 +570,7 @@
                                placeholder="Вес">
                     </el-input>
                   </div>
+                  -->
                   <div el-col span="4">
                     <el-button type="danger" icon="delete" (click)="removeAnswer(answer)"></el-button>
                   </div>
@@ -682,6 +692,7 @@
           <!-- End: Form type -->
 
           <!-- Start: Weight -->
+          <!--
           <el-form-item label="Вес вопроса"
                         [required]="true"
                         [status]="questionFormStatusCtrl('weight')"
@@ -692,6 +703,7 @@
                       [(model)]="questionData.weight">
             </el-input>
           </el-form-item>
+          -->
           <!-- End: Weight -->
 
         </el-form>
@@ -718,11 +730,12 @@
                             [status]="answerFormStatusCtrl('answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString()))"
                             [error]="answerFormMessageCtrl('answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString()))">
                 <div el-row gutter="20">
-                  <div el-col span="16">
+                  <div el-col span="20">
                     <el-input formControlName="{{'answer' + (answer.id !== 0 ? answer.id.toString() : answer.dateCreated.toString())}}"
                               [(model)]="answer.text_content"
                               placeholder="Текст ответа"></el-input>
                   </div>
+                  <!--
                   <div el-col span="4">
                     <el-input  native-type="number"
                                el-class="no-spinners"
@@ -731,6 +744,7 @@
                                placeholder="Вес">
                     </el-input>
                   </div>
+                  -->
                   <div el-col span="4">
                     <el-button type="danger" icon="delete" (click)="removeAnswer(answer)"></el-button>
                   </div>

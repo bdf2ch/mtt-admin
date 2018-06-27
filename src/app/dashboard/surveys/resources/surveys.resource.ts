@@ -5,9 +5,9 @@ import {
   Resource,
   ResourceAction,
   ResourceHandler,
-  ResourceParams,
+  ResourceParams, ResourceRequestBodyType,
   ResourceRequestMethod
-} from '@ngx-resource/core';
+} from "@ngx-resource/core";
 import { environment } from '../../../../environments/environment';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { ISurveyDTO } from '../dto/survey.dto';
@@ -255,5 +255,5 @@ export class SurveysResource extends Resource {
     method: ResourceRequestMethod.Patch,
     withCredentials: true
   })
-  editHeader: IResourceMethodStrict<IHeaderDTO, void, {templateId: number}, IServerResponse<IHeaderDTO>>;
+  editHeader: IResourceMethodStrict<FormData, void, {templateId: number}, IServerResponse<IHeaderDTO>>;
 }

@@ -284,6 +284,7 @@ export class SurveysService {
    * @returns {Promise<Survey | null>}
    */
   async editSurvey(survey: ISurveyDTO, header: IHeaderDTO, footer: IHeaderDTO): Promise<Survey | null> {
+    console.log('header', header);
     try {
       this.isEditingSurveyInProgress = true;
       const result = await this.resource.editSurvey(survey, null, {surveyId: survey.id});
@@ -789,7 +790,22 @@ export class SurveysService {
 
   async editHeader(header: IHeaderDTO, surveyId: number): Promise<Header | null> {
     try {
-      const result = await this.resource.editHeader(header, null, {templateId: header.id});
+      console.log(header);
+      const headerFormData = new FormData();
+      for (const attr in header) {
+        headerFormData.append(attr, header[attr]);
+      }
+      /*
+      headerFormData.append('id', header.id.toString());
+      headerFormData.append('type', header.type);
+      headerFormData.append('url', header.url);
+      headerFormData.append('text_content', header.text_content);
+      headerFormData.append('background_color', header.background_color);
+      headerFormData.append('image', header.image);
+      */
+      console.log('form image', headerFormData.get('image'));
+      console.log('form image', headerFormData.get('text_content'));
+      const result = await this.resource.editHeader(headerFormData, null, {templateId: header.id});
       if (result.data) {
         const findSurveyById = (item: Survey) => item.id === surveyId;
         const survey = this.surveys.find(findSurveyById);

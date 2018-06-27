@@ -31,6 +31,7 @@ import { RewardsResolveGuard } from './dashboard/surveys/guards/rewards-resolve.
 import { SurveysResolveGuard } from './dashboard/surveys/guards/surveys-resolve.guard';
 import { SurveyComponent } from './dashboard/surveys/components/survey/survey.component';
 import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.guard';
+import { AuthGuard } from './dashboard/authentication/guards/can-activate.guard';
 
 const routes: Routes = [
   {
@@ -93,7 +94,8 @@ const routes: Routes = [
   },
   {
     path: 'auth',
-    component: LogInComponent
+    component: LogInComponent,
+    canActivate: [AuthGuard]
   }
 ];
 

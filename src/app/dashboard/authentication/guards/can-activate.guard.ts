@@ -1,29 +1,26 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Resolve } from '@angular/router';
 import { Router } from '@angular/router';
-import { User } from '../../dashboard/users/models/user.model';
-import { AuthenticationService } from '../../dashboard/authentication/services/authentication.service';
+import { User } from '../../../dashboard/users/models/user.model';
+import { AuthenticationService } from '../../../dashboard/authentication/services/authentication.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserSessionGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(private readonly router: Router,
               private readonly authenticationService: AuthenticationService) {}
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     if (!this.authenticationService.getCurrentUser()) {
-      console.log('auth check');
-      const result: User | null = await this.authenticationService.check();
+      const result = await this.authenticationService.check();
       if (result) {
-        // this.router.navigate(['/surveys']);
-        return true;
+        this.router.navigate(['/surveys']);
       } else {
-        this.router.navigate(['/auth']);
-        return false;
+        return true;
       }
     } else {
-      return true;
+      this.router.navigate(['/surveys']);
     }
   }
 }

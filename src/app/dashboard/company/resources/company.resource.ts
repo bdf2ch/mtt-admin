@@ -18,9 +18,11 @@ import { IPaymentRequisitesDTO } from '../dto/payment-requisites.dto';
 @ResourceParams({
   pathPrefix: environment.apiUrl + 'company',
   withCredentials: true,
+  /*
   headers: {
     'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : ''
   }
+  */
 })
 export class CompanyResource extends Resource {
 

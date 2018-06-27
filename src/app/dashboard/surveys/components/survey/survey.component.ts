@@ -68,8 +68,8 @@ export class SurveyComponent implements OnInit {
       description: survey.description,
       from: `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
         ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`,
-      to: `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
-        ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`,
+      to: `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
+        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}`,
       reward_id: survey.rewardId,
       available_passing_count: survey.passingCount,
       need_client_data_first: survey.needClientDataFirst,
@@ -115,14 +115,14 @@ export class SurveyComponent implements OnInit {
     const dateRegExp = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
     const siteRegExp = /^https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,}$/;
     this.surveyForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: [''],
-      from: ['', [Validators.required, Validators.pattern(dateRegExp)]],
-      to: ['', Validators.pattern(dateRegExp)],
+      name: [this.surveyData.name, Validators.required],
+      description: [this.surveyData.description],
+      from: [this.surveyData.from, [Validators.required, Validators.pattern(dateRegExp)]],
+      to: [this.surveyData.to, Validators.pattern(dateRegExp)],
       reward_id: [this.surveyData.reward_id, Validators.required],
-      available_passing_count: ['', [Validators.required, Validators.min(1)]],
-      need_client_data_first: [''],
-      is_template: [''],
+      available_passing_count: [this.surveyData.available_passing_count, [Validators.required, Validators.min(1)]],
+      need_client_data_first: [this.surveyData.need_client_data_first],
+      is_template: [this.surveyData.is_template],
       header_url: [this.headerData.url, [Validators.pattern(siteRegExp)]],
       header_text_content: [this.headerData.text_content],
       header_background_color: [this.headerData.background_color],
@@ -156,8 +156,8 @@ export class SurveyComponent implements OnInit {
       `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
         ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`;
     this.surveyData.to =
-      `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
-        ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`;
+      `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
+        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}`;
     this.surveyData.reward_id = survey.rewardId;
     this.surveyData.available_passing_count = survey.passingCount;
     this.surveyData.need_client_data_first = survey.needClientDataFirst;
@@ -698,6 +698,9 @@ export class SurveyComponent implements OnInit {
     }
     console.log(this.headerData);
     this.surveyData.restaurants_ids = this.restaurantIds;
+    this.headerData.image = this.headerImage;
+    this.footerData.image = this.footerImage;
+    console.log(this.headerData);
     await this.surveysService.editSurvey(this.surveyData, this.headerData, this.footerData)
       .then(() => {
         this.closeEditSurveyDialog();

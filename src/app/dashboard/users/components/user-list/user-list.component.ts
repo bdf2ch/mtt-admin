@@ -156,6 +156,9 @@ export class UserListComponent implements OnInit {
    */
   openEditUserDialog(user: User) {
     this.selectedUser = user;
+    this.usersService.getRoleList().forEach((role: Role) => {
+      role.isEnabled = false;
+    });
     this.userData.id = user.id;
     this.userData.company_id = user.companyId;
     this.userData.first_name = user.firstName;

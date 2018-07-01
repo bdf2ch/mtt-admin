@@ -68,8 +68,8 @@ export class SurveyComponent implements OnInit {
       description: survey.description,
       from: `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
         ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`,
-      to: `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
-        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}`,
+      to: survey.end ? `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
+        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}` : null,
       reward_id: survey.rewardId,
       available_passing_count: survey.passingCount,
       need_client_data_first: survey.needClientDataFirst,

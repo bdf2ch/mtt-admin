@@ -16,6 +16,8 @@ export class User implements IUser {
   email: string;              // E-mail
   // password: string;           // Пароль
   phone: string | null;       // Телефон
+  isActive: boolean;          // Включен ли пользователь
+  isOwner: boolean;           // Является ли владельцем
   roles: IRole[];             // Набор ролей
   fio: string;                // ФИО
   rolesLabel: string;         // роли одной строкой
@@ -33,6 +35,8 @@ export class User implements IUser {
     this.email = config ? config.email : '';
     //this.password = config ? config.password : '';
     this.phone = config && config.phone ? config.phone : null;
+    this.isActive = config ? config.is_active : true;
+    this.isOwner = config ? config.is_owner : false;
     this.fio = `${this.firstName} ${this.secondName} ${this.lastName}`;
     this.roles = [];
     this.rolesLabel = '';
@@ -54,5 +58,16 @@ export class User implements IUser {
     this.roles.forEach((role: Role, index: number, array: Role[]) => {
       this.rolesLabel += `${role.title} ${index < array.length - 1 ? ', ' : ''}`;
     });
+  }
+
+  /**
+   * Поиск роли пользователя по коду
+   * @param {string} code
+   * @returns {IRole | null}
+   */
+  getRoleByCode(code: string): IRole | null {
+    const findRoleById = (item: Role) => item.code === code;
+    const role = this.roles.find(findRoleById);
+    return role ? role : null;
   }
 }

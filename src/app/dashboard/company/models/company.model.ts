@@ -1,11 +1,10 @@
 import { ICompany } from '../interfaces/company.interface';
 import { IRestaurant } from '../../restaurants/interfaces/restaurant.interface';
 import { IPaymentRequisites } from '../interfaces/payment-requisites.interface';
-import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { PaymentRequisites } from './payment-requisites.model';
 import { ICompanyDTO } from '../dto/company.dto';
-import {IPaymentRequisitesDTO} from '../dto/payment-requisites.dto';
-import {IRKeeperConfig} from '../interfaces/r-keeper-config.interface';
+import { IPaymentRequisitesDTO } from '../dto/payment-requisites.dto';
+import { RKeeperConfig } from './r-keeper-config.model';
 
 /**
  * Класс, реализующий интерфейс компании
@@ -15,7 +14,7 @@ export class Company implements ICompany {
   title: string;                                // Наименование
   www: string;                                  // Сайт
   phone: string;                                // Телефон
-  // rKeeperConfig: string | null;                 // Конфигурация R-Keeper
+  rKeeperConfig: RKeeperConfig;                 // Конфигурация R-Keeper
   restaurants: IRestaurant[];                   // Набор ресторанов
   paymentRequisites: IPaymentRequisites[];      // Набор платежных реквизитов
 
@@ -28,7 +27,7 @@ export class Company implements ICompany {
     this.title = config ? config.name : '';
     this.www = config ? config.site : '';
     this.phone = config ? config.phone : '';
-    // this.rKeeperConfig = config && config.r_keeper_config ? JSON.stringify(config.r_keeper_config) : null;
+    this.rKeeperConfig = config && config.rKeeperConfig ? new RKeeperConfig(config.rKeeperConfig.data) : new RKeeperConfig();
     this.restaurants = [];
     this.paymentRequisites = [];
 
@@ -38,13 +37,5 @@ export class Company implements ICompany {
         this.paymentRequisites.push(paymentRequisites);
       });
     }
-    /*
-    if (config && config.restaurants) {
-      config.restaurants['data'].forEach((item: IRestaurant) => {
-        const restaurant = new Restaurant(item);
-        this.restaurants.push(restaurant);
-      });
-    }
-    */
   }
 }

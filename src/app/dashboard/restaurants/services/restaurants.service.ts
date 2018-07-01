@@ -114,6 +114,7 @@ export class RestaurantsService {
             item.title = restaurant.name;
             item.phone = restaurant.phone;
             item.www = restaurant.site;
+            item.rKeeperConfig.id = restaurant.rKeeperConfig.id;
             return item;
           }
         });

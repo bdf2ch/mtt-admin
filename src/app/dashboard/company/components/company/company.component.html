@@ -1,44 +1,94 @@
 <div id="company" class="container-fluid h-100">
   <div class="row h-100">
     <div class="col-12 col-lg-6 p-4 d-flex flex-column align-items-center">
-      <h3 class="mb-4 w-100 d-flex justify-content-between">
-        О компании
-        <el-button type="primary" icon="edit" (click)="openEditCompanyDialog()">&nbsp; Изменить</el-button>
-      </h3>
 
-      <table class="table table-sm mt-4">
-        <tbody>
-        <tr>
-          <th scope="row">Наименование</th>
-          <td>{{ companyService.getCompany().title }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Телефон</th>
-          <td>
-            <span *ngIf="companyService.getCompany().phone">{{ companyService.getCompany().phone }}</span>
-            <span *ngIf="!companyService.getCompany().phone" class="text-muted">Не указан</span>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Сайт</th>
-          <td>
+      <!-- Start: Company data -->
+      <el-card class="w-100 mb-4">
+        <ng-template #header>
+          <h3 class="w-100 mb-0 d-flex justify-content-between">
+            О компании
+            <el-button type="primary" size="small" icon="edit" (click)="openEditCompanyDialog()">&nbsp; Изменить</el-button>
+          </h3>
+        </ng-template>
+        <table class="table table-sm">
+          <tbody>
+          <tr>
+            <th scope="row">Наименование</th>
+            <td>{{ companyService.getCompany().title }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Телефон</th>
+            <td>
+              <span *ngIf="companyService.getCompany().phone">{{ companyService.getCompany().phone }}</span>
+              <span *ngIf="!companyService.getCompany().phone" class="text-muted">Не указан</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Сайт</th>
+            <td>
             <span *ngIf="companyService.getCompany().www">
               <a href="{{ companyService.getCompany().www }}">{{ companyService.getCompany().www }}</a>
             </span>
-            <span *ngIf="!companyService.getCompany().www" class="text-muted">Не указан</span>
-          </td>
-        </tr>
-        <!--
-        <tr>
-          <th scope="row">Конфигурация R-Keeper</th>
-          <td>
-            <span *ngIf="companyService.getCompany().rKeeperConfig">{{ companyService.getCompany().rKeeperConfig }}</span>
-            <span *ngIf="!companyService.getCompany().rKeeperConfig" class="text-muted">Не указана</span>
-          </td>
-        </tr>
-        -->
-        </tbody>
-      </table>
+              <span *ngIf="!companyService.getCompany().www" class="text-muted">Не указан</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </el-card>
+      <!-- End: Company data -->
+
+
+
+
+      <!-- Start: R-Keepr configuration data -->
+      <el-card class="w-100">
+        <ng-template #header>
+          <h3 class="w-100 mb-0 d-flex justify-content-between">
+            Настройки R-Keeper
+            <el-button type="primary" size="small" icon="edit" (click)="openEditRKeeperDialog()">&nbsp; Изменить</el-button>
+          </h3>
+        </ng-template>
+
+        <table class="table table-sm">
+          <tbody>
+          <tr>
+            <th scope="row">Начало диапазона кодов</th>
+            <td>{{ companyService.getCompany().rKeeperConfig.from }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Конец диапазона кодов</th>
+            <td>
+              {{ companyService.getCompany().rKeeperConfig.to }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Код вознаграждения "Скидка"</th>
+            <td>
+              {{ companyService.getCompany().rKeeperConfig.discount.discount }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Код вознаграждения "Определенный товар"</th>
+            <td>
+              {{ companyService.getCompany().rKeeperConfig.discount.product }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Код вознаграждения "Товары на определенную сумму"</th>
+            <td>
+              {{ companyService.getCompany().rKeeperConfig.discount.money }}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Код вознаграждения "Баллы"</th>
+            <td>
+              {{ companyService.getCompany().rKeeperConfig.discount.loyalty }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </el-card>
+      <!-- End: R-Keeper configuration data-->
     </div>
 
     <!-- Start: Payment requisites -->
@@ -207,6 +257,136 @@
 </el-dialog>
 <!-- End: Edit company dialog -->
 
+<!-- Start: Edit R-Keeper configuration dialog -->
+<el-dialog [(visible)]="isInEditRKeeperConfigMode" [width]="'580px'">
+  <ng-template #title>
+    <span class="el-icon-edit"></span>&nbsp;
+    <span>Изменение настроек R-Keeper</span>
+  </ng-template>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <el-form [formGroup]="rKeeperForm"
+                 label-width="170px"
+                 [label-position]="'left'"
+                 size="small"
+                 [show-icon]="true"
+                 [show-message]="true">
+
+          <h4 class="text-muted mb-3">Диапазон генерируемых кодов</h4>
+          <!-- Start: Reward code from -->
+          <el-form-item label="Начало диапазона"
+                        [required]="true"
+                        [status]="rKeeperFormStatusCtrl('from')"
+                        [error]="rKeeperFormMessageCtrl('from')">
+            <el-input native-type="number"
+                      class="no-spinners"
+                      formControlName="from"
+                      [(model)]="companyData.reward_code_from">
+            </el-input>
+          </el-form-item>
+          <!-- End: Reward code from -->
+
+          <!-- Start: Reward code to -->
+          <el-form-item label="Конец диапазона"
+                        [required]="false"
+                        [status]="rKeeperFormStatusCtrl('to')"
+                        [error]="rKeeperFormMessageCtrl('to')">
+            <el-input native-type="number"
+                      class="no-spinners"
+                      formControlName="to"
+                      [(model)]="companyData.reward_code_to">
+            </el-input>
+          </el-form-item>
+          <!-- End: Reward code to -->
+
+          <!-- Start: Reward types -->
+          <div class="row">
+            <div class="col-12 border-bottom">
+              <h4 class="text-muted mb-3">Соответствие типов вознаграждений</h4>
+
+              <!-- Start: Discount -->
+              <el-form-item label="Скидка"
+                            [required]="false"
+                            [status]="rKeeperFormStatusCtrl('discount')"
+                            [error]="rKeeperFormMessageCtrl('discount')">
+                <el-input native-type="number"
+                          class="no-spinners"
+                          formControlName="discount"
+                          [(model)]="companyData.discount_types.discount">
+                </el-input>
+              </el-form-item>
+              <!-- End: Discount -->
+
+              <!-- Start: Money -->
+              <el-form-item label="Товары на опр. сумму"
+                            [required]="false"
+                            [status]="rKeeperFormStatusCtrl('money')"
+                            [error]="rKeeperFormMessageCtrl('money')">
+                <el-input native-type="number"
+                          class="no-spinners"
+                          formControlName="money"
+                          [(model)]="companyData.discount_types.money">
+                </el-input>
+              </el-form-item>
+              <!-- End: Money -->
+
+              <!-- Start: Product -->
+              <el-form-item label="Определенный товар"
+                            [required]="false"
+                            [status]="rKeeperFormStatusCtrl('product')"
+                            [error]="rKeeperFormMessageCtrl('product')">
+                <el-input native-type="number"
+                          class="no-spinners"
+                          formControlName="product"
+                          [(model)]="companyData.discount_types.product">
+                </el-input>
+              </el-form-item>
+              <!-- End: product -->
+
+              <!-- Start: Loyalty -->
+              <el-form-item label="Баллы"
+                            [required]="false"
+                            [status]="rKeeperFormStatusCtrl('loyalty')"
+                            [error]="rKeeperFormMessageCtrl('loyalty')">
+                <el-input native-type="number"
+                          class="no-spinners"
+                          formControlName="loyalty"
+                          [(model)]="companyData.discount_types.loyalty">
+                </el-input>
+              </el-form-item>
+              <!-- End: Loyalty -->
+
+            </div>
+          </div>
+          <!-- End: Reward types -->
+
+        </el-form>
+
+        <!-- Start: Form controls -->
+        <div class="row">
+          <div class="col-12 mt-2 text-right">
+            <el-button type="success"
+                       icon="check"
+                       [elDisabled]="rKeeperForm.invalid || rKeeperForm.pristine"
+                       [loading]="companyService.editingRKeeperInProgress()"
+                       (click)="editRKeeper()">
+              &nbsp; Сохранить
+            </el-button>
+            <el-button type="danger"
+                       icon="close"
+                       (click)="closeEditRKeeperDialog()">
+              &nbsp; Отмена
+            </el-button>
+          </div>
+        </div>
+        <!-- End: Form controls -->
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: edit R-Keeper configuration dialog -->
 
 <!-- Start: Add payment requisites dialog -->
 <el-dialog [(visible)]="isInAddPaymentRequisitesMode"
@@ -341,7 +521,6 @@
   </el-form>
 </el-dialog>
 <!-- End: Add payment requisites dialog -->
-
 
 <!-- Start: Edit payment requisites dialog -->
 <el-dialog [(visible)]="isInEditPaymentRequisitesMode"

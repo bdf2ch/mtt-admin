@@ -13,6 +13,8 @@ export interface IUserDTO {
   email: string;          // E-mail
   phone: string;          // Телефон
   password?: string;      // Пароль
+  is_active?: boolean;    // Включен ли пользователь
+  is_owner?: boolean;     // Является ли владельцем
   roles_ids?: number[];   // Массив идентификаторо ролей
   roles?: {               // Набор ролей пользователя
     data: IRoleDTO[];

@@ -21,6 +21,7 @@ export class UsersService {
   private isAddingUserInProgress: boolean;
   private isEditingUserInProgress: boolean;
   private isDeletingUserInProgress: boolean;
+  private isSettingUserStatusInProgress: boolean;
 
   constructor(private readonly resource: UsersResource) {
     this.roles = [];
@@ -32,6 +33,7 @@ export class UsersService {
     this.isAddingUserInProgress = false;
     this.isEditingUserInProgress = false;
     this.isDeletingUserInProgress = false;
+    this.isSettingUserStatusInProgress = false;
   }
 
   /**
@@ -104,6 +106,14 @@ export class UsersService {
    */
   deletingUserInProgress(): boolean {
     return this.isDeletingUserInProgress;
+  }
+
+  /**
+   * выполняется ли изменение статуса пользователя
+   * @returns {boolean}
+   */
+  settingUserStatusInProgress(): boolean {
+    return this.isSettingUserStatusInProgress;
   }
 
   /**
@@ -394,6 +404,31 @@ export class UsersService {
     } catch (error) {
       console.error(error);
       return false;
+    }
+  }
+
+  /**
+   * Активация / деактивация пользователя
+   * @param {number} userId - Идентификатор пользователя
+   * @param {boolean} isActive - Флаг активности
+   * @returns {Promise<boolean>}
+   */
+  async setUserStatus(userId: number, isActive: boolean): Promise<boolean> {
+    try {
+      this.isSettingUserStatusInProgress = true;
+      const result = await this.resource.setUserStatus({target_user_id: userId, status: isActive ? 1 : 0 });
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.isSettingUserStatusInProgress = false;
+        const findUserById = (item: User) => item.id === userId;
+        const user = this.users.find(findUserById);
+        if (user) {
+          user.isActive = isActive;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      this.isSettingUserStatusInProgress = false;
+      return null;
     }
   }
 }

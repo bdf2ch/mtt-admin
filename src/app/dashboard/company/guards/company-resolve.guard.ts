@@ -12,8 +12,10 @@ export class CompanyResolveGuard implements Resolve<Promise<Company | null>> {
               private readonly companyService: CompanyService) {}
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Company | null> {
-    const result = await this.companyService.fetchCompanyById(this.authenticationService.getCurrentUser().companyId);
-    return result;
+    if (this.authenticationService.getCurrentUser() && !this.authenticationService.getCurrentUser().getRoleByCode('admin')) {
+      const result = await this.companyService.fetchCompanyById(this.authenticationService.getCurrentUser().companyId);
+      return result;
+    }
+    return null;
   }
-
 }

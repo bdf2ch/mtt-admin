@@ -10,8 +10,8 @@ import { CompanyService } from '../../../company/services/company.service';
 import { Restaurant } from '../../models/restaurant.model';
 import { ElMessageService } from 'element-angular/release/message/message.service';
 import { SocialNetwork } from '../../models/social-network.model';
-import {YandexService} from "../../services/yandex.service";
-import {IGeoPosition} from "../../interfaces/geo-position.interface";
+import { YandexService } from '../../services/yandex.service';
+import { IGeoPosition } from '../../interfaces/geo-position.interface';
 
 @Component({
   selector: 'app-restaurant-list',
@@ -44,7 +44,10 @@ export class RestaurantListComponent implements OnInit {
       id: 0,
       name: '',
       phone: null,
-      site: null
+      site: null,
+      rKeeperConfig: {
+        id: 0
+      }
     };
     this.addressData = {
       id: 0,
@@ -78,7 +81,7 @@ export class RestaurantListComponent implements OnInit {
       from: [this.timeTableData.from, [Validators.required, Validators.pattern(timeRegExp)]],
       to: [this.timeTableData.to, [Validators.required, Validators.pattern(timeRegExp)]],
       until_last_client: [this.timeTableData.until_last_client],
-      config: [this.restaurantData.rKeeperConfig, Validators.required]
+      config: [this.restaurantData.rKeeperConfig.id, Validators.required]
     });
   }
 
@@ -91,7 +94,9 @@ export class RestaurantListComponent implements OnInit {
       name: '',
       phone: null,
       site: null,
-      rKeeperConfig: null,
+      rKeeperConfig: {
+        id: null
+      }
     };
     this.addressData = {
       city: '',
@@ -131,7 +136,7 @@ export class RestaurantListComponent implements OnInit {
       from: this.timeTableData.from,
       to: this.timeTableData.to,
       until_last_client: this.timeTableData.until_last_client,
-      config: this.restaurantData.rKeeperConfig
+      config: this.restaurantData.rKeeperConfig.id
     });
     this.isInAddRestaurantMode = true;
   }
@@ -202,7 +207,7 @@ export class RestaurantListComponent implements OnInit {
     this.restaurantData.name = restaurant.title;
     this.restaurantData.phone = restaurant.phone;
     this.restaurantData.site = restaurant.www;
-    this.restaurantData.rKeeperConfig = JSON.stringify(restaurant.rKeeperConfig);
+    this.restaurantData.rKeeperConfig.id = restaurant.rKeeperConfig.id;
     this.addressData.id = restaurant.address.id;
     this.addressData.city = restaurant.address.city;
     this.addressData.street = restaurant.address.street;
@@ -244,7 +249,8 @@ export class RestaurantListComponent implements OnInit {
       building_number: this.addressData.building_number,
       from: this.timeTableData.from,
       to: this.timeTableData.to,
-      until_last_client: this.timeTableData.until_last_client
+      until_last_client: this.timeTableData.until_last_client,
+      config: this.restaurantData.rKeeperConfig.id
     });
     this.socialNetworksData.forEach((item: ISocialNetworkDTO) => {
       this.restaurantForm.get(`socialNetworkType${item.id}`).reset(item.network_type);
@@ -337,7 +343,7 @@ export class RestaurantListComponent implements OnInit {
           'Вы не указали время окончания работы' : control.hasError('pattern')
             ? 'Время начала работы должно быть в формате ЧЧ:ММ' : '';
       case 'config':
-        return control.dirty && control.hasError('required') ? 'Вы не указали конфигурацию R-Keeper' : '';
+        return control.dirty && control.hasError('required') ? 'Вы не указали идентификатор R-Keeper' : '';
       default:
         return control.dirty && control.hasError('required')
           ? 'Вы не указали адрес в соц. сети' : control.hasError('pattern')

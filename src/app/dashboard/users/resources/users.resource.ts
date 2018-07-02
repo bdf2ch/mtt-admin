@@ -149,15 +149,4 @@ export class UsersResource extends Resource {
     withCredentials: true
   })
   deleteUser: IResourceMethod<{companyId: number, userId: number}, IServerResponse<boolean>>;
-
-  /**
-   * Path: user/set-active-status
-   * Method: POST
-   */
-  @ResourceAction({
-    path: '/user/set-active-status',
-    method: ResourceRequestMethod.Post,
-    withCredentials: true
-  })
-  setUserStatus: IResourceMethod<{target_user_id: number, status: number}, IServerResponse<any>>;
 }

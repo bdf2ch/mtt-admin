@@ -1,5 +1,6 @@
 import { IPaymentRequisitesDTO } from './payment-requisites.dto';
 import { IRKeeperConfigDTO } from './r-keeper-config.dto';
+import {IUserDTO} from '../../users/dto/user.dto';
 
 /**
  * Company DTO interface
@@ -23,5 +24,8 @@ export interface ICompanyDTO {
     money: number;
     discount: number;
     loyalty: number;
+  };
+  personal?: {                  // Массив пользователей компании
+    data: IUserDTO[];
   };
 }

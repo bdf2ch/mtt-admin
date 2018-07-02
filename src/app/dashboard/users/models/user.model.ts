@@ -1,8 +1,9 @@
 import { IUser } from '../interfaces/user.interface';
 import { IRole } from '../interfaces/role.interface';
-import {IUserDTO} from '../dto/user.dto';
-import {IRoleDTO} from "../dto/role.dto";
-import {Role} from "./role.model";
+import { IUserDTO } from '../dto/user.dto';
+import { IRoleDTO } from '../dto/role.dto';
+import { Role } from './role.model';
+import { Company } from '../../company/models/company.model';
 
 /**
  * Класс, реализующий интерфейс пользователя
@@ -21,6 +22,7 @@ export class User implements IUser {
   roles: IRole[];             // Набор ролей
   fio: string;                // ФИО
   rolesLabel: string;         // роли одной строкой
+  company?: Company;          // Компания пользователя
 
   /**
    * Конструктор

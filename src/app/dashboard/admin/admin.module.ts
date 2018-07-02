@@ -1,11 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminComponent } from './admin/admin.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { AdminResolveGuard } from './guards/admin.resolve.guard';
+import { ElModule } from 'element-angular';
+import { SearchPipe } from './pipes/search.pipe';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    ElModule
   ],
-  declarations: [AdminComponent]
+  declarations: [
+    AdminComponent,
+    SearchPipe
+  ],
+  providers: [
+    AdminResolveGuard
+  ]
 })
 export class AdminModule { }

@@ -32,6 +32,9 @@ import { SurveysResolveGuard } from './dashboard/surveys/guards/surveys-resolve.
 import { SurveyComponent } from './dashboard/surveys/components/survey/survey.component';
 import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.guard';
 import { AuthGuard } from './dashboard/authentication/guards/can-activate.guard';
+import { AdminComponent } from './dashboard/admin/components/admin/admin.component';
+import { AdminModule } from './dashboard/admin/admin.module';
+import {AdminResolveGuard} from './dashboard/admin/guards/admin.resolve.guard';
 
 const routes: Routes = [
   {
@@ -89,6 +92,13 @@ const routes: Routes = [
             resolve: [RoleListGuard]
           }
         ]
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        resolve: [
+          AdminResolveGuard
+        ]
       }
     ]
   },
@@ -116,7 +126,8 @@ const routes: Routes = [
     UsersModule,
     CompanyModule,
     RestaurantsModule,
-    SurveysModule
+    SurveysModule,
+    AdminModule
   ],
   exports: [
     ElModule,

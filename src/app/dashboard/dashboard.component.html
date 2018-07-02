@@ -6,18 +6,19 @@
              background-color="#545c64"
              active-text-color="#ffd04b"
              text-color="#fff">
-      <el-submenu title="Опросы">
+      <el-submenu title="Опросы" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">
         <el-menu-item index="surveys" [to]="'/surveys'">Опросы</el-menu-item>
         <el-menu-item index="rewards" [to]="'/surveys/rewards'">Вознаграждения</el-menu-item>
       </el-submenu>
-      <el-menu-item index="company" [to]="'/company'">Компания</el-menu-item>
-      <el-menu-item index="restaurants" [to]="'/restaurants'">Рестораны</el-menu-item>
-      <el-submenu [index]="'users'" title="Сотрудники">
+      <el-menu-item index="company" [to]="'/company'" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">Компания</el-menu-item>
+      <el-menu-item index="restaurants" [to]="'/restaurants'" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">Рестораны</el-menu-item>
+      <el-submenu [index]="'users'" title="Сотрудники" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">
         <el-menu-item index="users" [to]="'/users'">Сотрудники</el-menu-item>
         <el-menu-item index="roles" [to]="'/users/roles'">Роли</el-menu-item>
       </el-submenu>
-      <el-menu-item index="payment">Оплата</el-menu-item>
-      <el-submenu index="user-menu" title="{{ authenticationService.getCurrentUser().fio }}" *ngIf="authenticationService.getCurrentUser()" el-class="user-menu">
+      <el-menu-item index="payment" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">Оплата</el-menu-item>
+      <el-menu-item index="admin" *ngIf="authenticationService.getCurrentUser().getRoleByCode('admin')">Панель администратора</el-menu-item>
+      <el-submenu index="user-menu" title="{{ authenticationService.getCurrentUser().fio }}" *ngIf="authenticationService.getCurrentUser()" el-class="user-menu" >
         <el-menu-item index="log-out">Выход</el-menu-item>
       </el-submenu>
     </el-menu>

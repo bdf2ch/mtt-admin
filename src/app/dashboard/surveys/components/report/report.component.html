@@ -1,0 +1,49 @@
+<div class="container-fluid pt-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h3>Отчет</h3>
+    </div>
+  </div>
+  <div class="row bm-4" *ngFor="let question of surveysService.selectedSurvey().questions; let i = index">
+    <div class="col-12">
+      <div *ngIf="question.form.type !== 'text_input'">{{ i + 1 }}. {{ question.title }}</div>
+      <div *ngIf="question.form.type === 'radio_button'">
+        <ngx-charts-advanced-pie-chart
+          class="chart-container"
+          [scheme]="colorScheme"
+          [results]="question.report"
+          (legendLabelClick)="onLegendLabelClick($event)"
+          [gradient]="gradient"
+          [tooltipDisabled]="tooltipDisabled"
+          (select)="select($event)">
+        </ngx-charts-advanced-pie-chart>
+      </div>
+
+      <div *ngIf="question.form.type === 'checkbox'">
+        <div>
+          <ngx-charts-pie-grid
+            class="chart-container"
+            [scheme]="colorScheme"
+            (legendLabelClick)="onLegendLabelClick($event)"
+            [results]="question.report"
+            [tooltipDisabled]="tooltipDisabled"
+            (select)="select($event)">
+          </ngx-charts-pie-grid>
+        </div>
+      </div>
+
+      <div *ngIf="question.form.type === 'mark'">
+        <div>
+          <ngx-charts-pie-grid
+            class="chart-container"
+            [scheme]="colorScheme"
+            (legendLabelClick)="onLegendLabelClick($event)"
+            [results]="question.positiveValue"
+            [tooltipDisabled]="tooltipDisabled"
+            (select)="select($event)">
+          </ngx-charts-pie-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

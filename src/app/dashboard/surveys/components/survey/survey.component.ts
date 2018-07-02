@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SurveysService } from '../../services/surveys.service';
 import { RewardsService } from '../../services/rewards.service';
 import { FormGroup, AbstractControl, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -45,7 +46,8 @@ export class SurveyComponent implements OnInit {
   public footerData: IHeaderDTO;
   public footerImage: File | null;
 
-  constructor(private readonly formBuilder: FormBuilder,
+  constructor(private readonly router: Router,
+              private readonly formBuilder: FormBuilder,
               public readonly restaurantsService: RestaurantsService,
               public readonly surveysService: SurveysService,
               public readonly rewardsService: RewardsService,
@@ -785,5 +787,9 @@ export class SurveyComponent implements OnInit {
     this.footerImage = f;
     this.footerData.image = f;
     this.surveyForm.markAsDirty();
+  }
+
+  openReport() {
+    this.router.navigate(['surveys', this.surveysService.selectedSurvey().id, 'report']);
   }
 }

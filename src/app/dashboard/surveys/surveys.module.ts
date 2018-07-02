@@ -14,6 +14,8 @@ import { RewardsResolveGuard } from './guards/rewards-resolve.guard';
 import { SurveysResolveGuard } from './guards/surveys-resolve.guard';
 import { SurveyComponent } from './components/survey/survey.component';
 import { SurveyResolveGuard } from './guards/survey-resolve.guard';
+import { ReportComponent } from './components/report/report.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   imports: [
@@ -23,13 +25,15 @@ import { SurveyResolveGuard } from './guards/survey-resolve.guard';
     HttpClientModule,
     ResourceModule,
     RouterModule,
-    ElModule
+    ElModule,
+    NgxChartsModule
   ],
   declarations: [
     SurveysComponent,
     SurveysListComponent,
     RewardsListComponent,
-    SurveyComponent
+    SurveyComponent,
+    ReportComponent
   ],
   providers: [
     SurveysResource,

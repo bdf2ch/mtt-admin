@@ -35,6 +35,7 @@
             <div class="container-fluid">
               <div class="row">
                 <div class="col-12 d-flex justify-content-between">
+                  <el-button type="primary" size="small" icon="document" [routerLink]="['/surveys', survey.id, 'report']"  (click)="openEditSurveyDialog(survey)">&nbsp; Отчет</el-button>
                   <el-button type="success" size="small" icon="edit" [routerLink]="['/surveys', survey.id]"  (click)="openEditSurveyDialog(survey)">&nbsp; Изменить</el-button>
                   <el-button type="danger" size="small" icon="delete" *ngIf="survey.isDeletable" (click)="openDeleteSurveyDialog(survey)">&nbsp; Удалить</el-button>
                 </div>

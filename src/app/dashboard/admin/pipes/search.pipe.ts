@@ -10,7 +10,8 @@ export class SearchPipe implements PipeTransform {
     let result = [];
     value.forEach((item: User) => {
       if (search !== '') {
-        if (item.fio.toLowerCase().indexOf(search) !== -1) {
+        const query = `${item.fio} ${item.email}`;
+        if (query.toLowerCase().indexOf(search) !== -1) {
           if (onlyOwners) {
             if (item.isOwner) {
               result.push(item);

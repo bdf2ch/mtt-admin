@@ -34,7 +34,10 @@ import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.gu
 import { AuthGuard } from './dashboard/authentication/guards/can-activate.guard';
 import { AdminComponent } from './dashboard/admin/components/admin/admin.component';
 import { AdminModule } from './dashboard/admin/admin.module';
-import {AdminResolveGuard} from './dashboard/admin/guards/admin.resolve.guard';
+import { AdminResolveGuard } from './dashboard/admin/guards/admin.resolve.guard';
+import { TestComponent } from './dashboard/test/test.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import {ReportComponent} from './dashboard/surveys/components/report/report.component';
 
 const routes: Routes = [
   {
@@ -63,6 +66,11 @@ const routes: Routes = [
           {
             path: ':id',
             component: SurveyComponent,
+            resolve: [SurveyResolveGuard]
+          },
+          {
+            path: ':id/report',
+            component: ReportComponent,
             resolve: [SurveyResolveGuard]
           }
         ]
@@ -99,7 +107,11 @@ const routes: Routes = [
         resolve: [
           AdminResolveGuard
         ]
-      }
+      },
+      {
+        path: 'pie',
+        component: TestComponent
+      },
     ]
   },
   {
@@ -112,7 +124,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,
@@ -127,7 +140,8 @@ const routes: Routes = [
     CompanyModule,
     RestaurantsModule,
     SurveysModule,
-    AdminModule
+    AdminModule,
+    NgxChartsModule
   ],
   exports: [
     ElModule,

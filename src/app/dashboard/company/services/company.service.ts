@@ -15,6 +15,7 @@ export class CompanyService {
   private isAddingPaymentRequisitesInProgress: boolean;
   private isEditingPaymentRequisitesInProgress: boolean;
   private isDeletingPaymentRequisitesInProgress: boolean;
+  private isEditingRKeeperInProgress: boolean;
 
   constructor(private readonly resource: CompanyResource) {
     this.company =  null;
@@ -22,6 +23,7 @@ export class CompanyService {
     this.isAddingPaymentRequisitesInProgress = false;
     this.isEditingPaymentRequisitesInProgress = false;
     this.isDeletingPaymentRequisitesInProgress = false;
+    this.isEditingRKeeperInProgress = false;
   }
 
   /**
@@ -157,5 +159,13 @@ export class CompanyService {
    */
   addingPaymentRequisitesInProgress(): boolean {
     return this.isAddingPaymentRequisitesInProgress;
+  }
+
+  /**
+   * Выполняется ли изменение настроек R-Keeper
+   * @returns {boolean}
+   */
+  editingRKeeperInProgress(): boolean {
+    return this.isEditingRKeeperInProgress;
   }
 }

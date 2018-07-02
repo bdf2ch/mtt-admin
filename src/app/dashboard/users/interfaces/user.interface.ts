@@ -12,5 +12,7 @@ export interface IUser {
   email: string;          // E-mail
   password?: string;      // Пароль
   phone?: string;         // Телефон
+  isActive: boolean;      // Включен ли пользователь
+  isOwner: boolean;       // Является ли владельцем
   roles: IRole[];         // Набор ролей
 }

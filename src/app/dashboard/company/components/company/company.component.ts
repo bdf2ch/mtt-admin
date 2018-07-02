@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CompanyService } from '../../services/company.service';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import {FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
 import { ICompanyDTO } from '../../dto/company.dto';
 import { AuthenticationService } from '../../../authentication/services/authentication.service';
 import { IPaymentRequisitesDTO } from '../../dto/payment-requisites.dto';
 import { ElMessageService } from 'element-angular/release/message/message.service';
 import { PaymentRequisites } from '../../models/payment-requisites.model';
+import {IRKeeperConfigDTO} from '../../dto/r-keeper-config.dto';
 
 @Component({
   selector: 'app-company',
@@ -17,7 +18,9 @@ export class CompanyComponent implements OnInit {
   isInAddPaymentRequisitesMode: boolean;
   isInEditPaymentRequisitesMode: boolean;
   isInDeletePaymentRequisitesMode: boolean;
+  isInEditRKeeperConfigMode: boolean;
   editCompanyForm: FormGroup;
+  rKeeperForm: FormGroup;
   companyData: ICompanyDTO;
   addPaymentRequisitesForm: FormGroup;
   paymentRequisitesData: IPaymentRequisitesDTO;
@@ -28,16 +31,24 @@ export class CompanyComponent implements OnInit {
               public readonly companyService: CompanyService,
               private readonly message: ElMessageService) {
     this.isInEditCompanyMode = false;
+    this.isInAddPaymentRequisitesMode = false;
+    this.isInEditPaymentRequisitesMode = false;
+    this.isInDeletePaymentRequisitesMode = false;
+    this.isInEditRKeeperConfigMode = false;
     this.companyData = {
       id: this.authenticationService.getCurrentUser().companyId,
       name: this.companyService.getCompany().title,
       phone: this.companyService.getCompany().phone,
-      site: this.companyService.getCompany().www
+      site: this.companyService.getCompany().www,
+      reward_code_from: 0,
+      reward_code_to: 0,
+      discount_types: {
+        money: 0,
+        discount: 0,
+        loyalty: 0,
+        product: 0
+      }
     };
-
-    this.isInAddPaymentRequisitesMode = false;
-    this.isInEditPaymentRequisitesMode = false;
-    this.isInDeletePaymentRequisitesMode = false;
     this.paymentRequisitesData = {
       company_id: this.companyService.getCompany().id,
       name: '',
@@ -60,6 +71,14 @@ export class CompanyComponent implements OnInit {
       phone: [this.companyData.phone],
       www: [this.companyData.site, Validators.pattern(siteRegExp)]
       // r_keeper_config: [this.companyData.r_keeper_config]
+    });
+    this.rKeeperForm = this.builder.group({
+      from: [this.companyData.reward_code_from, Validators.required],
+      to: [this.companyData.reward_code_to, Validators.required],
+      discount: [this.companyData.discount_types.discount, [Validators.required, Validators.min(0), Validators.max(99)]],
+      money: [this.companyData.discount_types.money, [Validators.required, Validators.min(0), Validators.max(99)]],
+      product: [this.companyData.discount_types.product, [Validators.required, Validators.min(0), Validators.max(99)]],
+      loyalty: [this.companyData.discount_types.loyalty, [Validators.required, Validators.min(0), Validators.max(99)]]
     });
     const INNRegExp = /^[0-9]{10}$|^[0-9]{12}$/;
     const KPPRegExp = /^[0-9]{9}$/;
@@ -102,6 +121,35 @@ export class CompanyComponent implements OnInit {
   }
 
   /**
+   * Открытие диалогового окна редактрования настроек R-Keeper
+   */
+  openEditRKeeperDialog () {
+    const config = this.companyService.getCompany().rKeeperConfig;
+    this.companyData.reward_code_from = config.from;
+    this.companyData.reward_code_to = config.to;
+    this.companyData.discount_types.discount = config.discount.discount;
+    this.companyData.discount_types.product = config.discount.product;
+    this.companyData.discount_types.money = config.discount.money;
+    this.companyData.discount_types.loyalty = config.discount.loyalty;
+    this.rKeeperForm.reset({
+      from: this.companyData.reward_code_from,
+      to: this.companyData.reward_code_to,
+      discount: this.companyData.discount_types.discount,
+      money: this.companyData.discount_types.money,
+      product: this.companyData.discount_types.product,
+      loyalty: this.companyData.discount_types.loyalty
+    });
+    this.isInEditRKeeperConfigMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна редактирования настроек R-Keeper
+   */
+  closeEditRKeeperDialog () {
+    this.isInEditRKeeperConfigMode = false;
+  }
+
+  /**
    * Получение статуса элемента формы редактирования данных о компании
    * @param {string} item - Имя элемента формы
    * @returns {string}
@@ -125,6 +173,59 @@ export class CompanyComponent implements OnInit {
         return control.dirty && control.hasError('message') ? 'Вы не указали наименование' : '';
       case 'www':
         return control.dirty && control.hasError('pattern') ? 'Адрес сайта указан некорректно' : '';
+    }
+  }
+
+  /**
+   * Получение статуса элемента формы редактирования настроек R-Keeper
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  rKeeperFormStatusCtrl(item: string): string {
+    if (!this.rKeeperForm.controls[item]) { return; }
+    const c: AbstractControl = this.rKeeperForm.controls[item];
+    switch (item) {
+      case 'to':
+        return c.dirty && c.hasError('required') || (parseInt(this.rKeeperForm.get('from').value) > parseInt(c.value))
+          ? 'error' : 'validating';
+      default:
+        return c.dirty && c.hasError('required') || c.hasError('min') || c.hasError('max')
+          ? 'error' : 'validating';
+    }
+
+  }
+
+  /**
+   * Получение сообщения об ошибке элемента формы изменения настроек R-Keeper
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  rKeeperFormMessageCtrl(item: string): string {
+    if (!this.rKeeperForm.controls[item]) { return; }
+    const control: AbstractControl = this.rKeeperForm.controls[item];
+    switch (item) {
+      case 'from':
+        return control.dirty && control.hasError('required') ? 'Вы не указали начало диапазона' : '';
+      case 'to':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали конец диапозона' : parseInt(this.rKeeperForm.get('from').value) > parseInt(control.value)
+            ? 'Конец диапазона не может быть меньше начала диапазона' : '';
+      case 'discount':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали код соответствия' : control.hasError('min') || control.hasError('max')
+            ? 'Код должен быть в диапазоее от 0 до 99' : '';
+      case 'money':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали код соответствия' : control.hasError('min') || control.hasError('max')
+            ? 'Код должен быть в диапазоее от 0 до 99' : '';
+      case 'product':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали код соответствия' : control.hasError('min') || control.hasError('max')
+            ? 'Код должен быть в диапазоее от 0 до 99' : '';
+      case 'loyalty':
+        return control.dirty && control.hasError('required') ?
+          'Вы не указали код соответствия' : control.hasError('min') || control.hasError('max')
+            ? 'Код должен быть в диапазоее от 0 до 99' : '';
     }
   }
 
@@ -333,6 +434,14 @@ export class CompanyComponent implements OnInit {
       .then(() => {
         this.closeDeletePaymentRequisitesDialog();
         this.message['success']('Платежные реквизиты удалены');
+      });
+  }
+
+  async editRKeeper() {
+    await this.companyService.editCompanyById(this.companyData)
+      .then(() => {
+        this.closeEditRKeeperDialog();
+        this.message['success']('Настройки R-Keeper изменены');
       });
   }
 }

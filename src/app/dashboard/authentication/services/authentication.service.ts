@@ -47,6 +47,9 @@ export class AuthenticationService {
         const result: IServerResponse<IUserDTO> = await this.resource.check();
         this.currentUser = result.data ? new User(result.data) : null;
         console.log('current user', this.currentUser);
+        if (this.currentUser.getRoleByCode('admin')) {
+          this.router.navigate(['admin']);
+        }
         return this.currentUser;
       }
     } catch (error) {

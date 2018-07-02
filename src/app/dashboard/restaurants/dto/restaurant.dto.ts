@@ -10,7 +10,20 @@ export interface IRestaurantDTO {
   name: string;                                   // Наименование
   phone: string | null;                           // Телефон
   site: string | null;                            // Сайт
-  rKeeperConfig?: any;                          // Конфигурация R-Keeper
+  rKeeperConfig?: {                               // Конфигурация R-Keeper
+    data?: {
+      id: number;
+    },
+    id?: number;                  // Идентификатор
+    reward_code_from?: number;     // Начало диапазона генерируемых кодов
+    reward_code_to?: number;       // Конец диапазона генерируемых кодов
+    discount_types?: {             // Коды соответствия типо вознаграждений
+      product: number;
+      money: number;
+      discount: number;
+      loyalty: number;
+    };
+  };
   address?: IAddressDTO;                          // Адрес
   workIntervals?: {                               // Расписание работы
     data: ITimeTableDTO

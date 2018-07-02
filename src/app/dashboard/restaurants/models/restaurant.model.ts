@@ -7,20 +7,21 @@ import { TimeTable } from './time-table.model';
 import { SocialNetwork } from './social-network.model';
 import { IRestaurantDTO } from '../dto/restaurant.dto';
 import {ISocialNetworkDTO} from '../dto/social-network.dto';
+import {RKeeperConfig} from "../../company/models/r-keeper-config.model";
 
 /**
  * Класс, реализующий интерфейс ресторана
  */
 export class Restaurant implements IRestaurant {
-  id: number;                 // Идентфиикатор
-  title: string;              // Наименование
-  phone: string;              // Телефон
-  www: string;                // Сайт
-  rKeeperConfig: any;         // Конфигурация R-Keeper
-  address: IAddress;          // Адрес
-  timeTable: ITimeTable;      // Расписание работы
-  social: ISocialNetwork[];   // Набор социальных сетей
-  isSelected: boolean;        // Выбран ли ресторан ()при создании опроса
+  id: number;                     // Идентфиикатор
+  title: string;                  // Наименование
+  phone: string;                  // Телефон
+  www: string;                    // Сайт
+  rKeeperConfig?: RKeeperConfig;  // Идентификатор R-Keeper
+  address: IAddress;              // Адрес
+  timeTable: ITimeTable;          // Расписание работы
+  social: ISocialNetwork[];       // Набор социальных сетей
+  isSelected: boolean;            // Выбран ли ресторан ()при создании опроса
 
   /**
    * Конструктор
@@ -31,7 +32,7 @@ export class Restaurant implements IRestaurant {
     this.title = config ? config.name : '';
     this.phone = config ? config.phone : '';
     this.www = config ? config.site : '';
-    this.rKeeperConfig = config ? config.rKeeperConfig : {};
+    this.rKeeperConfig = config && config.rKeeperConfig ? new RKeeperConfig(config.rKeeperConfig.data) : new RKeeperConfig();
     this.address = config && config.address ? new Address(config.address['data']) : new Address();
     this.timeTable = config && config.workIntervals ? new TimeTable(config.workIntervals.data) : new TimeTable();
     this.social = [];

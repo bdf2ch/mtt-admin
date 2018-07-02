@@ -21,6 +21,7 @@ export class UsersService {
   private isAddingUserInProgress: boolean;
   private isEditingUserInProgress: boolean;
   private isDeletingUserInProgress: boolean;
+  private isSettingUserStatusInProgress: boolean;
 
   constructor(private readonly resource: UsersResource) {
     this.roles = [];
@@ -32,6 +33,7 @@ export class UsersService {
     this.isAddingUserInProgress = false;
     this.isEditingUserInProgress = false;
     this.isDeletingUserInProgress = false;
+    this.isSettingUserStatusInProgress = false;
   }
 
   /**
@@ -104,6 +106,14 @@ export class UsersService {
    */
   deletingUserInProgress(): boolean {
     return this.isDeletingUserInProgress;
+  }
+
+  /**
+   * выполняется ли изменение статуса пользователя
+   * @returns {boolean}
+   */
+  settingUserStatusInProgress(): boolean {
+    return this.isSettingUserStatusInProgress;
   }
 
   /**

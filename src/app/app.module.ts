@@ -32,8 +32,12 @@ import { SurveysResolveGuard } from './dashboard/surveys/guards/surveys-resolve.
 import { SurveyComponent } from './dashboard/surveys/components/survey/survey.component';
 import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.guard';
 import { AuthGuard } from './dashboard/authentication/guards/can-activate.guard';
+import { AdminComponent } from './dashboard/admin/components/admin/admin.component';
+import { AdminModule } from './dashboard/admin/admin.module';
+import { AdminResolveGuard } from './dashboard/admin/guards/admin.resolve.guard';
 import { TestComponent } from './dashboard/test/test.component';
-import {NgxChartsModule} from '@swimlane/ngx-charts';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import {ReportComponent} from './dashboard/surveys/components/report/report.component';
 
 const routes: Routes = [
   {
@@ -63,6 +67,11 @@ const routes: Routes = [
             path: ':id',
             component: SurveyComponent,
             resolve: [SurveyResolveGuard]
+          },
+          {
+            path: ':id/report',
+            component: ReportComponent,
+            resolve: [SurveyResolveGuard]
           }
         ]
       },
@@ -90,6 +99,13 @@ const routes: Routes = [
             component: RolesListComponent,
             resolve: [RoleListGuard]
           }
+        ]
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        resolve: [
+          AdminResolveGuard
         ]
       },
       {
@@ -124,6 +140,7 @@ const routes: Routes = [
     CompanyModule,
     RestaurantsModule,
     SurveysModule,
+    AdminModule,
     NgxChartsModule
   ],
   exports: [

@@ -45,8 +45,6 @@
 </div>
 
 
-
-
 <!-- Start: Add restaurant dialog -->
 <el-dialog [(visible)]="isInAddRestaurantMode" [width]="'580px'">
   <ng-template #title>
@@ -220,11 +218,15 @@
               <h4 class="text-muted mb-3">Конфигурация R-Keeper</h4>
 
               <!-- Start: Name -->
-              <el-form-item label="Конфигурация"
+              <el-form-item label="Идентификатор"
                             [required]="true"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
-                <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig"></el-input>
+                <el-input native-type="number"
+                          class="no-spinners"
+                          formControlName="config"
+                          [(model)]="restaurantData.rKeeperConfig.id">
+                </el-input>
               </el-form-item>
               <!-- End: Name -->
             </div>
@@ -256,7 +258,6 @@
   </div>
 </el-dialog>
 <!-- End: Add restaurant dialog -->
-
 
 <!-- Start: Edit restaurant dialog -->
 <el-dialog [(visible)]="isInEditRestaurantMode" [width]="'580px'">
@@ -430,11 +431,11 @@
               <h4 class="text-muted mb-3">Конфигурация R-Keeper</h4>
 
               <!-- Start: Name -->
-              <el-form-item label="Конфигурация"
+              <el-form-item label="Идентификатор"
                             [required]="true"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
-                <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig"></el-input>
+                <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig.id"></el-input>
               </el-form-item>
               <!-- End: Name -->
             </div>

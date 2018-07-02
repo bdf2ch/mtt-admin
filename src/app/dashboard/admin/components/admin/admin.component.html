@@ -1,0 +1,77 @@
+<div class="container-fluid pt-4">
+
+  <div class="row d-flex justify-content-center mb-4">
+    <div class="col-6">
+      <div class="mb-2">
+        <el-input size="large" placeholder="Поиск пользователей" icon="search" [(model)]="search"></el-input>
+      </div>
+      <div>
+        <el-checkbox [model]="searchOnlyOwners" (modelChange)="changeSearchOnlyOwners($event)">Только владельцы компаний</el-checkbox>
+      </div>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <div class="col-12">
+      <table class="users-table table-hover w-100" *ngIf="adminService.getUsers().length > 0">
+        <thead>
+        <tr>
+          <th class="index p-3">#</th>
+          <th class="p-3">ФИО</th>
+          <th class="p-3">Компания</th>
+          <th class="p-3">E-mail / Телефон</th>
+          <th class="p-3">Активен</th>
+          <th class="controls"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of adminService.getUsers() | search: search:searchOnlyOwners; let i = index;">
+          <td class="p-3">{{ i + 1 }}.</td>
+          <td class="p-3">
+            <div>{{ user.fio }}</div>
+            <div class="role-description text-muted">{{ user.rolesLabel }}</div>
+          </td>
+          <td>
+            {{ user.company.title }}
+          </td>
+          <td>
+            <div>{{ user.email }}</div>
+            <div class="role-description text-muted">{{ user.phone }}</div>
+          </td>
+          <td>
+            <div>{{ user.isActive ? 'Да' : 'Нет' }}</div>
+          </td>
+          <td>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <el-button type="success"
+                             size="small"
+                             icon="check"
+                             [elDisabled]="adminService.settingUserStatusInProgress()"
+                             (click)="setUserStatus(user)" *ngIf="!user.isActive">
+                    &nbsp; Включить
+                  </el-button>
+                  <el-button type="danger"
+                             size="small"
+                             icon="close"
+                             [elDisabled]="adminService.settingUserStatusInProgress()"
+                             (click)="setUserStatus(user)" *ngIf="user.isActive">
+                    &nbsp; Отключить
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- Start: No users placeholder -->
+      <div *ngIf="adminService.getUsers().length === 0">
+        <p class="text-muted text-center mt-4 pt-4">Пользователи отсутствуют</p>
+      </div>
+      <!-- End: No users placeholder -->
+    </div>
+  </div>
+</div>

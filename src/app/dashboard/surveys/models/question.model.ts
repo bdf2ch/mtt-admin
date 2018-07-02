@@ -16,6 +16,8 @@ export class Question {
   range: QuestionRange | null;      // Диапазон
   isEditable: boolean;              // Изменяем ли вопрос
   isDeletable: boolean;            // Удаляем ли вопрос
+  report: any[];
+  positiveValue: any[];
 
   /**
    * Конструктор
@@ -32,11 +34,21 @@ export class Question {
     this.isEditable = config ? config.is_editable : true;
     this.isDeletable = config ? config.is_deletable : false;
     this.answers = [];
+    this.report = [];
+    this.positiveValue = [];
+    this.positiveValue.push({
+      name: this.title,
+      value: Math.random() * 10
+    });
 
     if (config && config.answers) {
       config.answers.data.forEach((item: IAnswerDTO) => {
         const answer = new Answer(item);
         this.answers.push(answer);
+        this.report.push({
+          name: answer.content,
+          value: (100 * Math.random()) / 100
+        });
       });
     }
   }

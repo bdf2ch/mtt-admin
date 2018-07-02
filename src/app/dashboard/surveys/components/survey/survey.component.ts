@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SurveysService } from '../../services/surveys.service';
 import { RewardsService } from '../../services/rewards.service';
 import { FormGroup, AbstractControl, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -45,7 +46,8 @@ export class SurveyComponent implements OnInit {
   public footerData: IHeaderDTO;
   public footerImage: File | null;
 
-  constructor(private readonly formBuilder: FormBuilder,
+  constructor(private readonly router: Router,
+              private readonly formBuilder: FormBuilder,
               public readonly restaurantsService: RestaurantsService,
               public readonly surveysService: SurveysService,
               public readonly rewardsService: RewardsService,
@@ -68,8 +70,8 @@ export class SurveyComponent implements OnInit {
       description: survey.description,
       from: `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
         ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`,
-      to: `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
-        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}`,
+      to: survey.end ? `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
+        ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}` : null,
       reward_id: survey.rewardId,
       available_passing_count: survey.passingCount,
       need_client_data_first: survey.needClientDataFirst,
@@ -785,5 +787,9 @@ export class SurveyComponent implements OnInit {
     this.footerImage = f;
     this.footerData.image = f;
     this.surveyForm.markAsDirty();
+  }
+
+  openReport() {
+    this.router.navigate(['surveys', this.surveysService.selectedSurvey().id, 'report']);
   }
 }

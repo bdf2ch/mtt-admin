@@ -32,6 +32,8 @@ import { SurveysResolveGuard } from './dashboard/surveys/guards/surveys-resolve.
 import { SurveyComponent } from './dashboard/surveys/components/survey/survey.component';
 import { SurveyResolveGuard } from './dashboard/surveys/guards/survey-resolve.guard';
 import { AuthGuard } from './dashboard/authentication/guards/can-activate.guard';
+import { TestComponent } from './dashboard/test/test.component';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
 
 const routes: Routes = [
   {
@@ -89,7 +91,11 @@ const routes: Routes = [
             resolve: [RoleListGuard]
           }
         ]
-      }
+      },
+      {
+        path: 'pie',
+        component: TestComponent
+      },
     ]
   },
   {
@@ -102,7 +108,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,
@@ -116,7 +123,8 @@ const routes: Routes = [
     UsersModule,
     CompanyModule,
     RestaurantsModule,
-    SurveysModule
+    SurveysModule,
+    NgxChartsModule
   ],
   exports: [
     ElModule,

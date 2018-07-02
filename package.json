@@ -22,6 +22,7 @@
     "@angular/router": "^6.0.2",
     "@ngx-resource/core": "^5.2.11",
     "@ngx-resource/handler-ngx-http": "^6.0.1",
+    "@swimlane/ngx-charts": "^8.1.0",
     "bootstrap": "^4.1.1",
     "core-js": "^2.5.4",
     "element-angular": "^0.7.6",

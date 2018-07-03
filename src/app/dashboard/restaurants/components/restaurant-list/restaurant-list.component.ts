@@ -28,7 +28,9 @@ export class RestaurantListComponent implements OnInit {
   addressData: IAddressDTO;
   timeTableData: ITimeTableDTO;
   socialNetworksData: ISocialNetworkDTO[];
-  rKeeperData: string;
+  rKeeperConfigData: {
+    id: number;
+  };
   geo: IGeoPosition;
 
   constructor(private readonly builder: FormBuilder,
@@ -46,7 +48,7 @@ export class RestaurantListComponent implements OnInit {
       phone: null,
       site: null,
       rKeeperConfig: {
-        id: 0
+        id: null
       }
     };
     this.addressData = {
@@ -65,7 +67,9 @@ export class RestaurantListComponent implements OnInit {
       until_last_client: false
     };
     this.socialNetworksData = [];
-    this.rKeeperData = null;
+    this.rKeeperConfigData = {
+      id: null
+    };
   }
 
   ngOnInit() {
@@ -81,7 +85,7 @@ export class RestaurantListComponent implements OnInit {
       from: [this.timeTableData.from, [Validators.required, Validators.pattern(timeRegExp)]],
       to: [this.timeTableData.to, [Validators.required, Validators.pattern(timeRegExp)]],
       until_last_client: [this.timeTableData.until_last_client],
-      config: [this.restaurantData.rKeeperConfig.id, Validators.required]
+      config: [this.rKeeperConfigData.id]
     });
   }
 
@@ -136,7 +140,7 @@ export class RestaurantListComponent implements OnInit {
       from: this.timeTableData.from,
       to: this.timeTableData.to,
       until_last_client: this.timeTableData.until_last_client,
-      config: this.restaurantData.rKeeperConfig.id
+      config: this.rKeeperConfigData.id
     });
     this.isInAddRestaurantMode = true;
   }
@@ -165,6 +169,9 @@ export class RestaurantListComponent implements OnInit {
     }
     if (this.timeTableData.until_last_client) {
       delete this.timeTableData.to;
+    }
+    if (!this.rKeeperConfigData.id) {
+      delete this.restaurantData.rKeeperConfig;
     }
     /*
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
@@ -284,6 +291,9 @@ export class RestaurantListComponent implements OnInit {
     }
     if (this.timeTableData.until_last_client) {
       delete this.timeTableData.to;
+    }
+    if (!this.restaurantData.rKeeperConfig.id || this.restaurantData.rKeeperConfig.id === '') {
+
     }
     /*
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {

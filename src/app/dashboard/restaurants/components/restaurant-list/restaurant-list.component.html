@@ -52,7 +52,7 @@
     <span>Добавление ресторана</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="isInAddRestaurantMode">
     <div class="row">
       <div class="col-12">
 
@@ -219,13 +219,13 @@
 
               <!-- Start: Name -->
               <el-form-item label="Идентификатор"
-                            [required]="true"
+                            [required]="false"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
                 <el-input native-type="number"
                           class="no-spinners"
                           formControlName="config"
-                          [(model)]="restaurantData.rKeeperConfig.id">
+                          [(model)]="rKeeperConfigData.id">
                 </el-input>
               </el-form-item>
               <!-- End: Name -->
@@ -266,7 +266,7 @@
     <span>Изменение ресторана</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="isInEditRestaurantMode">
     <div class="row">
       <div class="col-12">
 

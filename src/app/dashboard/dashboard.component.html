@@ -16,7 +16,10 @@
         <el-menu-item index="users" [to]="'/users'">Сотрудники</el-menu-item>
         <el-menu-item index="roles" [to]="'/users/roles'">Роли</el-menu-item>
       </el-submenu>
+
+      <!--
       <el-menu-item index="payment" *ngIf="!authenticationService.getCurrentUser().getRoleByCode('admin')">Оплата</el-menu-item>
+      -->
       <el-menu-item index="admin" *ngIf="authenticationService.getCurrentUser().getRoleByCode('admin')">Панель администратора</el-menu-item>
       <el-submenu index="user-menu" title="{{ authenticationService.getCurrentUser().fio }}" *ngIf="authenticationService.getCurrentUser()" el-class="user-menu" >
         <el-menu-item index="log-out">Выход</el-menu-item>

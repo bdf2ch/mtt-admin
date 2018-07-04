@@ -217,18 +217,19 @@
             <div class="col-12 border-bottom">
               <h4 class="text-muted mb-3">Конфигурация R-Keeper</h4>
 
-              <!-- Start: Name -->
+              <!-- Start: R-Keeper id -->
               <el-form-item label="Идентификатор"
+                            *ngIf="restaurantData.rKeeperConfig"
                             [required]="false"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
                 <el-input native-type="number"
                           class="no-spinners"
                           formControlName="config"
-                          [(model)]="rKeeperConfigData.id">
+                          [(model)]="restaurantData.rKeeperConfig.id">
                 </el-input>
               </el-form-item>
-              <!-- End: Name -->
+              <!-- End: R-Keeper id -->
             </div>
           </div>
           <!-- End: R-Keeper config -->
@@ -240,13 +241,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="restaurantForm.invalid"
+                       [elDisabled]="restaurantForm.invalid || restaurantsService.addingRestaurantInProgress()"
                        [loading]="restaurantsService.addingRestaurantInProgress()"
                        (click)="addRestaurant()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="restaurantsService.addingRestaurantInProgress()"
                        (click)="closeEditRestaurantDialog()">
               &nbsp; Отмена
             </el-button>
@@ -269,7 +271,6 @@
   <div class="container-fluid" *ngIf="isInEditRestaurantMode">
     <div class="row">
       <div class="col-12">
-
         <el-form [formGroup]="restaurantForm"
                  label-width="170px"
                  [label-position]="'left'"
@@ -441,7 +442,6 @@
             </div>
           </div>
           <!-- End: R-Keeper config -->
-
         </el-form>
 
         <!-- Start: Form controls -->
@@ -449,13 +449,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="restaurantForm.invalid || restaurantForm.pristine"
+                       [elDisabled]="restaurantForm.invalid || restaurantForm.pristine || restaurantsService.editingRestaurantInProgress()"
                        [loading]="restaurantsService.editingRestaurantInProgress()"
                        (click)="editRestaurant()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="restaurantsService.editingRestaurantInProgress()"
                        (click)="closeEditRestaurantDialog()">
               &nbsp; Отмена
             </el-button>
@@ -467,7 +468,6 @@
   </div>
 </el-dialog>
 <!-- End: Edit restaurant dialog -->
-
 
 <!-- Start: Delete restaurant confirmation dialog -->
 <el-dialog [(visible)]="isInDeleteRestaurantMode" [width]="'400px'">
@@ -487,12 +487,19 @@
                    icon="check"
                    class="w-100"
                    [loading]="restaurantsService.deletingRestaurantInProgress()"
+                   [elDisabled]="restaurantsService.deletingRestaurantInProgress()"
                    (click)="deleteRestaurant()">
           &nbsp; Удалить
         </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteRestaurantDialog()">&nbsp; Отмена</el-button>
+        <el-button type="danger"
+                   icon="close"
+                   class="w-100"
+                   [elDisabled]="restaurantsService.deletingRestaurantInProgress()"
+                   (click)="closeDeleteRestaurantDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </div>
   </div>

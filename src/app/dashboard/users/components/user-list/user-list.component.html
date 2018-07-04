@@ -175,13 +175,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="userForm.invalid || userForm.pristine"
+                       [elDisabled]="userForm.invalid || userForm.pristine || usersService.editingUserInProgress()"
                        [loading]="usersService.editingUserInProgress()"
                        (click)="editUser()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="usersService.editingUserInProgress()"
                        (click)="closeEditUserDialog()">
               &nbsp; Отмена
             </el-button>
@@ -312,13 +313,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="userForm.invalid"
+                       [elDisabled]="userForm.invalid || usersService.addingUserInProgress()"
                        [loading]="usersService.addingUserInProgress()"
                        (click)="addUser()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="usersService.addingUserInProgress()"
                        (click)="closeAddUserDialog()">
               &nbsp; Отмена
             </el-button>
@@ -349,13 +351,21 @@
         <el-button type="success"
                    icon="check"
                    class="w-100"
+                   [elDisabled]="usersService.deletingUserInProgress()"
                    [loading]="usersService.deletingUserInProgress()"
                    (click)="deleteUser()">
           &nbsp; Удалить
         </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteUserDialog()">&nbsp; Отмена</el-button>
+        <el-button
+          type="danger"
+          icon="close"
+          class="w-100"
+          [elDisabled]="usersService.deletingUserInProgress()"
+          (click)="closeDeleteUserDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </div>
   </div>

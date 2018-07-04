@@ -85,7 +85,7 @@ export class RestaurantListComponent implements OnInit {
       from: [this.timeTableData.from, [Validators.required, Validators.pattern(timeRegExp)]],
       to: [this.timeTableData.to, [Validators.required, Validators.pattern(timeRegExp)]],
       until_last_client: [this.timeTableData.until_last_client],
-      config: [this.rKeeperConfigData.id]
+      config: [this.restaurantData.rKeeperConfig.id]
     });
   }
 
@@ -121,15 +121,6 @@ export class RestaurantListComponent implements OnInit {
       }
     }
     this.socialNetworksData = [];
-    /*
-    if (!this.companyService.getCompany().rKeeperConfig) {
-      this.restaurantForm.get('config').setValidators(Validators.required);
-    } else {
-      this.restaurantForm.get('config').clearValidators();
-    }
-    */
-    // this.restaurantForm.get('config').updateValueAndValidity();
-    // this.restaurantForm.updateValueAndValidity();
     this.restaurantForm.reset({
       name: this.restaurantData.name,
       phone: this.restaurantData.phone,
@@ -140,7 +131,7 @@ export class RestaurantListComponent implements OnInit {
       from: this.timeTableData.from,
       to: this.timeTableData.to,
       until_last_client: this.timeTableData.until_last_client,
-      config: this.rKeeperConfigData.id
+      config: this.restaurantData.rKeeperConfig.id
     });
     this.isInAddRestaurantMode = true;
   }
@@ -170,14 +161,9 @@ export class RestaurantListComponent implements OnInit {
     if (this.timeTableData.until_last_client) {
       delete this.timeTableData.to;
     }
-    if (!this.rKeeperConfigData.id) {
+    if (!this.restaurantData.rKeeperConfig.id) {
       delete this.restaurantData.rKeeperConfig;
     }
-    /*
-    if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {
-      this.restaurantData.r_keeper_config = this.companyService.getCompany().rKeeperConfig;
-    }
-    */
     this.socialNetworksData.forEach(async (item: ISocialNetworkDTO) => {
       item.url = item.url.indexOf('http') === -1 ? 'http://' + item.url : item.url;
     });
@@ -214,6 +200,11 @@ export class RestaurantListComponent implements OnInit {
     this.restaurantData.name = restaurant.title;
     this.restaurantData.phone = restaurant.phone;
     this.restaurantData.site = restaurant.www;
+    if (!this.restaurantData.rKeeperConfig) {
+      this.restaurantData.rKeeperConfig = {
+        id: null
+      };
+    }
     this.restaurantData.rKeeperConfig.id = restaurant.rKeeperConfig.id;
     this.addressData.id = restaurant.address.id;
     this.addressData.city = restaurant.address.city;
@@ -292,8 +283,8 @@ export class RestaurantListComponent implements OnInit {
     if (this.timeTableData.until_last_client) {
       delete this.timeTableData.to;
     }
-    if (!this.restaurantData.rKeeperConfig.id || this.restaurantData.rKeeperConfig.id === '') {
-
+    if (!this.rKeeperConfigData.id) {
+      delete this.restaurantData.rKeeperConfig;
     }
     /*
     if (!this.restaurantData.r_keeper_config && this.companyService.getCompany().rKeeperConfig) {

@@ -156,11 +156,11 @@ export class SurveyComponent implements OnInit {
     this.surveyData.description = survey.description;
     this.surveyData.from =
       `${survey.start.getFullYear()}-${survey.start.getMonth() < 10
-        ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate()}`;
+        ? '0' + (survey.start.getMonth() + 1).toString() : survey.start.getMonth()}-${survey.start.getDate() < 10 ? '0' + survey.start.getDate().toString() : survey.start.getDate()}`;
     if (survey.end) {
       this.surveyData.to =
         `${survey.end.getFullYear()}-${survey.end.getMonth() < 10
-          ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate()}`;
+          ? '0' + (survey.end.getMonth() + 1).toString() : survey.end.getMonth()}-${survey.end.getDate() < 10 ? '0' + survey.end.getDate().toString() : survey.end.getDate()}`;
     } else {
       this.surveyData.to = null;
     }

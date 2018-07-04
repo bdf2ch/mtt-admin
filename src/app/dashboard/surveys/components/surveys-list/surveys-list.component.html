@@ -161,13 +161,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="surveyForm.invalid || restaurantIds.length === 0"
+                       [elDisabled]="surveyForm.invalid || restaurantIds.length === 0 || surveysService.addingSurveyInProgress()"
                        [loading]="surveysService.addingSurveyInProgress()"
                        (click)="addSurvey()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="surveysService.addingSurveyInProgress()"
                        (click)="closeAddSurveyDialog()">
               &nbsp; Отмена
             </el-button>
@@ -197,13 +198,21 @@
         <el-button type="success"
                    icon="check"
                    class="w-100"
+                   [elDisabled]="surveysService.editingSurveyInProgress()"
                    [loading]="surveysService.deletingSurveyInProgress()"
                    (click)="deleteSurvey()">
           &nbsp; Удалить
         </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100" (click)="closeDeleteQuestionDialog()">&nbsp; Отмена</el-button>
+        <el-button
+          type="danger"
+          icon="close"
+          class="w-100"
+          [elDisabled]="surveysService.deletingSurveyInProgress()"
+          (click)="closeDeleteSurveyDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </div>
   </div>

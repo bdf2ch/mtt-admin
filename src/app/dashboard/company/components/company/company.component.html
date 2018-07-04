@@ -45,11 +45,14 @@
         <ng-template #header>
           <h3 class="w-100 mb-0 d-flex justify-content-between">
             Настройки R-Keeper
-            <el-button type="primary" size="small" icon="edit" (click)="openEditRKeeperDialog()">&nbsp; Изменить</el-button>
+            <div>
+              <el-button type="primary" size="small" icon="edit" (click)="openEditRKeeperDialog()">&nbsp; Изменить</el-button>
+              <el-button type="danger" size="small" icon="delete" *ngIf="companyService.getCompany().rKeeperConfig" (click)="openEditRKeeperDialog()">&nbsp; Удалить</el-button>
+            </div>
           </h3>
         </ng-template>
 
-        <table class="table table-sm">
+        <table class="table table-sm" *ngIf="companyService.getCompany().rKeeperConfig">
           <tbody>
           <tr>
             <th scope="row">Начало диапазона кодов</th>
@@ -87,6 +90,7 @@
           </tr>
           </tbody>
         </table>
+        <div class="text-muted text-center p-4" *ngIf="!companyService.getCompany().rKeeperConfig">Настройки отсутствуют</div>
       </el-card>
       <!-- End: R-Keeper configuration data-->
     </div>
@@ -110,63 +114,53 @@
       <!-- Start: Requisites-->
       <div class="container-fluid payment-requisites pl-0 pr-0">
         <div class="row mt-4">
-          <div class="col-12 col-xl-6 mb-3" *ngFor="let item of companyService.getCompany().paymentRequisites">
+          <div class="col-12 col-lg-12 col-xl-6 mb-3" *ngFor="let item of companyService.getCompany().paymentRequisites">
             <el-card>
               <ng-template #header>
                 <div class="clearfix text-center">
-                  <span style="line-height: 36px;" class="text-muted">
+                  <span style="line-height: 16px;" class="text-muted">
                     <strong>{{ item.businessTitle }}</strong>
                   </span>
                 </div>
               </ng-template>
-              <div class="text item">
-                <table class="table table-sm mb-0">
-                  <tbody>
-                  <tr>
-                    <td class="text-muted text-right border-top-0" style="width: 80px">ИНН</td>
-                    <td class="border-top-0">{{ item.INN }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">КПП</td>
-                    <td>{{ item.KPP }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Юр. адрес</td>
-                    <td>{{ item.businessAddress }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Физ. адрес</td>
-                    <td>{{ item.address }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Расч. счет</td>
-                    <td>{{ item.account }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">Корр. счет</td>
-                    <td>{{ item.correspondingAccount }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-muted text-right">БИК</td>
-                    <td>{{ item.BIK }}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" class="">
 
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+              <div class="d-flex mw-100 border-bottom">
+                <div class="requisite-title text-muted">ИНН</div>
+                <div class="pl-2 requisite-value">{{ item.INN }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1 border-bottom">
+                <div class="requisite-title text-muted">КПП</div>
+                <div class="pl-2 requisite-value">{{ item.KPP }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1 border-bottom">
+                <div class="requisite-title text-muted">Юр. адрес</div>
+                <div class="pl-2 requisite-value">{{ item.businessAddress }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1 border-bottom">
+                <div class="requisite-title text-muted">Физ. адрес</div>
+                <div class="pl-2 requisite-value">{{ item.address }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1 border-bottom">
+                <div class="requisite-title text-muted">Расч. счет</div>
+                <div class="pl-2 requisite-value">{{ item.account }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1 border-bottom">
+                <div class="requisite-title text-muted">Корр. счет</div>
+                <div class="pl-2 requisite-value">{{ item.correspondingAccount }}</div>
+              </div>
+              <div class="d-flex mw-100 pt-1">
+                <div class="requisite-title text-muted">БИК</div>
+                <div class="pl-2 requisite-value">{{ item.BIK }}</div>
+              </div>
 
-                <div class="footer">
-                  <div class="container-fluid p-0">
-                    <div class="row">
-                      <div class="col-6">
-                        <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
-                      </div>
-                      <div class="col-6">
-                        <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
-                      </div>
+              <div class="footer mt-3">
+                <div class="container-fluid p-0">
+                  <div class="row">
+                    <div class="col-6">
+                      <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
+                    </div>
+                    <div class="col-6">
+                      <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
                     </div>
                   </div>
                 </div>
@@ -239,13 +233,14 @@
       <div class="">
         <el-button type="success"
                    icon="check"
-                   [elDisabled]="editCompanyForm.invalid || editCompanyForm.pristine"
+                   [elDisabled]="editCompanyForm.invalid || editCompanyForm.pristine || companyService.editingCompanyInProgress()"
                    [loading]="companyService.editingCompanyInProgress()"
                    (click)="editCompany()">
           &nbsp; Сохранить
         </el-button>
         <el-button type="danger"
                    icon="close"
+                   [elDisabled]="companyService.editingCompanyInProgress()"
                    (click)="closeEditCompanyDialog()">
           &nbsp; Отмена
         </el-button>
@@ -369,13 +364,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="rKeeperForm.invalid || rKeeperForm.pristine"
+                       [elDisabled]="rKeeperForm.invalid || rKeeperForm.pristine || companyService.editingRKeeperInProgress()"
                        [loading]="companyService.editingRKeeperInProgress()"
                        (click)="editRKeeper()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="companyService.editingRKeeperInProgress()"
                        (click)="closeEditRKeeperDialog()">
               &nbsp; Отмена
             </el-button>
@@ -504,13 +500,14 @@
       <div class="mt-2">
         <el-button type="success"
                    icon="check"
-                   [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine"
+                   [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine || companyService.addingPaymentRequisitesInProgress()"
                    [loading]="companyService.addingPaymentRequisitesInProgress()"
                    (click)="addPaymentRequisites()">
           &nbsp; Сохранить
         </el-button>
         <el-button type="danger"
                    icon="close"
+                   [elDisabled]="companyService.addingPaymentRequisitesInProgress()"
                    (click)="closeAddPaymentRequisitesDialog()">
           &nbsp; Отмена
         </el-button>
@@ -606,13 +603,14 @@
       <div class="mt-2">
         <el-button type="success"
                    icon="check"
-                   [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine"
-                   [loading]="companyService.editingCompanyInProgress()"
+                   [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine || companyService.editingPaymentRequisitesInProgress()"
+                   [loading]="companyService.editingPaymentRequisitesInProgress()"
                    (click)="editPaymentRequisites()">
           &nbsp; Сохранить
         </el-button>
         <el-button type="danger"
                    icon="close"
+                   [elDisabled]="companyService.editingPaymentRequisitesInProgress()"
                    (click)="closeEditPaymentRequisitesDialog()">
           &nbsp; Отмена
         </el-button>
@@ -637,10 +635,24 @@
     </div>
     <div class="row mt-4">
       <div class="col-6">
-        <el-button type="success" icon="check" class="w-100" (click)="deletePaymentRequisites()">&nbsp; Удалить</el-button>
+        <el-button
+          type="success"
+          icon="check"
+          class="w-100"
+          [elDisabled]="companyService.deletingPaymentRequisitesInProgress()"
+          (click)="deletePaymentRequisites()">
+          &nbsp; Удалить
+        </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeletePaymentRequisitesDialog()">&nbsp; Отмена</el-button>
+        <el-button
+          type="danger"
+          icon="close"
+          class="w-100"
+          [elDisabled]="companyService.deletingPaymentRequisitesInProgress()"
+          (click)="closeDeletePaymentRequisitesDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </div>
   </div>

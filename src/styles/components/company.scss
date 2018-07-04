@@ -26,6 +26,17 @@
 .payment-requisites {
   font-size: 14px;
 
+  .requisite-title {
+    width: 80px !important;
+    text-align: right;
+  }
+
+  .requisite-value {
+    overflow: hidden;
+    flex: 1;
+    text-overflow: ellipsis;
+  }
+
   .footer {
     margin-left: -20px;
     margin-right: -20px;

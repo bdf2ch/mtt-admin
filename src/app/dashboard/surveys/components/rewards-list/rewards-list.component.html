@@ -152,13 +152,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="rewardForm.invalid"
+                       [elDisabled]="rewardForm.invalid || rewardsService.addingRewardInProgress()"
                        [loading]="rewardsService.addingRewardInProgress()"
                        (click)="addReward()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="rewardsService.addingRewardInProgress()"
                        (click)="closeAddRewardDialog()">
               &nbsp; Отмена
             </el-button>
@@ -170,7 +171,6 @@
   </div>
 </el-dialog>
 <!-- End: Add reward dialog -->
-
 
 <!-- Start: Edit reward dialog -->
 <el-dialog [(visible)]="isInEditRewardMode" [width]="'580px'">
@@ -256,13 +256,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="rewardForm.invalid || rewardForm.pristine"
+                       [elDisabled]="rewardForm.invalid || rewardForm.pristine || rewardsService.addingRewardInProgress()"
                        [loading]="rewardsService.editingRewardInProgress()"
                        (click)="editReward()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="rewardsService.addingRewardInProgress()"
                        (click)="closeEditRewardDialog()">
               &nbsp; Отмена
             </el-button>
@@ -274,7 +275,6 @@
   </div>
 </el-dialog>
 <!-- End: Edit reward dialog -->
-
 
 <!-- Start: Delete reward confirmation dialog -->
 <el-dialog [(visible)]="isInDeleteRewardMode" [width]="'400px'">
@@ -293,13 +293,21 @@
         <el-button type="success"
                    icon="check"
                    class="w-100"
+                   [elDisabled]="rewardsService.deletingRewardInProgress()"
                    [loading]="rewardsService.deletingRewardInProgress()"
                    (click)="deleteReward()">
           &nbsp; Удалить
         </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100" (click)="closeDeleteRewardDialog()">&nbsp; Отмена</el-button>
+        <el-button
+          type="danger"
+          icon="close"
+          class="w-100"
+          [elDisabled]="rewardsService.deletingRewardInProgress()"
+          (click)="closeDeleteRewardDialog()">
+          &nbsp; Отмена
+        </el-button>
       </div>
     </div>
   </div>

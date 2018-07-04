@@ -137,6 +137,7 @@ export class RestaurantsService {
     try {
       const result = await this.resource.deleteRestaurant(null, null, {companyId: companyId, restaurantId: restaurantId});
       if (result.meta['success'] && result.meta['success'] === true) {
+        this.isDeletingRestaurantInProgress = false;
         this.restaurants.forEach((item: Restaurant, index: number, array: Restaurant[]) => {
           if (item.id === restaurantId) {
             array.splice(index, 1);

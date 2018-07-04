@@ -128,13 +128,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="userRoleForm.invalid"
+                       [elDisabled]="userRoleForm.invalid || usersService.addingRoleInProgress()"
                        [loading]="usersService.addingRoleInProgress()"
                        (click)="addUserRole()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="usersService.addingRoleInProgress()"
                        (click)="closeAddRoleDialog()">
               &nbsp; Отмена
             </el-button>
@@ -229,13 +230,14 @@
           <div class="col-12 mt-2 text-right">
             <el-button type="success"
                        icon="check"
-                       [elDisabled]="userRoleForm.invalid || userRoleForm.pristine"
+                       [elDisabled]="userRoleForm.invalid || userRoleForm.pristine || usersService.editingRoleInProgress()"
                        [loading]="usersService.editingRoleInProgress()"
                        (click)="editUserRole()">
               &nbsp; Сохранить
             </el-button>
             <el-button type="danger"
                        icon="close"
+                       [elDisabled]="usersService.editingRoleInProgress()"
                        (click)="closeEditRoleDialog()">
               &nbsp; Отмена
             </el-button>
@@ -266,13 +268,19 @@
         <el-button type="success"
                    icon="check"
                    class="w-100"
+                   [elDisabled]="usersService.deletingRoleInProgress()"
                    [loading]="usersService.deletingRoleInProgress()"
                    (click)="deleteUserRole()">
           &nbsp; Удалить
         </el-button>
       </div>
       <div class="col-6">
-        <el-button type="danger" icon="close" class="w-100"  (click)="closeDeleteRoleDialog()">&nbsp; Отмена</el-button>
+        <el-button
+          type="danger"
+          icon="close"
+          class="w-100"
+          [elDisabled]="usersService.deletingRoleInProgress()"
+          (click)="closeDeleteRoleDialog()">&nbsp; Отмена</el-button>
       </div>
     </div>
   </div>

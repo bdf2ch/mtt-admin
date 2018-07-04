@@ -68,6 +68,19 @@ export class CompanyService {
     }
   }
 
+  async clearRKeeperConfig(company: ICompanyDTO, companyId: number): Promise<boolean> {
+    try {
+      const result = await this.resource.clearRKeeperConfig(company, null, {companyId: companyId});
+      if (result.data) {
+        this.company.rKeeperConfig = {};
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
   /**
    * Добавление платежных реквизитов
    * @param {IPaymentRequisitesDTO} requisites - Информация о платежных реквизитах
@@ -161,6 +174,21 @@ export class CompanyService {
     return this.isAddingPaymentRequisitesInProgress;
   }
 
+  /**
+   * Выполняется ли изменение платежных реквизитов
+   * @returns {boolean}
+   */
+  editingPaymentRequisitesInProgress(): boolean {
+    return this.isEditingPaymentRequisitesInProgress;
+  }
+
+  /**
+   * Выполняется ли удаление платежных реквизитов
+   * @returns {boolean}
+   */
+  deletingPaymentRequisitesInProgress(): boolean {
+    return this.isDeletingPaymentRequisitesInProgress;
+  }
   /**
    * Выполняется ли изменение настроек R-Keeper
    * @returns {boolean}

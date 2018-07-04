@@ -18,11 +18,9 @@ import { IPaymentRequisitesDTO } from '../dto/payment-requisites.dto';
 @ResourceParams({
   pathPrefix: environment.apiUrl + 'company',
   withCredentials: true,
-  /*
   headers: {
     'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : ''
   }
-  */
 })
 export class CompanyResource extends Resource {
 
@@ -54,6 +52,17 @@ export class CompanyResource extends Resource {
     withCredentials: true
   })
   editCompanyById: IResourceMethodStrict<ICompanyDTO, void, {id: number}, IServerResponse<ICompanyDTO>>;
+
+  /**
+   * Path: company/{!id}
+   * Method: PATCH
+   */
+  @ResourceAction({
+    path: '/{!id}',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  clearRKeeperConfig: IResourceMethodStrict<ICompanyDTO, void, {companyId: number}, IServerResponse<ICompanyDTO>>;
 
   /**
    * Path: company/{!id}/payment-requisites

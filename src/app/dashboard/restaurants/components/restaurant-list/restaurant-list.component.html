@@ -433,7 +433,7 @@
 
               <!-- Start: Name -->
               <el-form-item label="Идентификатор"
-                            [required]="true"
+                            [required]="false"
                             [status]="restaurantFormStatusCtrl('config')"
                             [error]="restaurantFormMessageCtrl('config')">
                 <el-input formControlName="config" [(model)]="restaurantData.rKeeperConfig.id"></el-input>

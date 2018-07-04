@@ -2,10 +2,12 @@
   <div class="row h-100">
     <!-- Start: Surveys list -->
     <div class="col-12 col-lg-8 p-4 d-flex flex-column align-items-center">
-      <h3 class="mb-4 w-100 d-flex justify-content-between">
-        {{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}
-        <el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button>
-      </h3>
+      <div class="w-100 mb-4 d-flex justify-content-between">
+        <span class="h3">
+          <h3>{{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}</h3>
+        </span>
+        <div><el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button></div>
+      </div>
 
       <table class="table table-sm mt-4">
         <tbody>
@@ -81,7 +83,21 @@
             <div el-row gutter="20">
 
               <div el-col span="12" class="text-left">
-                <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Сгенерировать коды</el-button>
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Сгенерировать коды</el-button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Показать коды</el-button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Скачать коды</el-button>
+                  </div>
+                </div>
               </div>
 
               <div el-col span="12" class="text-right">

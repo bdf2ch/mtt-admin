@@ -125,12 +125,12 @@ export class CompanyComponent implements OnInit {
    */
   openEditRKeeperDialog () {
     const config = this.companyService.getCompany().rKeeperConfig;
-    this.companyData.reward_code_from = config.from;
-    this.companyData.reward_code_to = config.to;
-    this.companyData.discount_types.discount = config.discount.discount;
-    this.companyData.discount_types.product = config.discount.product;
-    this.companyData.discount_types.money = config.discount.money;
-    this.companyData.discount_types.loyalty = config.discount.loyalty;
+    this.companyData.reward_code_from = config ? config.from : null;
+    this.companyData.reward_code_to = config ? config.to : null;
+    this.companyData.discount_types.discount = config ? config.discount.discount : null;
+    this.companyData.discount_types.product = config ? config.discount.product : null;
+    this.companyData.discount_types.money = config ? config.discount.money : null;
+    this.companyData.discount_types.loyalty = config ? config.discount.loyalty : null;
     this.rKeeperForm.reset({
       from: this.companyData.reward_code_from,
       to: this.companyData.reward_code_to,
@@ -442,6 +442,30 @@ export class CompanyComponent implements OnInit {
       .then(() => {
         this.closeEditRKeeperDialog();
         this.message['success']('Настройки R-Keeper изменены');
+      });
+  }
+
+  /**
+   * Удаление конфигрурации R-Keeper
+   * @returns {Promise<void>}
+   */
+  async deleteRKeeperConfiguration() {
+    const data = {
+      id: this.companyService.getCompany().id,
+      name: this.companyService.getCompany().title,
+      phone: this.companyService.getCompany().phone,
+      site: this.companyService.getCompany().www,
+      rKeeperConfig: {}
+    };
+    if (data.phone === '') {
+      delete data.phone;
+    }
+    if (data.site === '') {
+      delete data.site;
+    }
+    await this.companyService.clearRKeeperConfig(data, this.companyService.getCompany().id)
+      .then(() => {
+        this.message['success']('Настройки R-Keeper удалены');
       });
   }
 }

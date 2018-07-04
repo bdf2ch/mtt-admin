@@ -15,7 +15,8 @@ export class CompanyService {
   private isAddingPaymentRequisitesInProgress: boolean;
   private isEditingPaymentRequisitesInProgress: boolean;
   private isDeletingPaymentRequisitesInProgress: boolean;
-  private isEditingRKeeperInProgress: boolean;
+  private isEditingRKeeperConfigInProgress: boolean;
+  private isDeletingRKeeperConfigInProgress: boolean;
 
   constructor(private readonly resource: CompanyResource) {
     this.company =  null;
@@ -23,7 +24,8 @@ export class CompanyService {
     this.isAddingPaymentRequisitesInProgress = false;
     this.isEditingPaymentRequisitesInProgress = false;
     this.isDeletingPaymentRequisitesInProgress = false;
-    this.isEditingRKeeperInProgress = false;
+    this.isEditingRKeeperConfigInProgress = false;
+    this.isDeletingRKeeperConfigInProgress = false;
   }
 
   /**
@@ -70,13 +72,17 @@ export class CompanyService {
 
   async clearRKeeperConfig(company: ICompanyDTO, companyId: number): Promise<boolean> {
     try {
+      this.isDeletingRKeeperConfigInProgress = true;
       const result = await this.resource.clearRKeeperConfig(company, null, {companyId: companyId});
       if (result.data) {
-        this.company.rKeeperConfig = {};
+        this.isDeletingRKeeperConfigInProgress = false;
+        this.company.rKeeperConfig = null;
+        console.log(this.company);
         return true;
       }
     } catch (error) {
       console.error(error);
+      this.isDeletingRKeeperConfigInProgress = false;
       return false;
     }
   }
@@ -194,6 +200,14 @@ export class CompanyService {
    * @returns {boolean}
    */
   editingRKeeperInProgress(): boolean {
-    return this.isEditingRKeeperInProgress;
+    return this.isEditingRKeeperConfigInProgress;
+  }
+
+  /**
+   * Выполняется ли удаление настроек R-Keeper
+   * @returns {boolean}
+   */
+  deletingRKeeperInProgress(): boolean {
+    return this.isDeletingRKeeperConfigInProgress;
   }
 }

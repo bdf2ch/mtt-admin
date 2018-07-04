@@ -46,8 +46,24 @@
           <h3 class="w-100 mb-0 d-flex justify-content-between">
             Настройки R-Keeper
             <div>
-              <el-button type="primary" size="small" icon="edit" (click)="openEditRKeeperDialog()">&nbsp; Изменить</el-button>
-              <el-button type="danger" size="small" icon="delete" *ngIf="companyService.getCompany().rKeeperConfig" (click)="openEditRKeeperDialog()">&nbsp; Удалить</el-button>
+              <el-button
+                type="primary"
+                size="small"
+                icon="edit"
+                [elDisabled]="companyService.deletingRKeeperInProgress()"
+                (click)="openEditRKeeperDialog()">
+                &nbsp; Изменить
+              </el-button>
+              <el-button
+                type="danger"
+                size="small"
+                icon="delete"
+                *ngIf="companyService.getCompany().rKeeperConfig !== null"
+                [loading]="companyService.deletingRKeeperInProgress()"
+                [elDisabled]="companyService.deletingRKeeperInProgress()"
+                (click)="deleteRKeeperConfiguration()">
+                &nbsp; Удалить
+              </el-button>
             </div>
           </h3>
         </ng-template>

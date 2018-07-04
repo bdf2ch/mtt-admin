@@ -58,7 +58,7 @@ export class CompanyResource extends Resource {
    * Method: PATCH
    */
   @ResourceAction({
-    path: '/{!id}',
+    path: '/{!companyId}',
     method: ResourceRequestMethod.Patch,
     withCredentials: true
   })

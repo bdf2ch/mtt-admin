@@ -3,6 +3,7 @@ import { SurveysService } from '../../services/surveys.service';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Restaurant } from '../../../restaurants/models/restaurant.model';
 import { IReportFiltersDTO } from '../../dto/report-filters.dto';
+import { RestaurantsService } from '../../../restaurants/services/restaurants.service';
 
 @Component({
   selector: 'app-report',
@@ -15,7 +16,8 @@ export class ReportComponent implements OnInit {
   public filterData: IReportFiltersDTO;
 
   constructor(private readonly formBuilder: FormBuilder,
-              public readonly surveysService: SurveysService) {
+              public readonly surveysService: SurveysService,
+              public readonly restaurantsService: RestaurantsService) {
     this.selectedTabIndex = 1;
     this.filterData = {
       date_from: null,
@@ -167,7 +169,14 @@ export class ReportComponent implements OnInit {
     if (data.restaurants_ids.length === 0) {
       delete data.restaurants_ids;
     }
-    await this.surveysService.fetchCommonReport(this.surveysService.selectedSurvey().id, data);
+    switch (this.selectedTabIndex) {
+      case 1:
+        await this.surveysService.fetchCommonReport(this.surveysService.selectedSurvey().id, data);
+        break;
+      case 2:
+        await this.surveysService.fetchCompareReport(this.surveysService.selectedSurvey().id, data);
+        break;
+    }
   }
 
 }

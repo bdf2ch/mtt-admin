@@ -23,6 +23,7 @@ export class SurveyResolveGuard implements Resolve<Promise<Survey[]>> {
       this.surveysService.selectedSurvey(survey);
       await this.surveysService.fetchSurveyCodes(surveyId);
       await this.surveysService.fetchCommonReport(surveyId, null);
+      // await this.surveysService.fetchCompareReport(surveyId, null);
     }
     return this.surveysService.getSurveysList();
   }

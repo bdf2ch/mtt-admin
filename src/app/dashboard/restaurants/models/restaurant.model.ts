@@ -26,6 +26,10 @@ export class Restaurant implements IRestaurant {
     type: string;
     value: number;
   };
+  asOption?: {
+    label: string;
+    value: any;
+  };
 
   /**
    * Конструктор
@@ -47,6 +51,12 @@ export class Restaurant implements IRestaurant {
     };
     this.stat.type = config && config.statistic ? config.statistic.data.type : null;
     this.stat.value = config && config.statistic ? config.statistic.data.value : null;
+    this.asOption = {
+      label: '',
+      value: null
+    };
+    this.asOption.label = this.title;
+    this.asOption.value = this.id;
 
     if (config && config.socialNetworks) {
       config.socialNetworks.data.forEach((item: ISocialNetworkDTO) => {

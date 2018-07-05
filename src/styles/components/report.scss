@@ -14,11 +14,12 @@
       align-items: center;
       flex: auto;
       height: 50px;
+      background: #F5F5F5;
       cursor: pointer;
       border-bottom: 3px solid transparent;
 
       &:hover {
-        background: #F5F5F5;
+        background: #EEEEEE;
       }
 
       &.active {
@@ -26,4 +27,31 @@
       }
     }
   }
+}
+
+
+.compare-report-table {
+  thead tr {
+    font-size: 14px;
+    color: #607D8B;
+    border: none;
+
+    .index {
+      width: 50px;
+    }
+    .controls {
+      width: 200px;
+    }
+  }
+  tbody tr {
+    background: white;
+    border-bottom: 1px solid #ECEFF1;
+  }
+}
+
+
+.filters-column {
+  overflow: auto;
+  font-size: 14px;
+  background: #ECEFF1;
 }

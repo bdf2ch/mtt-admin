@@ -293,4 +293,12 @@ export class SurveysResource extends Resource {
     queryMappingMethod: ResourceQueryMappingMethod.Bracket
   })
   getCommonReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[]}, {surveyId: number}, IServerResponse<IReportDTO>>;
+
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/statistic/compare-restaurants',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true,
+    queryMappingMethod: ResourceQueryMappingMethod.Bracket
+  })
+  getCompareReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[]}, {surveyId: number}, IServerResponse<IReportDTO>>;
 }

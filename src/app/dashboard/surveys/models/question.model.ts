@@ -4,6 +4,8 @@ import { Answer } from './answer.model';
 import { IQuestionDTO } from '../dto/question.dto';
 import { IAnswerDTO } from '../dto/answer.dto';
 import { QuestionRange } from './question-range.model';
+import { Comparsion } from './comparsion.model';
+import { IRestaurantComparsionDTO } from '../dto/restaurant-comparsion.dto';
 
 export class Question {
   id: number;                       // Идентфиикатор
@@ -20,6 +22,7 @@ export class Question {
   positiveValue: any[];
   stat: any[];
   statTotal: number;
+  comparsion: Comparsion[];
 
   /**
    * Конструктор
@@ -38,6 +41,7 @@ export class Question {
     this.answers = [];
     this.stat = [];
     this.statTotal = 0;
+    this.comparsion = [];
 
     if (config && config.answers) {
       config.answers.data.forEach((item: IAnswerDTO) => {
@@ -57,6 +61,13 @@ export class Question {
           });
           this.statTotal += this.range.stat.value;
         }
+      });
+    }
+
+    if (config && config.statistic) {
+      config.statistic.data.forEach((item: IRestaurantComparsionDTO) => {
+        const comparsion = new Comparsion(item);
+        this.comparsion.push(comparsion);
       });
     }
   }

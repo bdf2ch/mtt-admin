@@ -1,6 +1,7 @@
 import { IQuestionFormDTO } from './question-form.dto';
 import { IAnswerDTO } from './answer.dto';
 import { IRangeDTO } from './range.dto';
+import {IRestaurantComparsionDTO} from "./restaurant-comparsion.dto";
 
 /**
  * Question DTO interface
@@ -21,5 +22,8 @@ export interface IQuestionDTO {
   };
   range?: {                           // Диапазон
     data: IRangeDTO
+  };
+  statistic?: {
+    data: IRestaurantComparsionDTO[];
   };
 }

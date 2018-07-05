@@ -389,6 +389,14 @@ export class RestaurantsService {
     return this.restaurants;
   }
 
+  getRestaurantsOptions(): any[] {
+    const result = [];
+    this.restaurants.forEach((item: Restaurant) => {
+      result.push(item.asOption);
+    });
+    return result;
+  }
+
   /**
    * Возвращает список всех типов социальных сетей
    * @returns {SocialNetworkType[]}

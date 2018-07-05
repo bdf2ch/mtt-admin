@@ -1,6 +1,6 @@
-<div class="container-fluid pl-0 pr-0 pt-4">
-  <div class="row mb-4 no-gutters">
-    <div class="col-12">
+<div class="container-fluid h-100 pl-0 pr-0">
+  <div class="row h-100 no-gutters">
+    <div class="col-12 col-md-8 col-lg-9 col-xl-9" style="overflow: auto">
       <div class="tabs-container">
         <div class="tabs-labels">
           <div class="tab-label" [ngClass]="{'active': selectedTabIndex === 1}" (click)="selectTab(1)">Общая оценка</div>
@@ -10,7 +10,8 @@
         </div>
 
         <!-- Start: Filters -->
-        <div class="filters border-bottom pb-4 pt-4">
+        <!--
+        <div class="filters pb-4 pt-4">
           <div class="container-fluid">
             <div class="row">
               <div class="col-12">
@@ -22,46 +23,49 @@
                              size="small"
                              [show-icon]="true"
                              [show-message]="true">
-                        <!-- Start: Start date -->
+
                         <el-form-item label="Начало периода"
                                       [required]="false"
                                       [status]="filterFormStatusCtrl('start')"
                                       [error]="filterFormMessageCtrl('start')">
                           <el-input formControlName="start" [(model)]="filterData.date_from"></el-input>
                         </el-form-item>
-                        <!-- End: Start date -->
 
-                        <!-- Start: Start date -->
+
+
                         <el-form-item label="Окончание периода"
                                       [required]="false"
                                       [status]="filterFormStatusCtrl('end')"
                                       [error]="filterFormMessageCtrl('end')">
                           <el-input formControlName="end" [(model)]="filterData.date_to"></el-input>
                         </el-form-item>
-                        <!-- End: Start date -->
+
                     </el-form>
                   </div>
                   <div el-col span="10">
                     <el-checkbox
                       *ngFor="let restaurant of surveysService.selectedSurvey().restaurants"
                       [label]="restaurant.title" (modelChange)="changeRestaurant($event, restaurant)"></el-checkbox>
-                    <!-- End: Start date -->
+
                   </div>
                 </div>
                 <div el-col span="8">
-                  <el-button type="primary" icon="document" (click)="getReport()">&nbsp; Сформировать отчет</el-button>
+                  <el-button type="primary" icon="document" [elDisabled]="selectedTabIndex === 2 && filterData.restaurants_ids.length < 2" (click)="getReport()">&nbsp; Сформировать отчет</el-button>
                 </div>
 
               </div>
             </div>
           </div>
         </div>
+        -->
+        <!-- End: Filters -->
+
         <div class="tab" *ngIf="selectedTabIndex === 1">
           <div class="container-fluid">
             <div class="row">
-              <div class="col-12 border-bottom pt-4 pb-4">
+              <div class="col-12 pt-4 pb-4">
                 <div><h4>Общая оценка удовлетворенности клиентов</h4></div>
-                <div class="d-flex flex-row flex-wrap">
+                <div class="d-flex flex-row flex-wrap justify-content-center">
                   <!--
                   <table class="table">
                     <tr *ngFor="let restaurant of surveysService.getCommonReport().restaurants">
@@ -80,7 +84,7 @@
               </div>
             </div>
 
-            <div class="row pt-4" *ngFor="let question of surveysService.getCommonReport().questions; let i = index">
+            <div class="row pt-4 border-top" *ngFor="let question of surveysService.getCommonReport().questions; let i = index">
               <div class="col-12">
                 <div *ngIf="question.form.type !== 'text_input'">{{ i + 1 }}. {{ question.title }}</div>
 
@@ -129,10 +133,119 @@
             </div>
           </div>
         </div>
-        <div class="tab p-4" *ngIf="selectedTabIndex === 2"></div>
+
+        <!-- Start: Compare report -->
+        <div class="tab p-4" *ngIf="selectedTabIndex === 2">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12 pt-4 pb-4">
+                <div class="p-4 text-muted text-center" *ngIf="!surveysService.getComparsionReport()">
+                  Данные отсутствуют
+                </div>
+                <table class="compare-report-table table" *ngIf="surveysService.getComparsionReport()">
+                  <thead>
+                  <tr>
+                    <th class="index">#</th>
+                    <th>Вопрос</th>
+                    <th *ngFor="let comparsion of surveysService.getComparsionReport().questions[0].comparsion">{{ comparsion.restaurant.title }}</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let question of surveysService.getComparsionReport().questions; let i = index;">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ question.title }}</td>
+                    <td *ngFor="let comparsion of question.comparsion">{{ comparsion.stat.value }}</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End: Compare report -->
+
         <div class="tab" *ngIf="selectedTabIndex === 3"></div>
         <div class="tab" *ngIf="selectedTabIndex === 4"></div>
       </div>
     </div>
+
+
+    <div class="filters-column col-12 col-md-4 col-lg-3 col-xl-3">
+      <!-- Start: Filters -->
+      <div class="filters pb-4 pt-4">
+        <div class="container-fluid">
+          <div class="row mb-3">
+            <div class="col-12">
+              <h3>Фильтры</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+
+              <el-form [formGroup]="filterForm"
+                       label-width="0px"
+                       [label-position]="'left'"
+                       size="small"
+                       [show-icon]="true"
+                       [show-message]="true">
+
+                <div el-row>
+                  <div el-col span="24">
+                    <!-- Start: Start date -->
+                    <el-form-item [required]="false"
+                                  [status]="filterFormStatusCtrl('start')"
+                                  [error]="filterFormMessageCtrl('start')">
+                      <el-input formControlName="start"
+                                [(model)]="filterData.date_from"
+                                placeholder="Начало периода">
+                      </el-input>
+                    </el-form-item>
+                    <!-- End: Start date -->
+                  </div>
+                </div>
+
+                <div el-row>
+                  <div el-col span="24">
+                    <!-- Start: End date -->
+                    <el-form-item [required]="false"
+                                  [status]="filterFormStatusCtrl('end')"
+                                  [error]="filterFormMessageCtrl('end')">
+                      <el-input formControlName="end"
+                                [(model)]="filterData.date_to"
+                                placeholder="Окончание периода">
+                      </el-input>
+                    </el-form-item>
+                    <!-- End: End date -->
+                  </div>
+                </div>
+              </el-form>
+
+              <div el-row>
+                <div el-col span="24">
+                  <el-select [model]="filterData.restaurants_ids" (modelChange)="handle($event)" [clearable]="true" [multiple]="true" size="large">
+                    <el-option *ngFor="let item of restaurantsService.getRestaurantsOptions()"
+                               [label]="item.label"
+                               [value]="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+              </div>
+
+              <div el-row>
+                <div el-col span="8">
+                  <el-button type="primary" icon="document"
+                             [elDisabled]="selectedTabIndex === 2 && filterData.restaurants_ids.length < 2"
+                             (click)="getReport()">&nbsp; Сформировать отчет
+                  </el-button>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- End: Filters -->
+    </div>
+
+
+
   </div>
 </div>

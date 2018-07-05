@@ -25,6 +25,7 @@ import {ResponseContentType, ResponseType} from '@angular/http';
 import {IReportDTO} from '../dto/report.dto';
 import {Report} from '../models/report.model';
 import {IReportFiltersDTO} from '../dto/report-filters.dto';
+import {ComparsionReport} from "../models/comparsion-report.model";
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,7 @@ export class SurveysService {
   private isDeletingQuestionInProgress: boolean;
   private isGeneratingCodesInProgress: boolean;
   private commonReport: Report | null;
+  private comparsionReport: Report | null;
 
   constructor(private readonly resource: SurveysResource,
               private readonly http: HttpClient) {
@@ -61,6 +63,7 @@ export class SurveysService {
     this.isDeletingQuestionInProgress = false;
     this.isGeneratingCodesInProgress = false;
     this.commonReport = null;
+    this.comparsionReport = null;
   }
 
   /**
@@ -906,6 +909,12 @@ export class SurveysService {
   }
 
 
+  /**
+   * Получение отчета с общей оценкой с сервера
+   * @param {number} surveyId - Идентификатор опроса
+   * @param {IReportFiltersDTO} filters - Фильтры
+   * @returns {Promise<Report | null>}
+   */
   async fetchCommonReport(surveyId: number, filters?: IReportFiltersDTO,): Promise<Report | null> {
     console.log('filters', filters);
     try {
@@ -923,9 +932,42 @@ export class SurveysService {
     }
   }
 
-
+  /**
+   * Возвращает отчет с общей оценкой
+   * @returns {Report | null}
+   */
   getCommonReport(): Report | null {
     return this.commonReport;
+  }
+
+  /**
+   * Получение сравнительного отчета с сервера
+   * @param {number} surveyId - Идентфиикатор опроса
+   * @param {IReportFiltersDTO} filters - Фильтры
+   * @returns {Promise<Report | null>}
+   */
+  async fetchCompareReport(surveyId: number, filters: IReportFiltersDTO): Promise<Report | null> {
+    try {
+      const result = await filters
+        ? await this.resource.getCompareReport(null, filters, {surveyId: surveyId}) : await this.resource.getCommonReport(null, null, {surveyId: surveyId});
+      if (result.data) {
+        const report  = new ComparsionReport(result.data);
+        this.comparsionReport = report;
+        console.log(this.comparsionReport);
+        return this.comparsionReport;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Возвращает сравнительный отчет
+   * @returns {Report | null}
+   */
+  getComparsionReport(): Report | null {
+    return this.comparsionReport;
   }
 
 }

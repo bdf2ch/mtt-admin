@@ -1,5 +1,5 @@
 <div id="survey" class="container-fluid h-100">
-  <div class="row h-100">
+  <div class="row h-100 mh-100">
 
     <!-- Start: Questions -->
     <div class="questions col-12 col-lg-7 p-4">
@@ -111,7 +111,7 @@
     <!-- End: Questions -->
 
     <!-- Start: Survey -->
-    <div class="col-12 col-lg-5 p-4 d-flex flex-column align-items-center">
+    <div class="col-12 col-lg-5 p-4 d-flex flex-column align-items-center" style="overflow: auto">
       <div class="w-100 mb-4 d-flex justify-content-between">
         <span class="h3">
           <h3>{{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}</h3>

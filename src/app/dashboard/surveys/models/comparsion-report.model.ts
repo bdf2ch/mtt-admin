@@ -2,9 +2,8 @@ import { Question } from './question.model';
 import { IReportDTO } from '../dto/report.dto';
 import { IQuestionDTO } from '../dto/question.dto';
 import { Restaurant } from '../../restaurants/models/restaurant.model';
-import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 
-export class Report {
+export class ComparsionReport {
   questions: Question[];
   restaurants: Restaurant[];
 
@@ -15,14 +14,10 @@ export class Report {
     if (config) {
       console.log(config);
       config.questions.data.forEach((item: IQuestionDTO) => {
-        if (item.form.data.type !== 'text_input') {
+        if (item.form.data.type === 'mark') {
           const question = new Question(item);
           this.questions.push(question);
         }
-      });
-      config.restaurant_marks.data.forEach((item: IRestaurantDTO) => {
-        const restaurant = new Restaurant(item);
-        this.restaurants.push(restaurant);
       });
     }
   }

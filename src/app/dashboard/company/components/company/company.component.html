@@ -58,7 +58,7 @@
                 type="danger"
                 size="small"
                 icon="delete"
-                *ngIf="companyService.getCompany().rKeeperConfig !== null"
+                *ngIf="companyService.getCompany().rKeeperConfig"
                 [loading]="companyService.deletingRKeeperInProgress()"
                 [elDisabled]="companyService.deletingRKeeperInProgress()"
                 (click)="deleteRKeeperConfiguration()">

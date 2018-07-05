@@ -31,4 +31,10 @@ export interface IRestaurantDTO {
   socialNetworks?: {                              // Список социальных сетей
     data: ISocialNetworkDTO[];
   };
+  statistic?: {
+    data: {
+      value: number,
+      type: string
+    };
+  };
 }

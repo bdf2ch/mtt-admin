@@ -8,4 +8,10 @@ export interface IRangeDTO {
   company_id?: number;          // Идентфиикатор компании
   min: number;                  // Минимальное значение
   max: number;                  // Максимальноке значение
+  statistic?: {                 // Статистика ответов
+    data: {
+      value: number;
+      type: string;
+    };
+  };
 }

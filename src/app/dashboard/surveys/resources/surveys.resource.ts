@@ -5,9 +5,9 @@ import {
   Resource,
   ResourceAction,
   ResourceHandler,
-  ResourceParams, ResourceRequestBodyType,
-  ResourceRequestMethod
-} from "@ngx-resource/core";
+  ResourceParams, ResourceQueryMappingMethod, ResourceRequestBodyType,
+  ResourceRequestMethod, ResourceResponseBodyType
+} from '@ngx-resource/core';
 import { environment } from '../../../../environments/environment';
 import { IServerResponse } from '../../../shared/interfaces/server-response.interface';
 import { ISurveyDTO } from '../dto/survey.dto';
@@ -16,6 +16,9 @@ import {IQuestionFormDTO} from '../dto/question-form.dto';
 import {IAnswerDTO} from '../dto/answer.dto';
 import {IRangeDTO} from '../dto/range.dto';
 import {IHeaderDTO} from '../dto/header.dto';
+import {ICodeDTO} from '../dto/code.dto';
+import {IReportDTO} from '../dto/report.dto';
+import {IReportFiltersDTO} from '../dto/report-filters.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -230,6 +233,32 @@ export class SurveysResource extends Resource {
   })
   deleteQuestion: IResourceMethod<{questionId: number}, IServerResponse<any>>;
 
+  /**
+   * Path: questionnaire/{!surveyId}/questionnaire-code
+   * Method: GET
+   */
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/questionnaire-code',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true
+  })
+  getSurveyCodes: IResourceMethodStrict<void, void, {surveyId: number}, IServerResponse<ICodeDTO[]>>;
+
+  /**
+   * Path: questionnaire/{!surveyId}/questionnaire-code/csv
+   * Method: GET
+   */
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/questionnaire-code/csv',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true,
+    responseBodyType: ResourceResponseBodyType.Blob,
+    headers: {
+      'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : '',
+      'Content-Type': 'text/csv, charset=UTF-8'
+    }
+  })
+  downloadSurveyCodes: IResourceMethodStrict<void, void, {surveyId: number}, any>;
 
   /**
    * Path: questionnare/{!surveyId}/questionnaire-code
@@ -240,7 +269,7 @@ export class SurveysResource extends Resource {
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
-  generateCodes: IResourceMethodStrict<{count: number}, void, {surveyId: number}, IServerResponse<any>>;
+  generateCodes: IResourceMethodStrict<{count: number}, void, {surveyId: number}, IServerResponse<ICodeDTO[]>>;
 
 
   @ResourceAction({
@@ -256,4 +285,12 @@ export class SurveysResource extends Resource {
     withCredentials: true
   })
   editHeader: IResourceMethodStrict<FormData, void, {templateId: number}, IServerResponse<IHeaderDTO>>;
+
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/statistic',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true,
+    queryMappingMethod: ResourceQueryMappingMethod.Bracket
+  })
+  getCommonReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[]}, {surveyId: number}, IServerResponse<IReportDTO>>;
 }

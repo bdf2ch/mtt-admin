@@ -8,6 +8,10 @@ export class Answer {
   index: number;                // Порядковый номер
   next?: any;                   // ???
   weight: number;
+  stat: {
+    value: number;
+    type: string;
+  };
 
   /**
    * Конструктор
@@ -21,5 +25,11 @@ export class Answer {
     this.index = config ? config.index : 0;
     this.next = config ? config.next_questions_map_node : null;
     this.weight = config ? config.weight : null;
+    this.stat = {
+      value: null,
+      type: null
+    };
+    this.stat.value = config && config.statistic ? config.statistic.data.value : null;
+    this.stat.type = config && config.statistic ? config.statistic.data.type : null;
   }
 }

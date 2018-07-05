@@ -10,4 +10,10 @@ export interface IAnswerDTO {
   weight?: number;                        // Вес отаета
   next_questions_map_node?: any | null;   // ХЗ что это
   dateCreated?: number;                   // Дата создания
+  statistic?: {                           // Статистика ответа
+    data: {
+      value: number;
+      type: string;
+    };
+  };
 }

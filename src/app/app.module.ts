@@ -37,7 +37,7 @@ import { AdminModule } from './dashboard/admin/admin.module';
 import { AdminResolveGuard } from './dashboard/admin/guards/admin.resolve.guard';
 import { TestComponent } from './dashboard/test/test.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import {ReportComponent} from './dashboard/surveys/components/report/report.component';
+import { ReportComponent } from './dashboard/surveys/components/report/report.component';
 
 const routes: Routes = [
   {

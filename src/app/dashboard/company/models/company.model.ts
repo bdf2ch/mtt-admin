@@ -27,7 +27,7 @@ export class Company implements ICompany {
     this.title = config ? config.name : '';
     this.www = config ? config.site : '';
     this.phone = config ? config.phone : '';
-    this.rKeeperConfig = config && config.rKeeperConfig ? new RKeeperConfig(config.rKeeperConfig.data) : null;
+    this.rKeeperConfig = config && config.rKeeperConfig.data.reward_code_from ? new RKeeperConfig(config.rKeeperConfig.data) : null;
     this.restaurants = [];
     this.paymentRequisites = [];
 

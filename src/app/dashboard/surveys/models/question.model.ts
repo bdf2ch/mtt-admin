@@ -18,6 +18,8 @@ export class Question {
   isDeletable: boolean;            // Удаляем ли вопрос
   report: any[];
   positiveValue: any[];
+  stat: any[];
+  statTotal: number;
 
   /**
    * Конструктор
@@ -34,21 +36,27 @@ export class Question {
     this.isEditable = config ? config.is_editable : true;
     this.isDeletable = config ? config.is_deletable : false;
     this.answers = [];
-    this.report = [];
-    this.positiveValue = [];
-    this.positiveValue.push({
-      name: this.title,
-      value: Math.random() * 10
-    });
+    this.stat = [];
+    this.statTotal = 0;
 
     if (config && config.answers) {
       config.answers.data.forEach((item: IAnswerDTO) => {
         const answer = new Answer(item);
         this.answers.push(answer);
-        this.report.push({
-          name: answer.content,
-          value: (100 * Math.random()) / 100
-        });
+        if (this.form.type === 'checkbox' || this.form.type === 'radio_button') {
+          this.stat.push({
+            name: answer.content,
+            value: answer.stat.value
+          });
+          this.statTotal += answer.stat.value;
+        }
+        if (this.form.type === 'mark') {
+          this.stat.push({
+            name: this.title,
+            value: this.range.stat.value
+          });
+          this.statTotal += this.range.stat.value;
+        }
       });
     }
   }

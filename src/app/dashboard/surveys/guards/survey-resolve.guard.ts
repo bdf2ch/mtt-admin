@@ -16,13 +16,13 @@ export class SurveyResolveGuard implements Resolve<Promise<Survey[]>> {
               private readonly restaurantsService: RestaurantsService) {}
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Survey[]> {
-    console.log('survey resolve');
     const surveyId = route.params['id'] ? parseInt(route.params['id']) : null;
-    console.log('surveyId', surveyId);
     if (surveyId) {
       const survey = this.surveysService.getSurveyById(surveyId);
       console.log(survey);
       this.surveysService.selectedSurvey(survey);
+      await this.surveysService.fetchSurveyCodes(surveyId);
+      await this.surveysService.fetchCommonReport(surveyId, null);
     }
     return this.surveysService.getSurveysList();
   }

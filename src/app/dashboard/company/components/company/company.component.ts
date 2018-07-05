@@ -438,6 +438,17 @@ export class CompanyComponent implements OnInit {
   }
 
   async editRKeeper() {
+    const data: IRKeeperConfigDTO = {
+      reward_code_from: this.companyData.reward_code_from,
+      reward_code_to: this.companyData.reward_code_to,
+      discount: {
+        product: this.companyData.discount_types.product,
+        discount: this.companyData.discount_types.discount,
+        loyalty: this.companyData.discount_types.loyalty,
+        money: this.companyData.discount_types.money
+      }
+    };
+    this.companyData.rKeeperConfig = data;
     await this.companyService.editCompanyById(this.companyData)
       .then(() => {
         this.closeEditRKeeperDialog();

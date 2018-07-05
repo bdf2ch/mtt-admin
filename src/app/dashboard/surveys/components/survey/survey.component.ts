@@ -14,6 +14,7 @@ import { IRangeDTO } from '../../dto/range.dto';
 import { Question } from '../../models/question.model';
 import { Answer } from '../../models/answer.model';
 import { IHeaderDTO } from '../../dto/header.dto';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-survey',
@@ -26,6 +27,7 @@ export class SurveyComponent implements OnInit {
   public isInEditQuestionMode: boolean;
   public isInDeleteQuestionMode: boolean;
   public isInGenerateCodesMode: boolean;
+  public isInShowSurveyCodesMode: boolean;
   public surveyForm: FormGroup;
   public surveyData: ISurveyDTO;
   public questionForm: FormGroup;
@@ -57,6 +59,7 @@ export class SurveyComponent implements OnInit {
     this.isInEditQuestionMode = false;
     this.isInDeleteQuestionMode = false;
     this.isInGenerateCodesMode = false;
+    this.isInShowSurveyCodesMode = false;
     this.restaurantIds = [];
     this.selectedQuestion = null;
     this.codesAmount = 50;
@@ -392,6 +395,20 @@ export class SurveyComponent implements OnInit {
    */
   closeGenerateCodesDialog() {
     this.isInGenerateCodesMode = false;
+  }
+
+  /**
+   * Открытие диалогового окна с кодами прохождения опроса
+   */
+  openSurveyCodesDialog() {
+    this.isInShowSurveyCodesMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна с кодами прохождения опроса
+   */
+  closeSurveyCodesDilaog() {
+    this.isInShowSurveyCodesMode = false;
   }
 
   /**
@@ -795,5 +812,19 @@ export class SurveyComponent implements OnInit {
 
   openReport() {
     this.router.navigate(['surveys', this.surveysService.selectedSurvey().id, 'report']);
+  }
+
+  async downloadCodes() {
+    const data = await this.surveysService.downloadSurveyCodes(this.surveysService.selectedSurvey().id);
+    //saveAs(data, 'codes.csv');
+
+    const file = new File([data], 'codes.csv', {type: 'text/csv;charset=utf-8'});
+    saveAs(file);
+    /*
+    this.surveysService.downloadCodes()
+      .subscribe((result: any) => {
+        saveAs(result, `codes.csv`);
+      });
+      */
   }
 }

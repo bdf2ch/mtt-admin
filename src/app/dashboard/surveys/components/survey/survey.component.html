@@ -1,148 +1,11 @@
 <div id="survey" class="container-fluid h-100">
   <div class="row h-100">
-    <!-- Start: Surveys list -->
-    <div class="col-12 col-lg-8 p-4 d-flex flex-column align-items-center">
-      <div class="w-100 mb-4 d-flex justify-content-between">
-        <span class="h3">
-          <h3>{{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}</h3>
-        </span>
-        <div><el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button></div>
-      </div>
-
-      <table class="table table-sm mt-4">
-        <tbody>
-        <tr>
-          <th scope="row">Наименование</th>
-          <td>{{ surveysService.selectedSurvey().title }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Описание</th>
-          <td>
-            <span *ngIf="surveysService.selectedSurvey().description">{{ surveysService.selectedSurvey().description }}</span>
-            <span *ngIf="!surveysService.selectedSurvey().description" class="text-muted">Не указано</span>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Дата начала</th>
-          <td>{{ surveysService.selectedSurvey().start | date: 'dd.MM.yyyy' }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Дата окончания</th>
-          <td>
-            <span *ngIf="surveysService.selectedSurvey().end">{{ surveysService.selectedSurvey().end | date: 'dd.MM.yyyy' }}</span>
-            <span *ngIf="!surveysService.selectedSurvey().end" class="text-muted">Не указана</span>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Вознаграждение</th>
-          <td>
-            {{ rewardsService.getRewardById(surveysService.selectedSurvey().rewardId).title }}
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Всего прохождений</th>
-          <td>
-            {{ surveysService.selectedSurvey().passingCount }}
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Доступно прохождений</th>
-          <td>
-            {{ surveysService.selectedSurvey().passingCount - surveysService.selectedSurvey().passedCount }}
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Когда спрашивать контакты</th>
-          <td>{{ surveysService.selectedSurvey().needClientDataFirst  ? 'В начале' : 'В конце' }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Рестораны</th>
-          <td>
-            <div *ngFor="let restaurant of surveysService.selectedSurvey().restaurants">
-              {{restaurant.title }}
-            </div>
-          </td>
-        </tr>
-        <!--
-        <tr>
-          <th scope="row">Является шаблоном</th>
-          <td>
-            {{ surveysService.selectedSurvey().isTemplate ? 'Да' : 'Нет' }}
-          </td>
-        </tr>
-        -->
-        <tr>
-          <th scope="row">Состояние</th>
-          <td>
-            {{ surveysService.selectedSurvey().isActive ? 'Активен' : 'Неактивен' }}
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td class="pt-4">
-            <div el-row gutter="20">
-
-              <div el-col span="12" class="text-left">
-                <div class="row">
-                  <div class="col-12 mb-2">
-                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Сгенерировать коды</el-button>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12 mb-2">
-                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Показать коды</el-button>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-12">
-                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Скачать коды</el-button>
-                  </div>
-                </div>
-              </div>
-
-              <div el-col span="12" class="text-right">
-                <div *ngIf="surveysService.selectedSurvey().isActive === false">
-                  <el-button type="success"
-                             class="w-100"
-                             (click)="setSurveyStatus(true)"
-                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
-                    Запустить опрос
-                  </el-button>
-                </div>
-                <div *ngIf="surveysService.selectedSurvey().isActive === true">
-                  <el-button type="danger"
-                             class="w-100"
-                             (click)="setSurveyStatus(false)"
-                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
-                    Остановить опрос
-                  </el-button>
-                </div>
-              </div>
-            </div>
-            <div el-row gutter="20" class="mt-3">
-              <div el-col span="12">
-                <el-button type="success"
-                           class="w-100"
-                           (click)="openReport()">
-                  Отчет
-                </el-button>
-              </div>
-              <div el-col span="12">
-
-              </div>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- End: Surveys list -->
 
     <!-- Start: Questions -->
-    <div class="questions col-12 col-lg-4 p-4 border-left">
+    <div class="questions col-12 col-lg-7 p-4">
 
       <!-- Start: Header -->
-      <h3 class="mb-4 d-flex justify-content-between">
+      <h3 class="mb-4 d-flex justify-content-between border-left">
         Вопросы
         <el-button type="primary" icon="plus" (click)="openAddQuestionDialog()">&nbsp; Добавить</el-button>
       </h3>
@@ -156,9 +19,10 @@
 
       <!-- Start: Questions-->
       <div class="container-fluid pl-0 pr-0">
-        <div class="row mt-4">
-          <div class="col-12 mb-3" *ngFor="let question of surveysService.selectedSurvey().questions; let i = index;">
-            <el-card>
+        <div class="row mt-4 d-flex justify-content-center">
+          <div class="col-12 col-md-10 col-lg-8 mb-3 d-flex justify-content-center"
+               *ngFor="let question of surveysService.selectedSurvey().questions; let i = index;">
+            <el-card class="w-100">
               <ng-template #header>
                 <div class="clearfix">
                   <span style="line-height: 36px;" class="text-muted">
@@ -244,7 +108,154 @@
 
       <!-- End: Requisites -->
     </div>
-    <!-- End: Payment requisites -->
+    <!-- End: Questions -->
+
+    <!-- Start: Survey -->
+    <div class="col-12 col-lg-5 p-4 d-flex flex-column align-items-center">
+      <div class="w-100 mb-4 d-flex justify-content-between">
+        <span class="h3">
+          <h3>{{ surveysService.selectedSurvey() ? surveysService.selectedSurvey().title : '' }}</h3>
+        </span>
+        <div>
+          <el-button type="success" icon="document" (click)="openReport()">&nbsp; Отчет</el-button>
+          <el-button type="primary" icon="edit" (click)="openEditSurveyDialog()">&nbsp; Изменить</el-button>
+        </div>
+      </div>
+
+      <table class="table table-sm mt-4">
+        <tbody>
+        <tr>
+          <th scope="row">Наименование</th>
+          <td>{{ surveysService.selectedSurvey().title }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Описание</th>
+          <td>
+            <span *ngIf="surveysService.selectedSurvey().description">{{ surveysService.selectedSurvey().description }}</span>
+            <span *ngIf="!surveysService.selectedSurvey().description" class="text-muted">Не указано</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Дата начала</th>
+          <td>{{ surveysService.selectedSurvey().start | date: 'dd.MM.yyyy' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Дата окончания</th>
+          <td>
+            <span *ngIf="surveysService.selectedSurvey().end">{{ surveysService.selectedSurvey().end | date: 'dd.MM.yyyy' }}</span>
+            <span *ngIf="!surveysService.selectedSurvey().end" class="text-muted">Не указана</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Вознаграждение</th>
+          <td>
+            {{ rewardsService.getRewardById(surveysService.selectedSurvey().rewardId).title }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Всего прохождений</th>
+          <td>
+            {{ surveysService.selectedSurvey().passingCount }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Доступно прохождений</th>
+          <td>
+            {{ surveysService.selectedSurvey().passingCount - surveysService.selectedSurvey().passedCount }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Когда спрашивать контакты</th>
+          <td>{{ surveysService.selectedSurvey().needClientDataFirst  ? 'В начале' : 'В конце' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Рестораны</th>
+          <td>
+            <div *ngFor="let restaurant of surveysService.selectedSurvey().restaurants">
+              {{restaurant.title }}
+            </div>
+          </td>
+        </tr>
+        <!--
+        <tr>
+          <th scope="row">Является шаблоном</th>
+          <td>
+            {{ surveysService.selectedSurvey().isTemplate ? 'Да' : 'Нет' }}
+          </td>
+        </tr>
+        -->
+        <tr>
+          <th scope="row">Состояние</th>
+          <td>
+            {{ surveysService.selectedSurvey().isActive ? 'Активен' : 'Неактивен' }}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="pt-4">
+            <div el-row gutter="20">
+
+              <div el-col span="12" class="text-left">
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <el-button type="warning" class="w-100" (click)="openGenerateCodesDialog()">Сгенерировать коды</el-button>
+                  </div>
+                </div>
+
+                <!-- Start: Кнопка показа дивлогового окна с кодами прохождения опроса -->
+                <div class="row">
+                  <div class="col-12 mb-2">
+                    <el-button
+                      type="warning"
+                      class="w-100"
+                      *ngIf="surveysService.getCodes().length > 0"
+                      (click)="openSurveyCodesDialog()">
+                      Показать коды
+                    </el-button>
+                  </div>
+                </div>
+                <!-- End: Кнопка показа дивлогового окна с кодами прохождения опроса -->
+
+                <!-- Start: Кнопка загрузки кодов прохождения опроса -->
+                <div class="row">
+                  <div class="col-12">
+                    <el-button
+                      type="warning"
+                      class="w-100"
+                      *ngIf="surveysService.getCodes().length > 0"
+                      (click)="downloadCodes()">
+                      Скачать коды
+                    </el-button>
+                  </div>
+                </div>
+                <!-- Start: Кнопка загрузки кодов прохождения опроса -->
+              </div>
+
+              <div el-col span="12" class="text-right">
+                <div *ngIf="surveysService.selectedSurvey().isActive === false">
+                  <el-button type="success"
+                             class="w-100"
+                             (click)="setSurveyStatus(true)"
+                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
+                    Запустить опрос
+                  </el-button>
+                </div>
+                <div *ngIf="surveysService.selectedSurvey().isActive === true">
+                  <el-button type="danger"
+                             class="w-100"
+                             (click)="setSurveyStatus(false)"
+                             [elDisabled]="surveysService.settingSurveyStatusInProgress()">
+                    Остановить опрос
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- End: Survey -->
+
 
   </div>
 </div>
@@ -941,3 +952,39 @@
   </div>
 </el-dialog>
 <!-- End: Code generation dialog -->
+
+<!-- Start: Surveys codes dialog -->
+<el-dialog [(visible)]="isInShowSurveyCodesMode" [width]="'450px'">
+  <ng-template #title>
+    <span class="el-icon-document"></span>&nbsp;
+    <span>Коды прохождения опроса</span>
+  </ng-template>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-striped">
+          <tbody>
+          <tr *ngFor="let code of surveysService.getCodes(); let i = index;">
+            <td style="width: 30px">{{ i + 1 }}.</td>
+            <td class="text-center">
+              <strong>{{ code.value }}</strong>
+            </td>
+            <td>
+              {{ code.isUsed ? 'Использован' : 'Не использован' }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-12 text-right">
+        <el-button
+          type="danger"
+          icon="close"
+          (click)="closeSurveyCodesDilaog()">&nbsp; Закрыть</el-button>
+      </div>
+    </div>
+  </div>
+</el-dialog>
+<!-- End: Survey codes dialog -->

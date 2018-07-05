@@ -17,6 +17,14 @@ import { QuestionRange } from '../models/question-range.model';
 import { IQuestionFormType } from '../interfaces/question-form-type.interface';
 import { IHeaderDTO } from '../dto/header.dto';
 import { Header } from '../models/header.model';
+import { Code } from '../models/code.model';
+import {ICodeDTO} from '../dto/code.dto';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {environment} from '../../../../environments/environment';
+import {ResponseContentType, ResponseType} from '@angular/http';
+import {IReportDTO} from '../dto/report.dto';
+import {Report} from '../models/report.model';
+import {IReportFiltersDTO} from '../dto/report-filters.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +34,7 @@ export class SurveysService {
   private surveys: Survey[];
   private templates: Survey[];
   private selectedSurvey_: Survey | null;
+  private selectedSurveyCodes: Code[];
   private isAddingSurveyInProgress: boolean;
   private isEditingSurveyInProgress: boolean;
   private isDeletingSurveyInProgress: boolean;
@@ -34,12 +43,15 @@ export class SurveysService {
   private isEditingQuestionInProgress: boolean;
   private isDeletingQuestionInProgress: boolean;
   private isGeneratingCodesInProgress: boolean;
+  private commonReport: Report | null;
 
-  constructor(private readonly resource: SurveysResource) {
+  constructor(private readonly resource: SurveysResource,
+              private readonly http: HttpClient) {
     this.questionTypes = [];
     this.surveys = [];
     this.templates = [];
     this.selectedSurvey_ = null;
+    this.selectedSurveyCodes = [];
     this.isAddingSurveyInProgress = false;
     this.isEditingSurveyInProgress = false;
     this.isSettingSurveyStatusInProgress = false;
@@ -48,6 +60,7 @@ export class SurveysService {
     this.isEditingQuestionInProgress = false;
     this.isDeletingQuestionInProgress = false;
     this.isGeneratingCodesInProgress = false;
+    this.commonReport = null;
   }
 
   /**
@@ -739,29 +752,90 @@ export class SurveysService {
   }
 
   /**
+   * Получение кодов опроса с сервера
+   * @param {number} surveyId - Идентфиикатор опроса
+   * @returns {Promise<Code[] | null>}
+   */
+  async fetchSurveyCodes(surveyId: number): Promise<Code[] | null> {
+    try {
+      const result = await this.resource.getSurveyCodes(null, null, {surveyId: surveyId});
+      if (result.data) {
+        this.selectedSurveyCodes = [];
+        result.data.forEach((item: ICodeDTO) => {
+          const code = new Code(item);
+          this.selectedSurveyCodes.
+            push(code);
+        });
+        console.log(this.selectedSurveyCodes);
+        return this.selectedSurveyCodes;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Загрузка файла с кодами прохождения опроса
+   * @param {number} surveyId - Идентификатор опроса
+   * @returns {Promise<any>}
+   */
+  async downloadSurveyCodes(surveyId: number): Promise<any> {
+    try {
+      const result = await this.resource.downloadSurveyCodes(null, null, {surveyId: surveyId});
+      return result;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  downloadCodes() {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + (window.localStorage && window.localStorage.getItem('api_token') ? window.localStorage.getItem('api_token') : ''),
+      'Content-Type': 'text/csv',
+      'Accept': 'text/csv'
+      });
+    return this.http.get(
+      environment.apiUrl + `questionnaire/${this.selectedSurvey_.id}/questionnaire-code/csv`,
+      {
+        headers: headers,
+        responseType: 'blob'
+      });
+  }
+
+  /**
    * Генерация кодов опроса
    * @param {number} surveyId - Идентификатор опроса
    * @param {number} amount - Количество кодов
    * @returns {Promise<boolean>}
    */
-  async generateCodes(surveyId: number, amount: number): Promise<boolean> {
+  async generateCodes(surveyId: number, amount: number): Promise<Code[] | null> {
     try {
       this.isGeneratingCodesInProgress = true;
       const result = await this.resource.generateCodes({count: amount}, null, {surveyId: surveyId});
       if (result.data) {
         this.isGeneratingCodesInProgress = false;
+        result.data.forEach((item: ICodeDTO) => {
+          const code = new Code(item);
+          this.selectedSurveyCodes.push(code);
+        });
         const findSurveyById = (survey: Survey) => survey.id === surveyId;
         const survey_ = this.surveys.find(findSurveyById);
         if (survey_) {
           survey_.passingCount += amount;
         }
-        return true;
+        return this.selectedSurveyCodes;
       }
     } catch (error) {
       console.error(error);
       this.isGeneratingCodesInProgress = false;
-      return false;
+      return null;
     }
+  }
+
+  getCodes(): Code[] {
+    return this.selectedSurveyCodes;
   }
 
   /**
@@ -830,4 +904,28 @@ export class SurveysService {
       return null;
     }
   }
+
+
+  async fetchCommonReport(surveyId: number, filters?: IReportFiltersDTO,): Promise<Report | null> {
+    console.log('filters', filters);
+    try {
+      const result = await filters
+        ? await this.resource.getCommonReport(null, filters, {surveyId: surveyId}) : await this.resource.getCommonReport(null, null, {surveyId: surveyId});
+      if (result.data) {
+        const report  = new Report(result.data);
+        this.commonReport = report;
+        console.log(this.commonReport);
+        return this.commonReport;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+
+  getCommonReport(): Report | null {
+    return this.commonReport;
+  }
+
 }

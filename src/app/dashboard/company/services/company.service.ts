@@ -101,6 +101,13 @@ export class CompanyService {
       if (result.data) {
         const paymentRequisites = new PaymentRequisites(result.data);
         this.company.paymentRequisites.push(paymentRequisites);
+        if (paymentRequisites.isPrimary) {
+          this.getCompany().paymentRequisites.forEach((item: PaymentRequisites) => {
+            if (item.id !== paymentRequisites.id) {
+              item.isPrimary = false;
+            }
+          });
+        }
         return paymentRequisites;
       }
     } catch (error) {

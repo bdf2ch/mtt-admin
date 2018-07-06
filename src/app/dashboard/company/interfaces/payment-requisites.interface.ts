@@ -3,6 +3,7 @@
  */
 export interface IPaymentRequisites {
   id: number;                       // Идентификатор
+  companyId: number;                // Идентификатор компании
   businessTitle: string;            // Наименование юр. лица
   INN: string;                      // ИНН
   KPP: string;                      // КПП
@@ -12,4 +13,5 @@ export interface IPaymentRequisites {
   account: string;                  // Расчетный счет
   correspondingAccount: string;     // Корреспондентский счет
   BIK: string;                      // БИК
+  isPrimary: boolean;               // Являются ли основными
 }

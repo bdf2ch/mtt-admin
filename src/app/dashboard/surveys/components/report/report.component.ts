@@ -4,6 +4,8 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Restaurant } from '../../../restaurants/models/restaurant.model';
 import { IReportFiltersDTO } from '../../dto/report-filters.dto';
 import { RestaurantsService } from '../../../restaurants/services/restaurants.service';
+import { SurveyResult } from '../../models/survey-result.model';
+import { ElMessageService } from 'element-angular/release/message/message.service';
 
 @Component({
   selector: 'app-report',
@@ -11,14 +13,20 @@ import { RestaurantsService } from '../../../restaurants/services/restaurants.se
   styleUrls: ['./report.component.scss']
 })
 export class ReportComponent implements OnInit {
+  public isInSendEmailMode: boolean;
   public selectedTabIndex: number;
   public filterForm: FormGroup;
   public filterData: IReportFiltersDTO;
+  public emailForm: FormGroup;
+  public email: string;
 
   constructor(private readonly formBuilder: FormBuilder,
               public readonly surveysService: SurveysService,
-              public readonly restaurantsService: RestaurantsService) {
+              public readonly restaurantsService: RestaurantsService,
+              private readonly message: ElMessageService) {
+    this.isInSendEmailMode = false;
     this.selectedTabIndex = 1;
+    this.email = null;
     this.filterData = {
       date_from: null,
       date_to: null,
@@ -92,6 +100,9 @@ export class ReportComponent implements OnInit {
       start: [this.filterData.date_from, Validators.pattern(dateRegExp)],
       end: [this.filterData.date_to, Validators.pattern(dateRegExp)]
     });
+    this.emailForm = this.formBuilder.group({
+      email: [this.email, [Validators.required, Validators.email]]
+    });
   }
 
 
@@ -137,20 +148,40 @@ export class ReportComponent implements OnInit {
     }
   }
 
+  /**
+   * Получение статуса элемента формы отправки почты
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  emailFormStatusCtrl(item: string): string {
+    if (!this.emailForm.controls[item]) { return; }
+    const control: AbstractControl = this.emailForm.controls[item];
+    return control.dirty && control.hasError('required') || control.hasError('email') ? 'error' : 'validating';
+  }
+
+  /**
+   * Получение сообщения об ошибке элемента формы отправки почты
+   * @param {string} item - Имя элемента формы
+   * @returns {string}
+   */
+  emailFormMessageCtrl(item: string): string {
+    if (!this.emailForm.controls[item]) { return; }
+    const control: AbstractControl = this.emailForm.controls[item];
+    switch (item) {
+      case 'email':
+        return control.dirty && control.hasError('required')
+          ? 'Вы не указали E-mail' : control.hasError('email')
+            ? 'E-mail указан некорректно' : '';
+    }
+  }
+
   selectTab(index: number) {
     this.selectedTabIndex = index;
   }
 
-  changeRestaurant(value: boolean, restaurant: Restaurant) {
-    if (value === false) {
-      this.filterData.restaurants_ids.forEach((item: number, index: number, array: number[]) => {
-        if (item === restaurant.id) {
-          array.splice(index, 1);
-        }
-      });
-    } else {
-      this.filterData.restaurants_ids.push(restaurant.id);
-    }
+  changeRestaurant(value: any) {
+    console.log(value);
+    this.filterData.restaurants_ids = value;
     console.log(this.filterData);
   }
 
@@ -176,7 +207,56 @@ export class ReportComponent implements OnInit {
       case 2:
         await this.surveysService.fetchCompareReport(this.surveysService.selectedSurvey().id, data);
         break;
+      case 3:
+        await this.surveysService.fetchSurveyResults(this.surveysService.selectedSurvey().id, data);
+        break;
     }
   }
 
+
+  /**
+   * Выбор прохождения опроса
+   * @param {SurveyResult} result - Прохождение опроса
+   */
+  async selectSurveyResult(result: SurveyResult) {
+    this.surveysService.selectedResult(result);
+    if (!result.viewed) {
+      await this.surveysService.setSurveyResultViewStatus(result.id, true);
+    }
+  }
+
+
+  /**
+   * Открытие диалогового окна отправки результатов опроса на почту
+   */
+  openSendToEmailDialog() {
+    this.isInSendEmailMode = true;
+  }
+
+  /**
+   * Закрытие диалогового окна отправки результатов опроса на почту
+   */
+  closeSendToEmailDialog() {
+    this.isInSendEmailMode = false;
+  }
+
+  /**
+   * Отправка рехультатов опроса на почту
+   * @returns {Promise<void>}
+   */
+  async sendSurveyResultToEmail() {
+    await this.surveysService.sendSurveyResultToEmail(this.surveysService.selectedSurvey().id, this.email)
+      .then(() => {
+        this.closeSendToEmailDialog();
+        this.message['success']('Отзывы отправлены на указанную почту');
+      });
+  }
+
+  async markResultAsNotViewed(result: SurveyResult) {
+    await this.surveysService.setSurveyResultViewStatus(result.id, false)
+      .then( () => {
+        this.surveysService.selectedResult(null);
+        console.log(this.surveysService.selectedResult());
+      });
+  }
 }

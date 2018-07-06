@@ -176,7 +176,15 @@
                       <el-button type="success" size="small" icon="edit" class="w-100" (click)="openEditPaymentsRequisitesDialog(item)">&nbsp; Изменить</el-button>
                     </div>
                     <div class="col-6">
-                      <el-button type="danger" size="small" icon="delete" class="w-100" (click)="openDeletePaymentRequisitesDialog(item)">&nbsp; Удалить</el-button>
+                      <el-button
+                        type="danger"
+                        size="small"
+                        icon="delete"
+                        class="w-100"
+                        [elDisabled]="item.isPrimary"
+                        (click)="openDeletePaymentRequisitesDialog(item)">
+                        &nbsp; Удалить
+                      </el-button>
                     </div>
                   </div>
                 </div>
@@ -419,7 +427,7 @@
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('name')"
                   [error]="addPaymentRequisitesFormMessageCtrl('name')">
-      <el-input formControlName="name" [(model)]="paymentRequisitesData.name"></el-input>
+      <el-input formControlName="name" [(model)]="newPaymentRequisites.businessTitle"></el-input>
     </el-form-item>
 
     <!-- Start: INN -->
@@ -430,7 +438,7 @@
       <el-input formControlName="inn"
                 native-type="number"
                 el-class="no-spinners"
-                [(model)]="paymentRequisitesData.inn">
+                [(model)]="newPaymentRequisites.INN">
       </el-input>
     </el-form-item>
     <!-- End: INN -->
@@ -443,7 +451,7 @@
       <el-input formControlName="kpp"
                 native-type="number"
                 el-class="no-spinners"
-                [(model)]="paymentRequisitesData.kpp">
+                [(model)]="newPaymentRequisites.KPP">
       </el-input>
     </el-form-item>
     <!-- End: KPP -->
@@ -453,13 +461,13 @@
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('legal_address')"
                   [error]="addPaymentRequisitesFormMessageCtrl('legal_address')">
-      <el-input formControlName="legal_address" [(model)]="paymentRequisitesData.legal_address"></el-input>
+      <el-input formControlName="legal_address" [(model)]="newPaymentRequisites.businessAddress"></el-input>
     </el-form-item>
     <!-- End: Business address -->
 
     <!-- Start: Actual address -->
     <el-form-item label="Физический адрес">
-      <el-input formControlName="actual_address" [(model)]="paymentRequisitesData.actual_address"></el-input>
+      <el-input formControlName="actual_address" [(model)]="newPaymentRequisites.address"></el-input>
     </el-form-item>
     <!-- End: Actual address -->
 
@@ -468,7 +476,7 @@
                   [required]="true"
                   [status]="addPaymentRequisitesFormStatusCtrl('bank_name')"
                   [error]="addPaymentRequisitesFormMessageCtrl('bank_name')">
-      <el-input formControlName="bank_name" [(model)]="paymentRequisitesData.bank_name"></el-input>
+      <el-input formControlName="bank_name" [(model)]="newPaymentRequisites.bankTitle"></el-input>
     </el-form-item>
     <!-- End: Bank title -->
 
@@ -480,7 +488,7 @@
       <el-input formControlName="checking_account"
                 native-type="number"
                 el-class="no-spinners"
-                [(model)]="paymentRequisitesData.checking_account">
+                [(model)]="newPaymentRequisites.account">
       </el-input>
     </el-form-item>
     <!-- End: Account -->
@@ -493,7 +501,7 @@
       <el-input formControlName="correspondent_account"
                 native-type="number"
                 el-class="no-spinners"
-                [(model)]="paymentRequisitesData.correspondent_account">
+                [(model)]="newPaymentRequisites.correspondingAccount">
       </el-input>
     </el-form-item>
     <!-- End: Corresponding account -->
@@ -506,10 +514,17 @@
       <el-input formControlName="bik"
                 native-type="number"
                 el-class="no-spinners"
-                [(model)]="paymentRequisitesData.bik">
+                [(model)]="newPaymentRequisites.BIK">
       </el-input>
     </el-form-item>
     <!-- End: BIK -->
+
+    <!-- Start: Is primary -->
+    <el-form-item label="Основные"
+                  [required]="false">
+      <el-switch [(model)]="newPaymentRequisites.isPrimary"></el-switch>
+    </el-form-item>
+    <!-- End: Is primary -->
 
     <!-- Start: Form controls -->
     <el-form-item>

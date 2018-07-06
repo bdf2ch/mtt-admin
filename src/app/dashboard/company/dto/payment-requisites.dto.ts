@@ -13,5 +13,5 @@ export interface IPaymentRequisitesDTO {
   checking_account: string;         // Расчетный счет
   correspondent_account: string;    // Корреспондентский счет
   bik: string;                      // БИК
-  primary: number;                  // ???
+  primary: number | boolean;        // Являются ли основными
 }

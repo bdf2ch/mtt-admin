@@ -1,5 +1,5 @@
-import {IQuestionDTO} from './question.dto';
-import {IRestaurantDTO} from '../../restaurants/dto/restaurant.dto';
+import { IQuestionDTO } from './question.dto';
+import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 
 export interface IReportDTO {
   questions: {
@@ -7,6 +7,10 @@ export interface IReportDTO {
   };
   restaurant_marks: {
     data: IRestaurantDTO[];
+  };
+  questionnaire_results?: {
+    not_viewed: number;
+    total: number;
   };
 }
 

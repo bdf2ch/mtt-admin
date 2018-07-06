@@ -7,10 +7,18 @@ import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 export class Report {
   questions: Question[];
   restaurants: Restaurant[];
+  views: {
+    total: number;
+    notViewed: number;
+  };
 
   constructor(config?: IReportDTO) {
     this.questions = [];
     this.restaurants = [];
+    this.views = {
+      total: null,
+      notViewed: null
+    };
 
     if (config) {
       console.log(config);
@@ -24,6 +32,11 @@ export class Report {
         const restaurant = new Restaurant(item);
         this.restaurants.push(restaurant);
       });
+
+      if (config.questionnaire_results) {
+        this.views.total = config.questionnaire_results.total;
+        this.views.notViewed = config.questionnaire_results.not_viewed;
+      }
     }
   }
 }

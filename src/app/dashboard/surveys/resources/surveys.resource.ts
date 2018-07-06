@@ -19,6 +19,8 @@ import {IHeaderDTO} from '../dto/header.dto';
 import {ICodeDTO} from '../dto/code.dto';
 import {IReportDTO} from '../dto/report.dto';
 import {IReportFiltersDTO} from '../dto/report-filters.dto';
+import {ISurveyAnswerDTO} from '../dto/survey-answer.dto';
+import {ISurveyResultDTO} from '../dto/survey-result.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -301,4 +303,26 @@ export class SurveysResource extends Resource {
     queryMappingMethod: ResourceQueryMappingMethod.Bracket
   })
   getCompareReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[]}, {surveyId: number}, IServerResponse<IReportDTO>>;
+
+  @ResourceAction({
+    path: '/questionnaire/{!surveyId}/questionnaire-result',
+    method: ResourceRequestMethod.Get,
+    withCredentials: true,
+    queryMappingMethod: ResourceQueryMappingMethod.Bracket
+  })
+  getFeedbackReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[]}, {surveyId: number}, IServerResponse<ISurveyResultDTO[]>>;
+
+  @ResourceAction({
+    path: '/questionnaire-result/{!surveyId}/send-to-email',
+    method: ResourceRequestMethod.Post,
+    withCredentials: true
+  })
+  sendSurveyResultToEmail: IResourceMethodStrict<{target_email: string}, void, {surveyId: number}, IServerResponse<boolean>>;
+
+  @ResourceAction({
+    path: '/questionnaire-result/{!resultId}/set-viewed-status',
+    method: ResourceRequestMethod.Patch,
+    withCredentials: true
+  })
+  setResultViewStatus: IResourceMethodStrict<{status: number}, void, {resultId: number}, IServerResponse<boolean>>;
 }

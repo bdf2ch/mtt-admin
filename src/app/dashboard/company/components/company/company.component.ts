@@ -26,6 +26,8 @@ export class CompanyComponent implements OnInit {
   paymentRequisitesData: IPaymentRequisitesDTO;
   selectedPaymentRequisites: PaymentRequisites;
 
+  newPaymentRequisites: PaymentRequisites;
+
   constructor(private readonly builder: FormBuilder,
               private readonly authenticationService: AuthenticationService,
               public readonly companyService: CompanyService,
@@ -62,6 +64,7 @@ export class CompanyComponent implements OnInit {
       bik: '',
       primary: 0
     };
+    this.newPaymentRequisites = new PaymentRequisites();
   }
 
   ngOnInit() {
@@ -84,6 +87,7 @@ export class CompanyComponent implements OnInit {
     const KPPRegExp = /^[0-9]{9}$/;
     const accountRegExp = /^[0-9]{20}$/;
     const BIKRegExp = /^[0-9]{9}$/;
+    /*
     this.addPaymentRequisitesForm = this.builder.group({
       name: ['', Validators.required],
       inn: ['', [Validators.required, Validators.pattern(INNRegExp)]],
@@ -93,7 +97,22 @@ export class CompanyComponent implements OnInit {
       bank_name: ['', Validators.required],
       checking_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
       correspondent_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
-      bik: ['', [Validators.required, Validators.pattern(BIKRegExp)]]
+      bik: ['', [Validators.required, Validators.pattern(BIKRegExp)]],
+      primary: [this.paymentRequisitesData.primary === 1 ? true : false]
+    });
+    */
+
+    this.addPaymentRequisitesForm = this.builder.group({
+      name: [this.newPaymentRequisites.businessTitle, Validators.required],
+      inn: [this.newPaymentRequisites.INN, [Validators.required, Validators.pattern(INNRegExp)]],
+      kpp: [this.newPaymentRequisites.KPP, [Validators.required, Validators.pattern(KPPRegExp)]],
+      legal_address: [this.newPaymentRequisites.businessAddress, Validators.required],
+      actual_address: [this.newPaymentRequisites.address],
+      bank_name: [this.newPaymentRequisites.bankTitle, Validators.required],
+      checking_account: [this.newPaymentRequisites.account, [Validators.required, Validators.pattern(accountRegExp)]],
+      correspondent_account: [this.newPaymentRequisites.correspondingAccount, [Validators.required, Validators.pattern(accountRegExp)]],
+      bik: [this.newPaymentRequisites.BIK, [Validators.required, Validators.pattern(BIKRegExp)]],
+      primary: [this.newPaymentRequisites.isPrimary]
     });
   }
 
@@ -263,7 +282,8 @@ export class CompanyComponent implements OnInit {
       bank_name: '',
       checking_account: '',
       correspondent_account: '',
-      bik: ''
+      bik: '',
+      primary: false
     });
   }
 
@@ -344,11 +364,15 @@ export class CompanyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async addPaymentRequisites() {
-    await this.companyService.addPaymentRequisites(this.paymentRequisitesData, this.authenticationService.getCurrentUser().companyId)
+    //console.log(this.paymentRequisitesData);
+    console.log(this.newPaymentRequisites.toDTO());
+
+    await this.companyService.addPaymentRequisites(this.newPaymentRequisites.toDTO(), this.authenticationService.getCurrentUser().companyId)
       .then(() => {
         this.closeAddPaymentRequisitesDialog();
         this.message['success']('Платежные реквизиты добавлены');
       });
+
   }
 
   /**
@@ -356,6 +380,7 @@ export class CompanyComponent implements OnInit {
    * @param {PaymentRequisites} paymentRequisites - Выбранные платежные реквизиты
    */
   openEditPaymentsRequisitesDialog(paymentRequisites: PaymentRequisites) {
+    console.log(paymentRequisites.toDTO());
     this.addPaymentRequisitesForm.get('actual_address').setValidators(Validators.required);
     this.selectedPaymentRequisites = paymentRequisites;
     this.isInEditPaymentRequisitesMode = true;
@@ -368,8 +393,10 @@ export class CompanyComponent implements OnInit {
       bank_name: paymentRequisites.bankTitle,
       checking_account: paymentRequisites.account,
       correspondent_account: paymentRequisites.correspondingAccount,
-      bik: paymentRequisites.BIK
+      bik: paymentRequisites.BIK,
+      primary: paymentRequisites.isPrimary
     });
+    /*
     this.paymentRequisitesData = {
       id: paymentRequisites.id,
       company_id: this.companyService.getCompany().id,
@@ -384,6 +411,7 @@ export class CompanyComponent implements OnInit {
       bik: paymentRequisites.BIK,
       primary: 0
     };
+    */
   }
 
   /**
@@ -398,8 +426,18 @@ export class CompanyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editPaymentRequisites() {
-    await this.companyService.editPaymentRequisites(this.paymentRequisitesData, this.authenticationService.getCurrentUser().companyId)
+    await this.companyService.editPaymentRequisites(this.selectedPaymentRequisites.toDTO(), this.authenticationService.getCurrentUser().companyId)
       .then(() => {
+        this.selectedPaymentRequisites.businessTitle = requisites.businessTitle;
+        this.selectedPaymentRequisites.INN = requisites.INN;
+        this.selectedPaymentRequisites.KPP = requisites.KPP;
+        this.selectedPaymentRequisites.businessAddress = requisites.businessAddress;
+        this.selectedPaymentRequisites.address = requisites.address;
+        this.selectedPaymentRequisites.bankTitle = requisites.bankTitle;
+        this.selectedPaymentRequisites.BIK = requisites.BIK;
+        this.selectedPaymentRequisites.isPrimary = requisites.isPrimary;
+
+        /*
         this.selectedPaymentRequisites.businessTitle = this.paymentRequisitesData.name;
         this.selectedPaymentRequisites.INN = this.paymentRequisitesData.inn;
         this.selectedPaymentRequisites.KPP = this.paymentRequisitesData.kpp;
@@ -407,6 +445,7 @@ export class CompanyComponent implements OnInit {
         this.selectedPaymentRequisites.address = this.paymentRequisitesData.actual_address;
         this.selectedPaymentRequisites.bankTitle = this.paymentRequisitesData.bank_name;
         this.selectedPaymentRequisites.BIK = this.paymentRequisitesData.bik;
+        */
         this.closeEditPaymentRequisitesDialog();
         this.message['success']('Платежные реквизиты изменены');
       });

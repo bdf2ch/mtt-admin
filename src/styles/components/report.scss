@@ -50,6 +50,28 @@
 }
 
 
+.feedback-table {
+  thead tr {
+    font-size: 14px;
+    color: #607D8B;
+    border: none;
+
+    .index {
+      width: 50px;
+    }
+    .controls {
+      width: 100px;
+    }
+  }
+  tbody tr {
+    background: white;
+    border-bottom: 1px solid #ECEFF1;
+  }
+}
+
+
+
+
 .filters-column {
   overflow: auto;
   font-size: 14px;

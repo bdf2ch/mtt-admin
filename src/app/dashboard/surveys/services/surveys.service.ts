@@ -18,14 +18,14 @@ import { IQuestionFormType } from '../interfaces/question-form-type.interface';
 import { IHeaderDTO } from '../dto/header.dto';
 import { Header } from '../models/header.model';
 import { Code } from '../models/code.model';
-import {ICodeDTO} from '../dto/code.dto';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {environment} from '../../../../environments/environment';
-import {ResponseContentType, ResponseType} from '@angular/http';
-import {IReportDTO} from '../dto/report.dto';
-import {Report} from '../models/report.model';
-import {IReportFiltersDTO} from '../dto/report-filters.dto';
-import {ComparsionReport} from "../models/comparsion-report.model";
+import { ICodeDTO } from '../dto/code.dto';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { Report } from '../models/report.model';
+import { IReportFiltersDTO } from '../dto/report-filters.dto';
+import { ComparsionReport } from '../models/comparsion-report.model';
+import { SurveyResult } from '../models/survey-result.model';
+import { ISurveyResultDTO } from '../dto/survey-result.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -44,8 +44,12 @@ export class SurveysService {
   private isEditingQuestionInProgress: boolean;
   private isDeletingQuestionInProgress: boolean;
   private isGeneratingCodesInProgress: boolean;
+  private isSendingEmailInProgress: boolean;
+  private isSettingResultStatusInProgress: boolean;
   private commonReport: Report | null;
   private comparsionReport: Report | null;
+  private feedbackReport: SurveyResult[];
+  private selectedSurveyResult: SurveyResult | null;
 
   constructor(private readonly resource: SurveysResource,
               private readonly http: HttpClient) {
@@ -62,8 +66,12 @@ export class SurveysService {
     this.isEditingQuestionInProgress = false;
     this.isDeletingQuestionInProgress = false;
     this.isGeneratingCodesInProgress = false;
+    this.isSendingEmailInProgress = false;
+    this.isSettingResultStatusInProgress = false;
     this.commonReport = null;
     this.comparsionReport = null;
+    this.feedbackReport = [];
+    this.selectedSurveyResult = null;
   }
 
   /**
@@ -915,7 +923,7 @@ export class SurveysService {
    * @param {IReportFiltersDTO} filters - Фильтры
    * @returns {Promise<Report | null>}
    */
-  async fetchCommonReport(surveyId: number, filters?: IReportFiltersDTO,): Promise<Report | null> {
+  async fetchCommonReport(surveyId: number, filters?: IReportFiltersDTO, ): Promise<Report | null> {
     console.log('filters', filters);
     try {
       const result = await filters
@@ -970,4 +978,99 @@ export class SurveysService {
     return this.comparsionReport;
   }
 
+  /**
+   * Получение результатов опроса с сервера
+   * @param {number} surveyId - Идентификатор опроса
+   * @param {IReportFiltersDTO} filters - Фильтры
+   * @returns {Promise<SurveyResult[] | null>}
+   */
+  async fetchSurveyResults(surveyId: number, filters: IReportFiltersDTO): Promise<SurveyResult[] | null> {
+    try {
+      const result = await filters
+        ? await this.resource.getFeedbackReport(null, filters, {surveyId: surveyId}) : await this.resource.getFeedbackReport(null, null, {surveyId: surveyId});
+      if (result.data) {
+        this.feedbackReport = [];
+        result.data.forEach((item: ISurveyResultDTO) => {
+          const res = new SurveyResult(item);
+          this.feedbackReport.push(res);
+        });
+        console.log(this.feedbackReport);
+        return this.feedbackReport;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  /**
+   * Возвращает отзывы
+   * @returns {SurveyResult[]}
+   */
+  getFeedbackreport(): SurveyResult[] {
+    return this.feedbackReport;
+  }
+
+  /**
+   * Установка / получение текущего результата опроса
+   * @param {SurveyResult | null} result - Результат опроса
+   * @returns {SurveyResult | null}
+   */
+  selectedResult(result?: SurveyResult | null): SurveyResult | null {
+    if (result) {
+      this.selectedSurveyResult = result;
+    }
+    return this.selectedSurveyResult;
+  }
+
+  async sendSurveyResultToEmail(surveyId: number, email: string): Promise<boolean> {
+    try {
+      this.isSendingEmailInProgress = true;
+      const result = await this.resource.sendSurveyResultToEmail({target_email: email}, null, {surveyId: surveyId});
+      if (result.meta['success'] && result.meta['success'] === true) {
+        this.isSendingEmailInProgress = false;
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      this.isSendingEmailInProgress = false;
+      return false;
+    }
+  }
+
+  sendingEmailInProgress(): boolean {
+    return this.isSendingEmailInProgress;
+  }
+
+  async setSurveyResultViewStatus(resultId: number, status: boolean): Promise<boolean> {
+    try {
+      this.isSettingResultStatusInProgress = true;
+      const result = await this.resource.setResultViewStatus({status: status ? 1 : 0}, null, {resultId: resultId});
+      if (result.data) {
+        this.isSettingResultStatusInProgress = false;
+        this.feedbackReport.forEach((item: SurveyResult) => {
+          if (item.id === resultId) {
+            item.viewed = status;
+          }
+        })
+        if (this.commonReport) {
+          if (status) {
+            this.commonReport.views.notViewed--;
+          } else {
+            this.commonReport.views.notViewed++;
+          }
+        }
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      this.isSettingResultStatusInProgress = false;
+      return false;
+    }
+  }
+
+  settingResultStatus(): boolean {
+    return this.isSettingResultStatusInProgress;
+  }
 }

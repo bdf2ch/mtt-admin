@@ -6,10 +6,19 @@ import { Restaurant } from '../../restaurants/models/restaurant.model';
 export class ComparsionReport {
   questions: Question[];
   restaurants: Restaurant[];
+  views: {
+    total: number;
+    notViewed: number;
+  };
+
 
   constructor(config?: IReportDTO) {
     this.questions = [];
     this.restaurants = [];
+    this.views = {
+      total: null,
+      notViewed: null
+    };
 
     if (config) {
       console.log(config);
@@ -19,6 +28,10 @@ export class ComparsionReport {
           this.questions.push(question);
         }
       });
+      if (config.questionnaire_results) {
+        this.views.total = config.questionnaire_results.total;
+        this.views.notViewed = config.questionnaire_results.not_viewed;
+      }
     }
   }
 }

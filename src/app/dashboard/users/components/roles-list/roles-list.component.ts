@@ -185,7 +185,7 @@ export class RolesListComponent implements OnInit {
    * Изменение роли пользователя
    * @returns {Promise<void>}
    */
-  async editUserRole(role: Role, companyId: number) {
+  async editUserRole() {
     await this.usersService.editUserRole(this.userRoleData, this.authenticationService.getCurrentUser().companyId)
       .then(() => {
         this.closeEditRoleDialog();

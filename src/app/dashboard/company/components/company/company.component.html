@@ -558,97 +558,106 @@
     <span>Изменение платежных реквизитов</span>
   </ng-template>
 
-  <el-form [formGroup]="addPaymentRequisitesForm"
-           label-width="200px"
-           [label-position]="'left'"
-           size="small"
-           [show-icon]="true"
-           [show-message]="true" #form>
+  <div *ngIf="selectedPaymentRequisites">
+    <el-form [formGroup]="addPaymentRequisitesForm"
+             label-width="200px"
+             [label-position]="'left'"
+             size="small"
+             [show-icon]="true"
+             [show-message]="true" #form>
 
-    <el-form-item label="Наименование"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('name')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('name')">
-      <el-input formControlName="name" [(model)]="paymentRequisitesData.name"></el-input>
-    </el-form-item>
+      <el-form-item label="Наименование"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('name')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('name')">
+        <el-input formControlName="name" [(model)]="selectedPaymentRequisites.businessTitle"></el-input>
+      </el-form-item>
 
-    <el-form-item label="ИНН"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('inn')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('inn')">
-      <el-input formControlName="inn" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.inn"></el-input>
-    </el-form-item>
+      <el-form-item label="ИНН"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('inn')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('inn')">
+        <el-input formControlName="inn" native-type="number" el-class="no-spinners" [(model)]="selectedPaymentRequisites.INN"></el-input>
+      </el-form-item>
 
-    <el-form-item label="КПП"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('kpp')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('kpp')">
-      <el-input formControlName="kpp" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.kpp"></el-input>
-    </el-form-item>
+      <el-form-item label="КПП"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('kpp')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('kpp')">
+        <el-input formControlName="kpp" native-type="number" el-class="no-spinners" [(model)]="selectedPaymentRequisites.KPP"></el-input>
+      </el-form-item>
 
-    <el-form-item label="Юридический адрес"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('legal_address')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('legal_address')">
-      <el-input formControlName="legal_address" [(model)]="paymentRequisitesData.legal_address"></el-input>
-    </el-form-item>
+      <el-form-item label="Юридический адрес"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('legal_address')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('legal_address')">
+        <el-input formControlName="legal_address" [(model)]="selectedPaymentRequisites.businessAddress"></el-input>
+      </el-form-item>
 
-    <el-form-item [required]="isInEditPaymentRequisitesMode"
-                  label="Физический адрес"
-                  [status]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormStatusCtrl('actual_address') : null"
-                  [error]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormMessageCtrl('actual_address') : null">
-      <el-input formControlName="actual_address"
-                [(model)]="paymentRequisitesData.actual_address"
-                ></el-input>
-    </el-form-item>
+      <el-form-item [required]="isInEditPaymentRequisitesMode"
+                    label="Физический адрес"
+                    [status]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormStatusCtrl('actual_address') : null"
+                    [error]="isInEditPaymentRequisitesMode ? addPaymentRequisitesFormMessageCtrl('actual_address') : null">
+        <el-input formControlName="actual_address"
+                  [(model)]="selectedPaymentRequisites.address">
+        </el-input>
+      </el-form-item>
 
-    <el-form-item label="Наименование банка"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('bank_name')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('bank_name')">
-      <el-input formControlName="bank_name" [(model)]="paymentRequisitesData.bank_name"></el-input>
-    </el-form-item>
+      <el-form-item label="Наименование банка"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('bank_name')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('bank_name')">
+        <el-input formControlName="bank_name" [(model)]="selectedPaymentRequisites.bankTitle"></el-input>
+      </el-form-item>
 
-    <el-form-item label="Расчетный счет"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('checking_account')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('checking_account')">
-      <el-input formControlName="checking_account" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.checking_account"></el-input>
-    </el-form-item>
+      <el-form-item label="Расчетный счет"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('checking_account')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('checking_account')">
+        <el-input formControlName="checking_account" native-type="number" el-class="no-spinners" [(model)]="selectedPaymentRequisites.account"></el-input>
+      </el-form-item>
 
-    <el-form-item label="Корреспондентский счет"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('correspondent_account')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('correspondent_account')">
-      <el-input formControlName="correspondent_account" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.correspondent_account"></el-input>
-    </el-form-item>
+      <el-form-item label="Корреспондентский счет"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('correspondent_account')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('correspondent_account')">
+        <el-input formControlName="correspondent_account" native-type="number" el-class="no-spinners" [(model)]="selectedPaymentRequisites.correspondingAccount"></el-input>
+      </el-form-item>
 
-    <el-form-item label="БИК"
-                  [required]="true"
-                  [status]="addPaymentRequisitesFormStatusCtrl('bik')"
-                  [error]="addPaymentRequisitesFormMessageCtrl('bik')">
-      <el-input formControlName="bik" native-type="number" el-class="no-spinners" [(model)]="paymentRequisitesData.bik"></el-input>
-    </el-form-item>
+      <el-form-item label="БИК"
+                    [required]="true"
+                    [status]="addPaymentRequisitesFormStatusCtrl('bik')"
+                    [error]="addPaymentRequisitesFormMessageCtrl('bik')">
+        <el-input formControlName="bik" native-type="number" el-class="no-spinners" [(model)]="selectedPaymentRequisites.BIK"></el-input>
+      </el-form-item>
 
-    <el-form-item>
-      <div class="mt-2">
-        <el-button type="success"
-                   icon="check"
-                   [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine || companyService.editingPaymentRequisitesInProgress()"
-                   [loading]="companyService.editingPaymentRequisitesInProgress()"
-                   (click)="editPaymentRequisites()">
-          &nbsp; Сохранить
-        </el-button>
-        <el-button type="danger"
-                   icon="close"
-                   [elDisabled]="companyService.editingPaymentRequisitesInProgress()"
-                   (click)="closeEditPaymentRequisitesDialog()">
-          &nbsp; Отмена
-        </el-button>
-      </div>
-    </el-form-item>
+      <!-- Start: Is primary -->
+      <el-form-item label="Основные"
+                    [required]="false">
+        <el-switch [(model)]="selectedPaymentRequisites.isPrimary" (modelChange)="setRequisitesPrimaryStatus($event)"></el-switch>
+      </el-form-item>
+      <!-- End: Is primary -->
 
-  </el-form>
+      <el-form-item>
+        <div class="mt-2">
+          <el-button type="success"
+                     icon="check"
+                     [elDisabled]="addPaymentRequisitesForm.invalid || addPaymentRequisitesForm.pristine || companyService.editingPaymentRequisitesInProgress()"
+                     [loading]="companyService.editingPaymentRequisitesInProgress()"
+                     (click)="editPaymentRequisites()">
+            &nbsp; Сохранить
+          </el-button>
+          <el-button type="danger"
+                     icon="close"
+                     [elDisabled]="companyService.editingPaymentRequisitesInProgress()"
+                     (click)="closeEditPaymentRequisitesDialog()">
+            &nbsp; Отмена
+          </el-button>
+        </div>
+      </el-form-item>
+
+    </el-form>
+  </div>
 </el-dialog>
 <!-- End: Edit payment requisites dialog -->
 

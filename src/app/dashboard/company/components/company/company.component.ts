@@ -51,19 +51,6 @@ export class CompanyComponent implements OnInit {
         product: 0
       }
     };
-    this.paymentRequisitesData = {
-      company_id: this.companyService.getCompany().id,
-      name: '',
-      inn: '',
-      kpp: '',
-      legal_address: '',
-      actual_address: '',
-      bank_name: '',
-      checking_account: '',
-      correspondent_account: '',
-      bik: '',
-      primary: 0
-    };
     this.newPaymentRequisites = new PaymentRequisites();
   }
 
@@ -87,20 +74,6 @@ export class CompanyComponent implements OnInit {
     const KPPRegExp = /^[0-9]{9}$/;
     const accountRegExp = /^[0-9]{20}$/;
     const BIKRegExp = /^[0-9]{9}$/;
-    /*
-    this.addPaymentRequisitesForm = this.builder.group({
-      name: ['', Validators.required],
-      inn: ['', [Validators.required, Validators.pattern(INNRegExp)]],
-      kpp: ['', [Validators.required, Validators.pattern(KPPRegExp)]],
-      legal_address: ['', Validators.required],
-      actual_address: [''],
-      bank_name: ['', Validators.required],
-      checking_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
-      correspondent_account: ['', [Validators.required, Validators.pattern(accountRegExp)]],
-      bik: ['', [Validators.required, Validators.pattern(BIKRegExp)]],
-      primary: [this.paymentRequisitesData.primary === 1 ? true : false]
-    });
-    */
 
     this.addPaymentRequisitesForm = this.builder.group({
       name: [this.newPaymentRequisites.businessTitle, Validators.required],
@@ -396,22 +369,6 @@ export class CompanyComponent implements OnInit {
       bik: paymentRequisites.BIK,
       primary: paymentRequisites.isPrimary
     });
-    /*
-    this.paymentRequisitesData = {
-      id: paymentRequisites.id,
-      company_id: this.companyService.getCompany().id,
-      name: paymentRequisites.businessTitle,
-      inn: paymentRequisites.INN,
-      kpp: paymentRequisites.KPP,
-      legal_address: paymentRequisites.businessAddress,
-      actual_address: paymentRequisites.address,
-      bank_name: paymentRequisites.bankTitle,
-      checking_account: paymentRequisites.account,
-      correspondent_account: paymentRequisites.correspondingAccount,
-      bik: paymentRequisites.BIK,
-      primary: 0
-    };
-    */
   }
 
   /**
@@ -426,29 +383,13 @@ export class CompanyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editPaymentRequisites() {
-    await this.companyService.editPaymentRequisites(this.selectedPaymentRequisites.toDTO(), this.authenticationService.getCurrentUser().companyId)
-      .then(() => {
-        this.selectedPaymentRequisites.businessTitle = requisites.businessTitle;
-        this.selectedPaymentRequisites.INN = requisites.INN;
-        this.selectedPaymentRequisites.KPP = requisites.KPP;
-        this.selectedPaymentRequisites.businessAddress = requisites.businessAddress;
-        this.selectedPaymentRequisites.address = requisites.address;
-        this.selectedPaymentRequisites.bankTitle = requisites.bankTitle;
-        this.selectedPaymentRequisites.BIK = requisites.BIK;
-        this.selectedPaymentRequisites.isPrimary = requisites.isPrimary;
-
-        /*
-        this.selectedPaymentRequisites.businessTitle = this.paymentRequisitesData.name;
-        this.selectedPaymentRequisites.INN = this.paymentRequisitesData.inn;
-        this.selectedPaymentRequisites.KPP = this.paymentRequisitesData.kpp;
-        this.selectedPaymentRequisites.businessAddress = this.paymentRequisitesData.legal_address;
-        this.selectedPaymentRequisites.address = this.paymentRequisitesData.actual_address;
-        this.selectedPaymentRequisites.bankTitle = this.paymentRequisitesData.bank_name;
-        this.selectedPaymentRequisites.BIK = this.paymentRequisitesData.bik;
-        */
-        this.closeEditPaymentRequisitesDialog();
-        this.message['success']('Платежные реквизиты изменены');
-      });
+    await this.companyService.editPaymentRequisites(
+      this.selectedPaymentRequisites.toDTO(),
+      this.authenticationService.getCurrentUser().companyId
+    ).then(() => {
+      this.closeEditPaymentRequisitesDialog();
+      this.message['success']('Платежные реквизиты изменены');
+    });
   }
 
   /**
@@ -517,5 +458,10 @@ export class CompanyComponent implements OnInit {
       .then(() => {
         this.message['success']('Настройки R-Keeper удалены');
       });
+  }
+
+
+  setRequisitesPrimaryStatus(value: boolean) {
+    this.addPaymentRequisitesForm.markAsDirty();
   }
 }

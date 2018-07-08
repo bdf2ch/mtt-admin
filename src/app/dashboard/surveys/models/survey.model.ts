@@ -4,8 +4,9 @@ import { Restaurant } from '../../restaurants/models/restaurant.model';
 import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 import { Question } from './question.model';
 import { IQuestionDTO } from '../dto/question.dto';
-import { Header } from './header.model';
+import { Template } from './template.model';
 import { Footer } from './footer.model';
+import {ITemplateDTO} from "../dto/template.dto";
 
 /**
  * Класс, реализующий интерфейс опроса
@@ -26,8 +27,8 @@ export class Survey implements ISurvey {
   restaurants?: Restaurant[];       // Массив ресторанов, в которых проводится опрос
   needClientDataFirst?: boolean;    // Спрашивать контакты в начале
   questions: Question[];            // Вопросы
-  header: Header;
-  footer: Footer;
+  header: Template;
+  footer: Template;
 
   /**
    * Конструктор
@@ -47,10 +48,23 @@ export class Survey implements ISurvey {
     this.isActive = config ? config.is_active : false;
     this.isDeletable = config ? config.is_deletable : false;
     this.needClientDataFirst = config && config.need_client_data_first ? config.need_client_data_first : true;
-    this.header = config && config.templates ? new Header(config.templates.data[0]) : new Header();
-    this.footer = config && config.templates ? new Footer(config.templates.data[1]) : new Footer();
+    this.header = null;
+    this.footer = null;
     this.restaurants = [];
     this.questions = [];
+
+    if (config && config.templates) {
+      config.templates.data.forEach((template: ITemplateDTO) => {
+        switch (template.type) {
+          case 'header':
+            this.header = new Template(template);
+            break;
+          case 'footer':
+            this.footer = new Template(template);
+            break;
+        }
+      });
+    }
 
     if (config && config.restaurants) {
       config.restaurants.data.forEach((item: IRestaurantDTO) => {

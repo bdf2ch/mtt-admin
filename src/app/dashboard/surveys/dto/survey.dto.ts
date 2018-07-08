@@ -1,6 +1,6 @@
 import { IRestaurantDTO } from '../../restaurants/dto/restaurant.dto';
 import {IQuestionDTO} from './question.dto';
-import {IHeaderDTO} from './header.dto';
+import {ITemplateDTO} from './template.dto';
 
 /**
  * Survey DTO interface
@@ -28,6 +28,6 @@ export interface ISurveyDTO {
     data: IQuestionDTO[];
   };
   templates?: {
-    data: IHeaderDTO[];
+    data: ITemplateDTO[];
   };
 }

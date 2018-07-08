@@ -4,12 +4,12 @@
     <!-- Start: Questions -->
     <div class="questions col-12 col-lg-7 p-4">
 
-      <!-- Start: Header -->
+      <!-- Start: Template -->
       <h3 class="mb-4 d-flex justify-content-between border-left">
         Вопросы
         <el-button type="primary" icon="plus" (click)="openAddQuestionDialog()">&nbsp; Добавить</el-button>
       </h3>
-      <!-- End: Header -->
+      <!-- End: Template -->
 
       <!-- Start: No requisites placeholder -->
       <div *ngIf="surveysService.selectedSurvey().questions.length === 0">
@@ -268,7 +268,7 @@
     <span>Изменение опроса</span>
   </ng-template>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="surveysService.selectedSurvey()">
     <div class="row">
       <div class="col-12">
         <h4 class="text-muted mb-3">Информация об опросе</h4>
@@ -363,7 +363,7 @@
           -->
           <!-- End: Is template -->
 
-          <!-- Start: Header -->
+          <!-- Start: Template -->
           <div class="row">
             <div class="col-12">
               <h4 class="text-muted mb-3">Шапка опроса</h4>
@@ -373,7 +373,7 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('header_url')"
                             [error]="surveyFormMessageCtrl('header_url')">
-                <el-input formControlName="header_url" [(model)]="headerData.url"></el-input>
+                <el-input formControlName="header_url" [(model)]="surveysService.selectedSurvey().header.url"></el-input>
               </el-form-item>
               <!-- End: Url -->
 
@@ -382,7 +382,10 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('header_background_color')"
                             [error]="surveyFormMessageCtrl('header_background_color')">
-                <el-input formControlName="header_background_color" [(model)]="headerData.background_color"></el-input>
+                <el-input
+                  formControlName="header_background_color"
+                  [(model)]="surveysService.selectedSurvey().header.backgroundColor">
+                </el-input>
               </el-form-item>
               <!-- End: Background color -->
 
@@ -391,7 +394,8 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('header_text_content')"
                             [error]="surveyFormMessageCtrl('header_text_content')">
-                <el-input formControlName="header_text_content" [(model)]="headerData.text_content"></el-input>
+                <el-input formControlName="header_text_content"
+                          [(model)]="surveysService.selectedSurvey().header.content"></el-input>
               </el-form-item>
               <!-- End: Content -->
 
@@ -400,12 +404,17 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('header_image')"
                             [error]="surveyFormMessageCtrl('header_image')">
-                <el-upload [upload-filter]="appendHeaderImage.bind(this)" [show-file-list]="true">
-                  <ng-template #trigger>
-                    <el-button size="small" type="primary">Загрузить</el-button>
-                    <span class="text-muted ml-2">{{ headerImage ? headerImage.name : 'Изображение не выбрано' }}</span>
-                  </ng-template>
-                </el-upload>
+                <div class="text-center mb-2">
+                  <img src="{{surveysService.selectedSurvey().header.imageUrl}}" style="width: 100px; height: 100px;">
+                </div>
+                <div class="text-center">
+                  <el-upload [upload-filter]="appendHeaderImage.bind(this)" [show-file-list]="true">
+                    <ng-template #trigger>
+                      <el-button size="small" type="primary">Загрузить</el-button>
+                      <span class="text-muted ml-2">{{ headerImage ? headerImage.name : 'Изображение не выбрано' }}</span>
+                    </ng-template>
+                  </el-upload>
+                </div>
               </el-form-item>
               <!-- End: Image -->
 
@@ -424,7 +433,7 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('footer_url')"
                             [error]="surveyFormMessageCtrl('footer_url')">
-                <el-input formControlName="footer_url" [(model)]="footerData.url"></el-input>
+                <el-input formControlName="footer_url" [(model)]="surveysService.selectedSurvey().footer.url"></el-input>
               </el-form-item>
               <!-- End: Url -->
 
@@ -433,7 +442,10 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('footer_background_color')"
                             [error]="surveyFormMessageCtrl('footer_background_color')">
-                <el-input formControlName="footer_background_color" [(model)]="footerData.background_color"></el-input>
+                <el-input
+                  formControlName="footer_background_color"
+                  [(model)]="surveysService.selectedSurvey().footer.backgroundColor">
+                </el-input>
               </el-form-item>
               <!-- End: Background color -->
 
@@ -442,11 +454,15 @@
                             [required]="true"
                             [status]="surveyFormStatusCtrl('footer_text_content')"
                             [error]="surveyFormMessageCtrl('footer_text_content')">
-                <el-input formControlName="footer_text_content" [(model)]="footerData.text_content"></el-input>
+                <el-input
+                  formControlName="footer_text_content"
+                  [(model)]="surveysService.selectedSurvey().footer.content">
+                </el-input>
               </el-form-item>
               <!-- End: Content -->
 
               <!-- Start: Image -->
+              <!--
               <el-form-item label="Изображение"
                             [required]="true"
                             [status]="surveyFormStatusCtrl('footer_image')"
@@ -458,6 +474,7 @@
                   </ng-template>
                 </el-upload>
               </el-form-item>
+              -->
               <!-- End: Image -->
 
             </div>

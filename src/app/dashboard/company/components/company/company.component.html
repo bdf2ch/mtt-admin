@@ -114,12 +114,12 @@
     <!-- Start: Payment requisites -->
     <div class="col-12 col-lg-6 p-4 border-left">
 
-      <!-- Start: Header -->
+      <!-- Start: Template -->
       <h3 class="mb-4 d-flex justify-content-between">
         Платежные реквизиты
         <el-button type="primary" icon="plus" (click)="openAddPaymentRequisitesDialog()">&nbsp; Добавить</el-button>
       </h3>
-      <!-- End: Header -->
+      <!-- End: Template -->
 
       <!-- Start: No requisites placeholder -->
       <div *ngIf="companyService.getCompany().paymentRequisites.length === 0">

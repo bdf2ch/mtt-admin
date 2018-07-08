@@ -13,7 +13,7 @@ import { IAnswerDTO } from '../../dto/answer.dto';
 import { IRangeDTO } from '../../dto/range.dto';
 import { Question } from '../../models/question.model';
 import { Answer } from '../../models/answer.model';
-import { IHeaderDTO } from '../../dto/header.dto';
+import { ITemplateDTO } from '../../dto/template.dto';
 import { saveAs } from 'file-saver';
 
 @Component({
@@ -43,9 +43,9 @@ export class SurveyComponent implements OnInit {
   public selectedQuestion: Question | null;
   public codesAmount: number;
   public codesForm: FormGroup;
-  public headerData: IHeaderDTO;
+  public headerData: ITemplateDTO;
   public headerImage: File | null;
-  public footerData: IHeaderDTO;
+  public footerData: ITemplateDTO;
   public footerImage: File | null;
 
   constructor(private readonly router: Router,
@@ -171,6 +171,7 @@ export class SurveyComponent implements OnInit {
     this.surveyData.available_passing_count = survey.passingCount;
     this.surveyData.need_client_data_first = survey.needClientDataFirst;
     this.surveyData.is_template = survey.isTemplate;
+    /*
     this.headerData.id = survey.header.id;
     this.headerData.type = survey.header.type;
     this.headerData.url = survey.header.url;
@@ -183,6 +184,11 @@ export class SurveyComponent implements OnInit {
     this.footerData.background_color = survey.footer.backgroundColor;
     this.footerData.text_content = survey.footer.content;
     this.footerData.image_url = survey.footer.imageUrl;
+    */
+    this.headerImage = null;
+    this.footerImage = null;
+    survey.header.image = null;
+    survey.footer.image = null;
     this.surveyForm.reset({
       name: this.surveyData.name,
       description: this.surveyData.description,
@@ -192,12 +198,12 @@ export class SurveyComponent implements OnInit {
       available_passing_count: this.surveyData.available_passing_count,
       need_client_data_first: this.surveyData.need_client_data_first,
       is_template: this.surveyData.is_template,
-      header_url: this.headerData.url,
-      header_text_content: this.headerData.text_content,
-      header_background_color: this.headerData.background_color,
-      footer_url: this.footerData.url,
-      footer_text_content: this.footerData.text_content,
-      footer_background_color: this.footerData.background_color
+      header_url: survey.header.url,
+      header_text_content: survey.header.content,
+      header_background_color: survey.header.backgroundColor,
+      footer_url: survey.footer.url,
+      footer_text_content: survey.footer.content,
+      footer_background_color: survey.footer.backgroundColor
     });
     this.restaurantsService.getRestaurants().forEach((item: Restaurant) => {
       item.isSelected = false;
@@ -694,7 +700,7 @@ export class SurveyComponent implements OnInit {
    * @returns {Promise<void>}
    */
   async editSurvey() {
-    console.log(this.headerData);
+    console.log('headerdata', this.headerData);
     if (!this.headerData.image) {
       delete this.headerData.image;
     }
@@ -724,11 +730,14 @@ export class SurveyComponent implements OnInit {
     this.headerData.image = this.headerImage;
     this.footerData.image = this.footerImage;
     console.log(this.headerData);
-    await this.surveysService.editSurvey(this.surveyData, this.headerData, this.footerData)
-      .then(() => {
-        this.closeEditSurveyDialog();
-        this.message['success']('Опрос изменен');
-      });
+    await this.surveysService.editSurvey(
+      this.surveyData,
+      this.surveysService.selectedSurvey().header.toDTO(),
+      this.surveysService.selectedSurvey().footer.toDTO()
+    ).then(() => {
+      this.closeEditSurveyDialog();
+      this.message['success']('Опрос изменен');
+    });
   }
 
   async setSurveyStatus(isActive: boolean) {
@@ -801,6 +810,7 @@ export class SurveyComponent implements OnInit {
     this.headerImage = f;
     this.headerData.image = f;
     this.surveyForm.markAsDirty();
+    this.surveysService.selectedSurvey().header.image = f;
   }
 
   appendFooterImage(f: File) {

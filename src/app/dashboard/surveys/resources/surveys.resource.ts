@@ -15,7 +15,7 @@ import {IQuestionDTO} from '../dto/question.dto';
 import {IQuestionFormDTO} from '../dto/question-form.dto';
 import {IAnswerDTO} from '../dto/answer.dto';
 import {IRangeDTO} from '../dto/range.dto';
-import {IHeaderDTO} from '../dto/header.dto';
+import {ITemplateDTO} from '../dto/template.dto';
 import {ICodeDTO} from '../dto/code.dto';
 import {IReportDTO} from '../dto/report.dto';
 import {IReportFiltersDTO} from '../dto/report-filters.dto';
@@ -279,14 +279,19 @@ export class SurveysResource extends Resource {
     method: ResourceRequestMethod.Post,
     withCredentials: true
   })
-  addHeader: IResourceMethodStrict<IHeaderDTO, void, void, IServerResponse<IHeaderDTO>>;
+  addHeader: IResourceMethodStrict<ITemplateDTO, void, void, IServerResponse<ITemplateDTO>>;
 
   @ResourceAction({
     path: '/questionnaire-template/{!templateId}',
     method: ResourceRequestMethod.Patch,
-    withCredentials: true
+    withCredentials: true,
+    // requestBodyType: ResourceRequestBodyType.FORM_DATA,
+    headers: {
+      'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : '',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
-  editHeader: IResourceMethodStrict<FormData, void, {templateId: number}, IServerResponse<IHeaderDTO>>;
+  editHeader: IResourceMethodStrict<any, void, {templateId: number}, IServerResponse<ITemplateDTO>>;
 
   @ResourceAction({
     path: '/questionnaire/{!surveyId}/statistic',

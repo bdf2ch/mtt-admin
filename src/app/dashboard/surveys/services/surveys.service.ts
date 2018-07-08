@@ -15,8 +15,8 @@ import { IAnswerDTO } from '../dto/answer.dto';
 import { IRangeDTO } from '../dto/range.dto';
 import { QuestionRange } from '../models/question-range.model';
 import { IQuestionFormType } from '../interfaces/question-form-type.interface';
-import { IHeaderDTO } from '../dto/header.dto';
-import { Header } from '../models/header.model';
+import { ITemplateDTO } from '../dto/template.dto';
+import { Template } from '../models/template.model';
 import { Code } from '../models/code.model';
 import { ICodeDTO } from '../dto/code.dto';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -26,6 +26,10 @@ import { IReportFiltersDTO } from '../dto/report-filters.dto';
 import { ComparsionReport } from '../models/comparsion-report.model';
 import { SurveyResult } from '../models/survey-result.model';
 import { ISurveyResultDTO } from '../dto/survey-result.dto';
+import {Observable} from 'rxjs';
+import 'rxjs/operators/map';
+import {map} from 'rxjs/operators';
+import {IServerResponse} from '../../../shared/interfaces/server-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -307,7 +311,7 @@ export class SurveysService {
    * @param {ISurveyDTO} survey - Опрос
    * @returns {Promise<Survey | null>}
    */
-  async editSurvey(survey: ISurveyDTO, header: IHeaderDTO, footer: IHeaderDTO): Promise<Survey | null> {
+  async editSurvey(survey: ISurveyDTO, header: ITemplateDTO, footer: ITemplateDTO): Promise<Survey | null> {
     console.log('header', header);
     try {
       this.isEditingSurveyInProgress = true;
@@ -319,7 +323,7 @@ export class SurveysService {
             item.title = survey.name;
             item.description = survey.description;
             item.start = new Date(survey.from);
-            item.end = survey.to !== '' ? new Date(survey.to) : null;
+            item.end = survey.to ? new Date(survey.to) : null;
             item.rewardId = survey.reward_id;
             item.passingCount = survey.available_passing_count;
             item.needClientDataFirst = survey.need_client_data_first;
@@ -331,8 +335,20 @@ export class SurveysService {
                 item.restaurants.push(restaurant);
               });
             }
-            await this.editHeader(header, survey.id);
-            await this.editHeader(footer, survey.id);
+
+            await this.editTemplate_(new Template(header), header.id)
+              .subscribe((data: Template) => {
+                console.log('HEADER', data);
+                this.selectedSurvey().header = data;
+              });
+
+            await this.editTemplate_(new Template(footer), footer.id)
+              .subscribe((data: Template) => {
+                console.log('FOOTER', data);
+                this.selectedSurvey().footer = data;
+              });
+
+           // await this.editTemplate(new Template(footer), survey.id);
             return item;
           }
         });
@@ -851,15 +867,15 @@ export class SurveysService {
 
   /**
    * Добавление шапки опроса
-   * @param {IHeaderDTO} header - Шапка
+   * @param {ITemplateDTO} header - Шапка
    * @param {number} surveyId - Идентфикатор опроса
-   * @returns {Promise<IHeaderDTO | null>}
+   * @returns {Promise<ITemplateDTO | null>}
    */
-  async addHeader(header: IHeaderDTO, surveyId: number): Promise<Header | null> {
+  async addHeader(header: ITemplateDTO, surveyId: number): Promise<Template | null> {
     try {
       const result = await this.resource.addHeader(header, null, null);
       if (result.data) {
-        const header_ = new Header(result.data);
+        const header_ = new Template(result.data);
         const findSurveyById = (item: Survey) => item.id === surveyId;
         const survey = this.surveys.find(findSurveyById);
         if (survey) {
@@ -873,47 +889,51 @@ export class SurveysService {
     }
   }
 
-  async editHeader(header: IHeaderDTO, surveyId: number): Promise<Header | null> {
+  async editTemplate(template: Template, surveyId: number): Promise<Template | null> {
     try {
-      console.log(header);
-      const headerFormData = new FormData();
-      for (const attr in header) {
-        headerFormData.append(attr, header[attr]);
-      }
-      /*
-      headerFormData.append('id', header.id.toString());
-      headerFormData.append('type', header.type);
-      headerFormData.append('url', header.url);
-      headerFormData.append('text_content', header.text_content);
-      headerFormData.append('background_color', header.background_color);
-      headerFormData.append('image', header.image);
-      */
-      console.log('form image', headerFormData.get('image'));
-      console.log('form image', headerFormData.get('text_content'));
-      const result = await this.resource.editHeader(headerFormData, null, {templateId: header.id});
+      console.log(template);
+      const result = await this.resource.editHeader(template.toDTO(), null, {templateId: template.id});
       if (result.data) {
         const findSurveyById = (item: Survey) => item.id === surveyId;
         const survey = this.surveys.find(findSurveyById);
         if (survey) {
-          if (header.type === 'header') {
-            survey.header.url = header.url;
-            survey.header.content = header.text_content;
-            survey.header.backgroundColor = header.background_color;
-            survey.header.imageUrl = result.data.image_url;
+          if (template.type === 'header') {
+            survey.header = new Template(result.data);
+            // survey.header.url = template.url;
+            // survey.header.content = template.text_content;
+            // survey.header.backgroundColor = template.background_color;
+            // survey.header.imageUrl = result.data.image_url;
           }
-          if (header.type === 'footer') {
-            survey.footer.url = header.url;
-            survey.footer.content = header.text_content;
-            survey.footer.backgroundColor = header.background_color;
-            survey.footer.imageUrl = result.data.image_url;
+          if (template.type === 'footer') {
+            survey.footer = new Template(result.data);
+            // survey.footer.url = template.url;
+            // survey.footer.content = template.text_content;
+            // survey.footer.backgroundColor = template.background_color;
+            // survey.footer.imageUrl = result.data.image_url;
           }
-          return header.type === 'header' ? survey.header : survey.footer;
+          return template.type === 'template' ? survey.header : survey.footer;
         }
       }
     } catch (error) {
       console.error(error);
       return null;
     }
+  }
+
+  editTemplate_(template: Template, templateId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': window.localStorage && window.localStorage['api_token'] ? `Bearer ${window.localStorage['api_token']}` : '',
+    });
+    const request = this.http.post(
+      environment.apiUrl + `questionnaire-template/${templateId}`,
+      template.toFormData(),
+      {headers: headers}
+    ).pipe(map((result: IServerResponse<ITemplateDTO>) => {
+      const tpl = new Template(result.data);
+      console.log('recieved template', tpl);
+      return tpl;
+    }));
+    return request;
   }
 
 
@@ -1053,7 +1073,7 @@ export class SurveysService {
           if (item.id === resultId) {
             item.viewed = status;
           }
-        })
+        });
         if (this.commonReport) {
           if (status) {
             this.commonReport.views.notViewed--;

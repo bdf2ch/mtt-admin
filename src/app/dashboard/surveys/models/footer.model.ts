@@ -1,4 +1,4 @@
-import { IHeaderDTO } from '../dto/header.dto';
+import { ITemplateDTO } from '../dto/template.dto';
 
 export class Footer {
   id: number;
@@ -8,7 +8,7 @@ export class Footer {
   content: string;
   imageUrl: string;
 
-  constructor(config?: IHeaderDTO) {
+  constructor(config?: ITemplateDTO) {
     this.id = config ? config.id : 0;
     this.type = 'footer';
     this.url = config ? config.url : '';

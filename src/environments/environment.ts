@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://85.143.175.18/api/'
+  apiUrl: 'https://bk.restkarma.ru/api/'
 };
 
 /*

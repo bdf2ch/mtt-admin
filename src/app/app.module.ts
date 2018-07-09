@@ -38,6 +38,8 @@ import { AdminResolveGuard } from './dashboard/admin/guards/admin.resolve.guard'
 import { TestComponent } from './dashboard/test/test.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ReportComponent } from './dashboard/surveys/components/report/report.component';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { AccessDeniedComponent } from './shared/components/access-denied/access-denied.component';
 
 const routes: Routes = [
   {
@@ -118,6 +120,10 @@ const routes: Routes = [
     path: 'auth',
     component: LogInComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: '**',
+    component: NotFoundComponent
   }
 ];
 
@@ -125,7 +131,9 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     DashboardComponent,
-    TestComponent
+    TestComponent,
+    NotFoundComponent,
+    AccessDeniedComponent
   ],
   imports: [
     BrowserModule,

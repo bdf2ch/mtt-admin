@@ -23,6 +23,10 @@ export class Question {
   stat: any[];
   statTotal: number;
   comparsion: Comparsion[];
+  asOption?: {
+    label: string;
+    value: any;
+  };
 
   /**
    * Конструктор
@@ -42,6 +46,10 @@ export class Question {
     this.stat = [];
     this.statTotal = 0;
     this.comparsion = [];
+    this.asOption = {
+      label: this.title,
+      value: this.id
+    };
 
     if (config && config.answers) {
       config.answers.data.forEach((item: IAnswerDTO) => {
@@ -54,14 +62,15 @@ export class Question {
           });
           this.statTotal += answer.stat.value;
         }
-        if (this.form.type === 'mark') {
-          this.stat.push({
-            name: this.title,
-            value: this.range.stat.value
-          });
-          this.statTotal += this.range.stat.value;
-        }
       });
+    }
+
+    if (config && config.range.data.id) {
+      this.stat.push({
+        name: this.title,
+        value: this.range.stat.value
+      });
+      this.statTotal += this.range.stat.value;
     }
 
     if (config && config.statistic) {

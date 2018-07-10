@@ -80,4 +80,23 @@ export class Survey implements ISurvey {
       });
     }
   }
+
+  getResturantsOptions(): any[] {
+    const result = [];
+    this.restaurants.forEach((item: Restaurant) => {
+      result.push(item.asOption);
+    });
+    return result;
+  }
+
+  getQuestionsOptions(): any[] {
+    const result = [];
+    this.questions.forEach((item: Question) => {
+      if (item.form.type === 'mark') {
+        result.push(item.asOption);
+      }
+    });
+    return result;
+  }
 }
+

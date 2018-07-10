@@ -4,25 +4,27 @@ import { IUserDTO } from '../dto/user.dto';
 import { IRoleDTO } from '../dto/role.dto';
 import { Role } from './role.model';
 import { Company } from '../../company/models/company.model';
+import {PermissionManager} from './permission-manager.model';
 
 /**
  * Класс, реализующий интерфейс пользователя
  */
 export class User implements IUser {
-  id: number;                 // Идентификатор
-  companyId: number;          // Идентификатор компании
-  firstName: string;          // Имя
-  secondName: string;         // Отчество
-  lastName: string;           // Фамилия
-  email: string;              // E-mail
-  // password: string;           // Пароль
-  phone: string | null;       // Телефон
-  isActive: boolean;          // Включен ли пользователь
-  isOwner: boolean;           // Является ли владельцем
-  roles: IRole[];             // Набор ролей
-  fio: string;                // ФИО
-  rolesLabel: string;         // роли одной строкой
-  company?: Company;          // Компания пользователя
+  id: number;                       // Идентификатор
+  companyId: number;                // Идентификатор компании
+  firstName: string;                // Имя
+  secondName: string;               // Отчество
+  lastName: string;                 // Фамилия
+  email: string;                    // E-mail
+  // password: string;              // Пароль
+  phone: string | null;             // Телефон
+  isActive: boolean;                // Включен ли пользователь
+  isOwner: boolean;                 // Является ли владельцем
+  roles: Role[];                   // Набор ролей
+  fio: string;                      // ФИО
+  rolesLabel: string;               // Роли одной строкой
+  company?: Company;                // Компания пользователя
+  permissions: PermissionManager;   // Роли и права пользователя
 
   /**
    * Конструктор
@@ -42,12 +44,14 @@ export class User implements IUser {
     this.fio = `${this.firstName} ${this.secondName} ${this.lastName}`;
     this.roles = [];
     this.rolesLabel = '';
+    // this.permissions = new PermissionManager();
 
     if (config && config.roles) {
-      config.roles.data.forEach((item: IRoleDTO, index: number, array: IRoleDTO[]) => {
+      config.roles.data.forEach((item: IRoleDTO) => {
         const role = new Role(item);
         this.roles.push(role);
       });
+      this.permissions = new PermissionManager(this.roles);
       this.generateRolesLabel();
     }
   }

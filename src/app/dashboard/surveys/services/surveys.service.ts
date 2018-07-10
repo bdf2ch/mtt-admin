@@ -850,7 +850,7 @@ export class SurveysService {
         const findSurveyById = (survey: Survey) => survey.id === surveyId;
         const survey_ = this.surveys.find(findSurveyById);
         if (survey_) {
-          survey_.passingCount += amount;
+          survey_.passingCount += Number(amount);
         }
         return this.selectedSurveyCodes;
       }

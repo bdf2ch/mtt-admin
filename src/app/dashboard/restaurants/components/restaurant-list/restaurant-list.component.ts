@@ -187,6 +187,7 @@ export class RestaurantListComponent implements OnInit {
     this.geo = await this.yandexService.getGeoPosition(
       `${this.addressData.city}, ${this.addressData.street}, ${this.addressData.building_number}`
     );
+    this.restaurantData.point = this.geo;
     console.log(this.geo);
   }
 

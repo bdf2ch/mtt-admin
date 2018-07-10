@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SurveysService } from '../../services/surveys.service';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Restaurant } from '../../../restaurants/models/restaurant.model';
 import { IReportFiltersDTO } from '../../dto/report-filters.dto';
 import { RestaurantsService } from '../../../restaurants/services/restaurants.service';
 import { SurveyResult } from '../../models/survey-result.model';
@@ -19,6 +18,7 @@ export class ReportComponent implements OnInit {
   public filterData: IReportFiltersDTO;
   public emailForm: FormGroup;
   public email: string;
+  public questionFormType: string;
 
   constructor(private readonly formBuilder: FormBuilder,
               public readonly surveysService: SurveysService,
@@ -26,11 +26,13 @@ export class ReportComponent implements OnInit {
               private readonly message: ElMessageService) {
     this.isInSendEmailMode = false;
     this.selectedTabIndex = 1;
+    this.questionFormType = '';
     this.email = null;
     this.filterData = {
       date_from: null,
       date_to: null,
-      restaurants_ids: []
+      restaurants_ids: [],
+      questions_ids: []
     };
   }
 
@@ -177,6 +179,17 @@ export class ReportComponent implements OnInit {
 
   selectTab(index: number) {
     this.selectedTabIndex = index;
+    switch (index) {
+      case 1:
+        this.questionFormType = '';
+        break;
+      case 2:
+        this.questionFormType = 'mark';
+        break;
+      case 3:
+        this.questionFormType = 'text_input';
+        break;
+    }
   }
 
   changeRestaurant(value: any) {
@@ -185,11 +198,18 @@ export class ReportComponent implements OnInit {
     console.log(this.filterData);
   }
 
+  changeQuestion(value: any) {
+    console.log(value);
+    this.filterData.questions_ids = value;
+    console.log(this.filterData);
+  }
+
   async getReport() {
     const data: IReportFiltersDTO = {
       date_from: this.filterData.date_from,
       date_to: this.filterData.date_to,
-      restaurants_ids: this.filterData.restaurants_ids
+      restaurants_ids: this.filterData.restaurants_ids,
+      questions_ids: this.filterData.questions_ids
     };
     if (!data.date_from) {
       delete data.date_from;
@@ -199,6 +219,9 @@ export class ReportComponent implements OnInit {
     }
     if (data.restaurants_ids.length === 0) {
       delete data.restaurants_ids;
+    }
+    if (data.questions_ids.length === 0) {
+      delete data.questions_ids;
     }
     switch (this.selectedTabIndex) {
       case 1:

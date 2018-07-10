@@ -16,6 +16,7 @@ import { SurveyComponent } from './components/survey/survey.component';
 import { SurveyResolveGuard } from './guards/survey-resolve.guard';
 import { ReportComponent } from './components/report/report.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ByQuestionTypePipe } from './pipes/by-question-type.pipe';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     SurveysListComponent,
     RewardsListComponent,
     SurveyComponent,
-    ReportComponent
+    ReportComponent,
+    ByQuestionTypePipe
   ],
   providers: [
     SurveysResource,

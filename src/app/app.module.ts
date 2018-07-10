@@ -40,12 +40,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ReportComponent } from './dashboard/surveys/components/report/report.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { AccessDeniedComponent } from './shared/components/access-denied/access-denied.component';
+import {CanActivateChildGuard} from './shared/guards/can-activate-child.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     canActivate: [UserSessionGuard],
+    canActivateChild: [CanActivateChildGuard],
     children: [
       {
         path: '',
@@ -124,6 +126,10 @@ const routes: Routes = [
   {
     path: '**',
     component: NotFoundComponent
+  },
+  {
+    path: 'restricted',
+    component: AccessDeniedComponent
   }
 ];
 

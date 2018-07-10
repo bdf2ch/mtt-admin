@@ -15,8 +15,9 @@ import { Injectable } from '@angular/core';
 @ResourceParams({
   pathPrefix: 'https://geocode-maps.yandex.ru/1.x',
   headers: {
-    'Access-Control-Allow-Origin': 'Origin',
-    'Access-Control-Allow-Headers': 'ALL'
+    'Content-Type': 'text/plain',
+    // 'Access-Control-Allow-Headers': 'POST, GET, PUT, DELETE, OPTIONS, HEAD, authorization',
+    'Access-Control-Allow-Origin': '*',
   }
 })
 export class YandexResource extends Resource {

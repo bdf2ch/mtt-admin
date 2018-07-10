@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://bk.restkarma.ru/api/'
+  apiUrl: 'https://bk.restkarma.ru/api/',
+  yandexMapsApiKey: 'AEFgRFsBAAAAQ9gifAMAMsG8vLj4WANUgd3JIIB3ke1m58YAAAAAAAAAAAAjadBx0A8cAfv9Lnqkj1h2QazFSA=='
 };
 
 /*

@@ -1,5 +1,6 @@
 import { Permission } from './permission.model';
 import { Role } from './role.model';
+import { IRole } from '../interfaces/role.interface';
 
 export class PermissionManager {
   private roles: Role[];
@@ -9,7 +10,13 @@ export class PermissionManager {
     this.roles = [];
     this.permissions = [];
     if (config) {
+      console.log('perm config', config);
       config.forEach((role: Role) => {
+        const findRoleById = (item: Role) => item.id === role.id;
+        const role_ = this.roles.find(findRoleById);
+        if (!role_) {
+          this.roles.push(role);
+        }
         role.permissions.forEach((permission: Permission) => {
           const findPermissionByCode = (item: Permission) => item.code === permission.code;
           const permission_ = this.permissions.find(findPermissionByCode);

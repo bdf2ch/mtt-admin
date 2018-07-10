@@ -1,6 +1,7 @@
 import { ITimeTableDTO } from './time-table.dto';
-import {IAddressDTO} from './address.dto';
-import {ISocialNetworkDTO} from './social-network.dto';
+import { IAddressDTO } from './address.dto';
+import { ISocialNetworkDTO } from './social-network.dto';
+import {IGeoPosition} from '../interfaces/geo-position.interface';
 
 /**
  * Restaurant DTO interface
@@ -25,6 +26,7 @@ export interface IRestaurantDTO {
     };
   };
   address?: IAddressDTO;                          // Адрес
+  point?: IGeoPosition;
   workIntervals?: {                               // Расписание работы
     data: ITimeTableDTO
   };

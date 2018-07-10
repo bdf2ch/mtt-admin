@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { YandexResource } from '../resources/yandex.resource';
 import { IGeoPosition } from '../interfaces/geo-position.interface';
+import { environment } from './../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

@@ -797,7 +797,7 @@ export class SurveyComponent implements OnInit {
    * Генерация кодов опроса
    * @returns {Promise<void>}
    */
-  async  generateCodes() {
+  async generateCodes() {
     await this.surveysService.generateCodes(this.surveysService.selectedSurvey().id, this.codesAmount)
       .then(() => {
         this.closeGenerateCodesDialog();

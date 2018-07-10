@@ -54,6 +54,7 @@ export class SurveysService {
   private comparsionReport: Report | null;
   private feedbackReport: SurveyResult[];
   private selectedSurveyResult: SurveyResult | null;
+  public feedbackTotal: number;
 
   constructor(private readonly resource: SurveysResource,
               private readonly http: HttpClient) {
@@ -76,6 +77,7 @@ export class SurveysService {
     this.comparsionReport = null;
     this.feedbackReport = [];
     this.selectedSurveyResult = null;
+    this.feedbackTotal = 0;
   }
 
   /**

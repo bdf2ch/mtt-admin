@@ -19,6 +19,7 @@ export class ReportComponent implements OnInit {
   public emailForm: FormGroup;
   public email: string;
   public questionFormType: string;
+  public currentPage: number;
 
   constructor(private readonly formBuilder: FormBuilder,
               public readonly surveysService: SurveysService,
@@ -27,12 +28,14 @@ export class ReportComponent implements OnInit {
     this.isInSendEmailMode = false;
     this.selectedTabIndex = 1;
     this.questionFormType = '';
+    this.currentPage = 1;
     this.email = null;
     this.filterData = {
       date_from: null,
       date_to: null,
       restaurants_ids: [],
-      questions_ids: []
+      questions_ids: [],
+      page: this.currentPage
     };
   }
 
@@ -281,5 +284,16 @@ export class ReportComponent implements OnInit {
         this.surveysService.selectedResult(null);
         console.log(this.surveysService.selectedResult());
       });
+  }
+
+  /**
+   * Изменение стариницы отображения отзывов
+   * @param {number} page - Страница
+   */
+  async changePage(page: number) {
+    console.log('page', page);
+    console.log(this.filterData);
+    this.filterData.page = this.currentPage;
+    await this.surveysService.fetchSurveyResults(this.surveysService.selectedSurvey().id, this.filterData);
   }
 }

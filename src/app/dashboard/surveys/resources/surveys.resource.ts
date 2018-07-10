@@ -315,7 +315,7 @@ export class SurveysResource extends Resource {
     withCredentials: true,
     queryMappingMethod: ResourceQueryMappingMethod.Bracket
   })
-  getFeedbackReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[], questions_ids?: number[]}, {surveyId: number}, IServerResponse<ISurveyResultDTO[]>>;
+  getFeedbackReport: IResourceMethodStrict<null, {date_from?: string, date_to?: string, restaurants_ids?: number[], questions_ids?: number[], page?: number}, {surveyId: number}, IServerResponse<ISurveyResultDTO[]>>;
 
   @ResourceAction({
     path: '/questionnaire-result/{!surveyId}/send-to-email',

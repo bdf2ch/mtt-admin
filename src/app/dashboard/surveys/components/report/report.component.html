@@ -150,7 +150,7 @@
                   </thead>
                   <tbody>
                   <tr *ngFor="let question of surveysService.getComparsionReport().questions; let i = index;">
-                    <td>{{ i + 1 }}</td>
+                    <td>{{ (i + 1) * currentPage }}</td>
                     <td>{{ question.title }}</td>
                     <td *ngFor="let comparsion of question.comparsion">{{ comparsion.stat.value }}%</td>
                   </tr>
@@ -191,6 +191,18 @@
                   <td>{{ result.restaurantId }}</td>
                   <td>
                     <el-button type="success" size="small" (click)="selectSurveyResult(result)">Смотреть</el-button>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="5" class="text-center">
+                    <el-pagination [total]="26"
+                                   [page-size]="15"
+                                   [(model)]="currentPage"
+                                   (modelChange)="changePage($event)"
+                                   [layout]="['prev', 'pager', 'next']">
+
+
+                    </el-pagination>
                   </td>
                 </tr>
                 </tbody>

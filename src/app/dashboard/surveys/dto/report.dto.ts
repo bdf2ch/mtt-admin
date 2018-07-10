@@ -12,5 +12,10 @@ export interface IReportDTO {
     not_viewed: number;
     total: number;
   };
+  meta?: {
+    page: number;
+    last_page: number;
+    total: number;
+  };
 }
 
